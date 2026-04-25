@@ -38,7 +38,7 @@ body {
 }
 
 /* Mobile specific styling */
-@media (max-width: 768px) {
+@media (pointer: coarse), (max-width: 850px), (max-height: 500px) {
   .App {
     height: 100dvh;
   }
