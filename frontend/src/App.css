@@ -41,6 +41,7 @@ body {
 @media (pointer: coarse), (max-width: 850px), (max-height: 500px) {
   .App {
     height: 100dvh;
+    background-color: #35682d;
   }
   .App-header h1, .instructions, .controls-panel {
     display: none; /* Hide HTML UI on mobile to maximize game space */
@@ -51,6 +52,7 @@ body {
     border: none;
     border-radius: 0;
     margin-bottom: 0;
+    background-color: #35682d;
   }
 }
 
