@@ -14,8 +14,12 @@ import LevelUpScene from './scenes/LevelUpScene';
 export const config = {
     type: Phaser.AUTO,
     parent: 'phaser-container',
-    width: 800,
-    height: 600,
+    scale: {
+        mode: Phaser.Scale.FIT,
+        autoCenter: Phaser.Scale.CENTER_BOTH,
+        width: 800,
+        height: 600
+    },
     backgroundColor: '#35682d',
     physics: {
         default: 'arcade',

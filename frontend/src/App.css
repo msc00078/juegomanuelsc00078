@@ -8,6 +8,8 @@ body {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
+  overflow: hidden; /* Prevent scrolling on mobile */
+  touch-action: none; /* Prevent pinch-zoom and pull-to-refresh */
 }
 
 .App {
@@ -15,19 +17,20 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 100%;
+  height: 100vh;
 }
 
 .App-header h1 {
-  margin-bottom: 0.2rem;
-  color: #ffcc00;
+  display: none; /* Hide header on mobile for more space */
 }
 
 .game-container {
-  border: 4px solid #fff;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 0 20px rgba(0,255,0,0.2);
-  margin-bottom: 1rem;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .instructions {
