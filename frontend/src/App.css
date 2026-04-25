@@ -40,14 +40,14 @@ body {
 /* Mobile specific styling */
 @media (max-width: 768px) {
   .App {
-    height: 100vh;
+    height: 100dvh;
   }
   .App-header h1, .instructions, .controls-panel {
     display: none; /* Hide HTML UI on mobile to maximize game space */
   }
   .game-container {
     width: 100vw;
-    height: 100vh;
+    height: 100dvh;
     border: none;
     border-radius: 0;
     margin-bottom: 0;
