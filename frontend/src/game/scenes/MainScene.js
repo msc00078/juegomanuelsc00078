@@ -40,7 +40,7 @@ export default class MainScene extends Phaser.Scene {
         if (this.registry.get('runXp') === undefined) this.registry.set('runXp', 0);
         if (this.registry.get('xpToNext') === undefined) this.registry.set('xpToNext', 50);
         if (this.registry.get('combo') === undefined) this.registry.set('combo', 0);
-        
+
         this.currentLevel = this.registry.get('currentLevel') || 1;
         this.gold = this.registry.get('gold');
         this.gameOver = false;
@@ -50,11 +50,11 @@ export default class MainScene extends Phaser.Scene {
     create() {
         // Ajustar límites del mundo físico para respetar el HUD superior (60px)
         this.physics.world.setBounds(0, 60, 800, 540);
-        
+
         this.add.grid(400, 300, 800, 600, 32, 32, 0x35682d, 1, 0x22441d, 1);
 
         this.player = new Player(this, 400, 500);
-        
+
         this.enemies = [];
         this.golds = this.physics.add.group();
         this.hearts = this.physics.add.group();
@@ -72,32 +72,32 @@ export default class MainScene extends Phaser.Scene {
         this.drawVignette();
 
         this.topPanel = this.add.rectangle(400, 30, 800, 60, 0x000000, 0.6).setDepth(100).setScrollFactor(0);
-        
+
         let nodeLabel = this.nodeType.toUpperCase();
-        this.levelText = this.add.text(400, 20, `NIVEL ${this.currentLevel} • ${nodeLabel}`, { 
-            fontSize: '22px', fill: '#00ffff', fontStyle: 'bold', stroke: '#000', strokeThickness: 3 
+        this.levelText = this.add.text(400, 20, `NIVEL ${this.currentLevel} • ${nodeLabel}`, {
+            fontSize: '22px', fill: '#00ffff', fontStyle: 'bold', stroke: '#000', strokeThickness: 3
         }).setOrigin(0.5).setDepth(101).setScrollFactor(0);
 
         // Barra de vida gráfica
         this.hpBarBg = this.add.rectangle(120, 45, 150, 15, 0x333333).setDepth(101).setScrollFactor(0);
         this.hpBar = this.add.rectangle(120, 45, 150, 15, 0x00ff00).setDepth(102).setScrollFactor(0);
-        this.playerHpText = this.add.text(120, 25, `HP: ${this.player.hp}/${this.player.maxHp}`, { 
-            fontSize: '14px', fill: '#fff', fontStyle: 'bold' 
+        this.playerHpText = this.add.text(120, 25, `HP: ${this.player.hp}/${this.player.maxHp}`, {
+            fontSize: '14px', fill: '#fff', fontStyle: 'bold'
         }).setOrigin(0.5).setDepth(103).setScrollFactor(0);
 
         // Barra de XP gráfica
         this.xpBarBg = this.add.rectangle(120, 62, 150, 8, 0x333333).setDepth(101).setScrollFactor(0);
         this.xpBar = this.add.rectangle(120, 62, 150, 8, 0x00ffff).setDepth(102).setScrollFactor(0);
-        this.runLevelText = this.add.text(120, 75, `LVL: ${this.registry.get('runLevel')}`, { 
-            fontSize: '12px', fill: '#00ffff', fontStyle: 'bold' 
+        this.runLevelText = this.add.text(120, 75, `LVL: ${this.registry.get('runLevel')}`, {
+            fontSize: '12px', fill: '#00ffff', fontStyle: 'bold'
         }).setOrigin(0.5).setDepth(103).setScrollFactor(0);
 
-        this.goldText = this.add.text(780, 30, `🪙 ${this.gold}`, { 
-            fontSize: '22px', fill: '#ffd700', fontStyle: 'bold' 
+        this.goldText = this.add.text(780, 30, `🪙 ${this.gold}`, {
+            fontSize: '22px', fill: '#ffd700', fontStyle: 'bold'
         }).setOrigin(1, 0.5).setDepth(101).setScrollFactor(0);
-        
-        this.weaponText = this.add.text(400, 570, "1 - ESPADA", { 
-            fontSize: '18px', fill: '#fff', backgroundColor: '#0077ff', padding: {x: 15, y: 5} 
+
+        this.weaponText = this.add.text(400, 570, "1 - ESPADA", {
+            fontSize: '18px', fill: '#fff', backgroundColor: '#0077ff', padding: { x: 15, y: 5 }
         }).setOrigin(0.5).setDepth(101).setScrollFactor(0);
 
         // Atajos de teclado adicionales
@@ -122,11 +122,11 @@ export default class MainScene extends Phaser.Scene {
             // Boss Intro Cinematic
             this.cameras.main.flash(1000, 255, 0, 0);
             this.cameras.main.shake(1000, 0.02);
-            
+
             this.boss = new Boss(this, 400, 150, this.bossType);
             this.bossHpContainer.setVisible(true);
             this.bossNameText.setText(this.bossType.toUpperCase());
-            
+
             this.bossText = this.add.text(400, 110, "¡PREPÁRATE PARA TU FINAL!", {
                 fontSize: '20px', fill: '#ff0000', backgroundColor: '#000', fontStyle: 'bold', padding: { x: 10, y: 5 }
             }).setOrigin(0.5).setDepth(101);
@@ -142,7 +142,7 @@ export default class MainScene extends Phaser.Scene {
             this.physics.add.overlap(this.player.sword, this.boss.sprite, () => {
                 if (this.player.isAttacking && this.boss.hp > 0) {
                     this.pushBack(this.boss.sprite, this.player.sprite, 100);
-                    this.boss.takeDamage(this.getPlayerDamage() / 2); 
+                    this.boss.takeDamage(this.getPlayerDamage() / 2);
                     this.updateUI();
                 }
             });
@@ -167,7 +167,7 @@ export default class MainScene extends Phaser.Scene {
                 if (this.boss.hp > 0) {
                     const relics = this.registry.get('relics') || [];
                     if (!relics.includes('perforante')) arrow.destroy();
-                    this.boss.takeDamage(10); 
+                    this.boss.takeDamage(10);
                     this.updateUI();
                 }
             });
@@ -204,7 +204,7 @@ export default class MainScene extends Phaser.Scene {
         this.physics.add.overlap(this.player.sprite, this.hearts, (playerSprite, heartObj) => {
             heartObj.destroy();
             this.player.hp += 20;
-            if(this.player.hp > this.player.maxHp) this.player.hp = this.player.maxHp;
+            if (this.player.hp > this.player.maxHp) this.player.hp = this.player.maxHp;
             this.updateUI();
             this.createParticles(this.player.sprite.x, this.player.sprite.y, 0x00ff00);
         });
@@ -216,10 +216,10 @@ export default class MainScene extends Phaser.Scene {
 
         this.crates = this.physics.add.staticGroup();
         this.physics.add.collider(this.player.sprite, this.crates);
-        
+
         // Usar group en lugar de map para que afecte a futuros enemigos
         this.physics.add.collider(this.enemySprites, this.crates);
-        
+
         this.physics.add.overlap(this.player.sword, this.crates, (sword, crate) => {
             if (this.player.isAttacking) {
                 this.destroyCrate(crate);
@@ -227,17 +227,17 @@ export default class MainScene extends Phaser.Scene {
         });
 
         this.spawnCrates();
-        
+
         this.updateUI();
     }
 
     getPlayerDamage() {
         let dmg = Number(this.registry.get('swordDamage'));
         if (isNaN(dmg) || dmg <= 0) dmg = 10;
-        
+
         const relics = this.registry.get('relics') || [];
         if (relics.includes('berserker') && this.player.hp < (this.player.maxHp * 0.3)) {
-            dmg = dmg * 1.5; 
+            dmg = dmg * 1.5;
         }
         return dmg;
     }
@@ -245,22 +245,22 @@ export default class MainScene extends Phaser.Scene {
     showElitePrompt() {
         const bg = this.add.rectangle(400, 300, 400, 220, 0x000000, 0.95).setDepth(200).setStrokeStyle(2, 0xff0000);
         const txt = this.add.text(400, 230, "¡UN ÉLITE BLOQUEA EL CAMINO!", { fontSize: '22px', fill: '#ff0000', fontStyle: 'bold' }).setOrigin(0.5).setDepth(201);
-        
+
         const fightBtn = this.add.rectangle(300, 330, 140, 50, 0xaa0000).setInteractive().setDepth(201);
         const fightTxt = this.add.text(300, 330, "LUCHAR", { fontSize: '18px', fill: '#fff', fontStyle: 'bold' }).setOrigin(0.5).setDepth(202);
-        
+
         const escapeBtn = this.add.rectangle(500, 330, 160, 50, 0x555555).setInteractive().setDepth(201);
         const escapeTxt = this.add.text(500, 330, "ESCAPAR (50%)", { fontSize: '18px', fill: '#fff', fontStyle: 'bold' }).setOrigin(0.5).setDepth(202);
 
         const cleanup = () => {
-            bg.destroy(); txt.destroy(); 
-            fightBtn.destroy(); fightTxt.destroy(); 
+            bg.destroy(); txt.destroy();
+            fightBtn.destroy(); fightTxt.destroy();
             escapeBtn.destroy(); escapeTxt.destroy();
         };
 
         fightBtn.on('pointerover', () => fightBtn.setFillStyle(0xee0000));
         fightBtn.on('pointerout', () => fightBtn.setFillStyle(0xaa0000));
-        
+
         fightBtn.on('pointerdown', () => {
             cleanup();
             this.isWaitingForElite = false;
@@ -312,14 +312,14 @@ export default class MainScene extends Phaser.Scene {
     }
 
     spawnNormalEnemies() {
-        const numEnemies = 2 + this.currentLevel; 
+        const numEnemies = 2 + this.currentLevel;
         for (let i = 0; i < numEnemies; i++) {
             let rx = Phaser.Math.Between(100, 700);
             let ry = Phaser.Math.Between(100, 400);
             let rand = Math.random();
             let enemy;
             if (this.currentLevel < 3) {
-                enemy = new StandardEnemy(this, rx, ry); 
+                enemy = new StandardEnemy(this, rx, ry);
             } else {
                 if (rand < 0.4) enemy = new StandardEnemy(this, rx, ry);
                 else if (rand < 0.6) enemy = new TankEnemy(this, rx, ry);
@@ -338,14 +338,14 @@ export default class MainScene extends Phaser.Scene {
         this.physics.add.overlap(this.player.sword, enemy.sprite, () => {
             if (this.player.isAttacking && enemy.hp > 0) {
                 this.pushBack(enemy.sprite, this.player.sprite, 200);
-                
+
                 let damage = this.getPlayerDamage();
                 let isCrit = Math.random() < 0.15; // 15% crit chance
                 if (isCrit) {
                     damage *= 2;
                     this.showCritEffect(enemy.sprite.x, enemy.sprite.y);
                 }
-                
+
                 enemy.takeDamage(damage);
                 if (relics.includes('sangrado')) {
                     enemy.startBleed();
@@ -387,7 +387,7 @@ export default class MainScene extends Phaser.Scene {
         const arrow = this.add.rectangle(x, y, 10, 4, 0xffff00);
         this.physics.add.existing(arrow);
         this.arrows.add(arrow);
-        
+
         let baseSpeed = 400;
         let angle = 0;
         if (facing === 1) angle = 0;
@@ -395,17 +395,17 @@ export default class MainScene extends Phaser.Scene {
         else if (facing === 2) angle = -Math.PI / 2;
         else if (facing === -2) angle = Math.PI / 2;
         angle += angleOffset;
-        
+
         arrow.body.setVelocity(Math.cos(angle) * baseSpeed, Math.sin(angle) * baseSpeed);
         arrow.setRotation(angle);
-        this.time.delayedCall(1000, () => { if(arrow.active) arrow.destroy() });
+        this.time.delayedCall(1000, () => { if (arrow.active) arrow.destroy() });
     }
 
     spawnBomb(x, y, isSticky = false) {
         const bomb = this.add.circle(x, y, 10, 0x000000);
         bomb.setStrokeStyle(2, 0xff0000);
         this.tweens.add({ targets: bomb, scale: 1.2, duration: 200, yoyo: true, repeat: 9 });
-        
+
         if (isSticky) {
             let targets = this.enemies.filter(e => e.hp > 0).map(e => e.sprite);
             if (this.boss && this.boss.hp > 0) targets.push(this.boss.sprite);
@@ -453,7 +453,7 @@ export default class MainScene extends Phaser.Scene {
         const angle = Phaser.Math.Angle.Between(ex, ey, px, py);
         const speed = 250;
         arrow.body.setVelocity(Math.cos(angle) * speed, Math.sin(angle) * speed);
-        this.time.delayedCall(1500, () => { if(arrow.active) arrow.destroy() });
+        this.time.delayedCall(1500, () => { if (arrow.active) arrow.destroy() });
     }
 
     spawnGold(x, y) {
@@ -473,7 +473,7 @@ export default class MainScene extends Phaser.Scene {
         orb.setStrokeStyle(2, 0xffffff);
         this.physics.add.existing(orb);
         this.xpOrbs.add(orb);
-        
+
         // Pequeño impulso inicial aleatorio
         orb.body.setVelocity(Phaser.Math.Between(-50, 50), Phaser.Math.Between(-50, 50));
     }
@@ -531,7 +531,7 @@ export default class MainScene extends Phaser.Scene {
     }
 
     spawnCrates() {
-        for(let i=0; i<4; i++) {
+        for (let i = 0; i < 4; i++) {
             const rx = Phaser.Math.Between(150, 650);
             const ry = Phaser.Math.Between(150, 450);
             const crate = this.crates.create(rx, ry, null);
@@ -548,7 +548,7 @@ export default class MainScene extends Phaser.Scene {
         if (crate.rect) crate.rect.destroy();
         crate.destroy();
         this.createParticles(x, y, 0x5d4037);
-        
+
         // Loot de cajas
         if (Math.random() < 0.4) {
             if (Math.random() < 0.2) this.spawnHealth(x, y);
@@ -593,9 +593,9 @@ export default class MainScene extends Phaser.Scene {
     nextLevel() {
         this.registry.set('currentLevel', this.currentLevel + 1);
         this.registry.set('playerHp', this.player.hp);
-        
+
         const nextLevel = this.registry.get('currentLevel');
-        
+
         // El Boss es cada 5 niveles
         if (nextLevel % 5 === 0) {
             this.registry.set('nextNodeType', 'boss');
@@ -628,8 +628,8 @@ export default class MainScene extends Phaser.Scene {
 
     spawnTreasureRoom() {
         this.add.text(400, 150, "SALA DEL TESORO", { fontSize: '32px', fill: '#ffd700', fontStyle: 'bold' }).setOrigin(0.5);
-        
-        for(let i=0; i<5; i++) {
+
+        for (let i = 0; i < 5; i++) {
             const rx = Phaser.Math.Between(200, 600);
             const ry = Phaser.Math.Between(250, 450);
             this.time.delayedCall(i * 200, () => {
@@ -637,7 +637,7 @@ export default class MainScene extends Phaser.Scene {
                 this.createParticles(rx, ry, 0xffd700);
             });
         }
-        
+
         if (Math.random() < 0.3) {
             this.spawnHealth(400, 300);
         }
@@ -645,7 +645,7 @@ export default class MainScene extends Phaser.Scene {
 
     updateUI() {
         if (this.player.hp <= 0) this.player.hp = 0;
-        
+
         // Actualizar HP Bar
         if (this.playerHpText.active) {
             this.playerHpText.setText(`HP: ${this.player.hp}/${this.player.maxHp}`);
@@ -665,7 +665,7 @@ export default class MainScene extends Phaser.Scene {
             this.runLevelText.setText(`LVL: ${this.registry.get('runLevel')}`);
         }
 
-        if(this.goldText.active) this.goldText.setText(`🪙 ${this.gold}`);
+        if (this.goldText.active) this.goldText.setText(`🪙 ${this.gold}`);
 
         // Combo
         const combo = this.registry.get('combo');
@@ -677,10 +677,10 @@ export default class MainScene extends Phaser.Scene {
         }
 
         const w = this.registry.get('equippedWeapon') || 1;
-        if(this.weaponText.active) {
-            if(w === 1) this.weaponText.setText("1 - ESPADA").setBackgroundColor('#0077ff');
-            if(w === 2) this.weaponText.setText("2 - ARCO").setBackgroundColor('#aa7700');
-            if(w === 3) this.weaponText.setText("3 - BOMBAS").setBackgroundColor('#555555');
+        if (this.weaponText.active) {
+            if (w === 1) this.weaponText.setText("1 - ESPADA").setBackgroundColor('#0077ff');
+            if (w === 2) this.weaponText.setText("2 - ARCO").setBackgroundColor('#aa7700');
+            if (w === 3) this.weaponText.setText("3 - BOMBAS").setBackgroundColor('#555555');
         }
 
         if (this.isBossLevel && this.boss) {
@@ -707,7 +707,7 @@ export default class MainScene extends Phaser.Scene {
     }
 
     pushBack(target, source, force) {
-        if(!target || !target.body || !source || !source.x) return;
+        if (!target || !target.body || !source || !source.x) return;
         const angle = Phaser.Math.Angle.Between(source.x, source.y, target.x, target.y);
         target.body.setVelocity(Math.cos(angle) * force, Math.sin(angle) * force);
     }
@@ -762,7 +762,7 @@ export default class MainScene extends Phaser.Scene {
         }
 
         this.enemies.forEach(enemy => {
-            if(enemy.hp > 0 && enemy.sprite && enemy.sprite.active) {
+            if (enemy.hp > 0 && enemy.sprite && enemy.sprite.active) {
                 enemy.update(this.player.sprite, time);
                 // Dibujar mini barra de vida para cada enemigo
                 this.drawEnemyHealthBar(enemy);
@@ -785,7 +785,7 @@ export default class MainScene extends Phaser.Scene {
         this.lastKillTime = this.time.now;
         const currentCombo = this.registry.get('combo') || 0;
         this.registry.set('combo', currentCombo + 1);
-        
+
         // Efecto visual de combo
         this.cameras.main.shake(100, 0.005);
         this.updateUI();
@@ -817,10 +817,10 @@ export default class MainScene extends Phaser.Scene {
             boss_type: this.boss.bossType
         };
         try {
-            const response = await axios.post('http://localhost:3001/api/boss-decision', gameState);
+            const response = await axios.post(' https://juegomanuelsc00078.onrender.com', gameState);
             const { action, intensity, dialogue } = response.data;
             if (!this.gameOver && this.boss && this.boss.hp > 0) {
-                if(this.bossText.active) this.bossText.setText(dialogue);
+                if (this.bossText.active) this.bossText.setText(dialogue);
                 this.boss.executeAction(action, intensity, this.player.sprite);
             }
         } catch (error) {
@@ -840,9 +840,9 @@ export default class MainScene extends Phaser.Scene {
             message += `\nGanaste ${crystalsEarned} 💎`;
         }
 
-        if(this.player.sprite.body) this.player.sprite.body.setVelocity(0);
+        if (this.player.sprite.body) this.player.sprite.body.setVelocity(0);
         if (this.boss && this.boss.sprite.body) this.boss.sprite.body.setVelocity(0);
-        if(this.gameOverText.active) {
+        if (this.gameOverText.active) {
             this.gameOverText.setText(message);
             this.gameOverText.setVisible(true);
         }
