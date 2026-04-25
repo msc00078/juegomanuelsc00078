@@ -104,8 +104,8 @@ export class Player {
                 }
             }
 
-            vx = moveX * this.speed;
-            vy = moveY * this.speed;
+            let vx = moveX * this.speed;
+            let vy = moveY * this.speed;
 
             this.sprite.body.setVelocity(vx, vy);
 
