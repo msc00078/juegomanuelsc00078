@@ -76,29 +76,36 @@ export class Player {
         } else if (this.isDashing) {
             // Mantener velocidad de dash sin cambiar dirección
         } else {
-            let vx = 0;
-            let vy = 0;
+            let moveX = 0;
+            let moveY = 0;
 
-            if (this.cursors.left.isDown || this.wasd.left.isDown) {
-                vx = -this.speed;
-                this.facing = -1;
-            } else if (this.cursors.right.isDown || this.wasd.right.isDown) {
-                vx = this.speed;
-                this.facing = 1;
+            if (this.cursors.left.isDown || this.wasd.left.isDown) moveX = -1;
+            else if (this.cursors.right.isDown || this.wasd.right.isDown) moveX = 1;
+
+            if (this.cursors.up.isDown || this.wasd.up.isDown) moveY = -1;
+            else if (this.cursors.down.isDown || this.wasd.down.isDown) moveY = 1;
+            
+            // Sobrescribir con input móvil si está activo
+            if (this.scene.mobileJoystick && this.scene.mobileJoystick.active) {
+                moveX = this.scene.mobileJoystick.vx;
+                moveY = this.scene.mobileJoystick.vy;
             }
 
-            if (this.cursors.up.isDown || this.wasd.up.isDown) {
-                vy = -this.speed;
-                this.facing = 2;
-            } else if (this.cursors.down.isDown || this.wasd.down.isDown) {
-                vy = this.speed;
-                this.facing = -2;
+            if (moveX !== 0 && moveY !== 0 && (!this.scene.mobileJoystick || !this.scene.mobileJoystick.active)) {
+                moveX *= 0.7071;
+                moveY *= 0.7071;
             }
 
-            if (vx !== 0 && vy !== 0) {
-                vx *= 0.7071;
-                vy *= 0.7071;
+            if (moveX !== 0 || moveY !== 0) {
+                if (Math.abs(moveX) > Math.abs(moveY)) {
+                    this.facing = moveX > 0 ? 1 : -1;
+                } else {
+                    this.facing = moveY > 0 ? -2 : 2; 
+                }
             }
+
+            vx = moveX * this.speed;
+            vy = moveY * this.speed;
 
             this.sprite.body.setVelocity(vx, vy);
 

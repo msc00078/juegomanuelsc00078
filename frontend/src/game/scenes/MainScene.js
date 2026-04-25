@@ -99,6 +99,15 @@ export default class MainScene extends Phaser.Scene {
         this.weaponText = this.add.text(400, 570, "1 - ESPADA", {
             fontSize: '18px', fill: '#fff', backgroundColor: '#0077ff', padding: { x: 15, y: 5 }
         }).setOrigin(0.5).setDepth(101).setScrollFactor(0);
+        
+        this.weaponText.setInteractive({ useHandCursor: true });
+        this.weaponText.on('pointerdown', () => {
+            let w = this.registry.get('equippedWeapon') || 1;
+            w++;
+            if (w > 3) w = 1;
+            this.registry.set('equippedWeapon', w);
+            this.updateUI();
+        });
 
         // Atajos de teclado adicionales
         this.input.keyboard.on('keydown-P', () => this.pauseGame());
@@ -227,8 +236,74 @@ export default class MainScene extends Phaser.Scene {
         });
 
         this.spawnCrates();
-
         this.updateUI();
+        
+        // Mobile Controls
+        if (!this.sys.game.device.os.desktop || navigator.maxTouchPoints > 0) {
+            this.createMobileControls();
+        }
+    }
+
+    createMobileControls() {
+        this.input.addPointer(2); // Permitir multi-touch
+        
+        this.mobileJoystick = { vx: 0, vy: 0, active: false };
+
+        const base = this.add.circle(100, 480, 60, 0xffffff, 0.2).setDepth(1000).setScrollFactor(0);
+        const stick = this.add.circle(100, 480, 30, 0x00ffff, 0.5).setDepth(1001).setScrollFactor(0);
+        
+        const attackBtn = this.add.circle(700, 450, 45, 0xff0000, 0.5).setDepth(1000).setScrollFactor(0).setInteractive();
+        const attackTxt = this.add.text(700, 450, "ATK", { fontSize: '20px', fill: '#fff', fontStyle: 'bold' }).setOrigin(0.5).setDepth(1001).setScrollFactor(0);
+        
+        attackBtn.on('pointerdown', () => { 
+            attackBtn.setAlpha(0.8);
+            this.player.attack(); 
+        });
+        attackBtn.on('pointerup', () => attackBtn.setAlpha(0.5));
+        attackBtn.on('pointerout', () => attackBtn.setAlpha(0.5));
+        
+        const dashBtn = this.add.circle(600, 520, 35, 0x00ff00, 0.5).setDepth(1000).setScrollFactor(0).setInteractive();
+        const dashTxt = this.add.text(600, 520, "DASH", { fontSize: '16px', fill: '#fff', fontStyle: 'bold' }).setOrigin(0.5).setDepth(1001).setScrollFactor(0);
+        
+        dashBtn.on('pointerdown', () => { 
+            dashBtn.setAlpha(0.8);
+            this.player.dash(); 
+        });
+        dashBtn.on('pointerup', () => dashBtn.setAlpha(0.5));
+        dashBtn.on('pointerout', () => dashBtn.setAlpha(0.5));
+
+        this.input.on('pointerdown', (pointer) => {
+            // Ignorar clics en la mitad derecha para no interferir con los botones
+            if (pointer.x < 400 && pointer.y > 100) {
+                this.mobileJoystick.active = true;
+                this.mobileJoystick.pointerId = pointer.id;
+                base.setPosition(pointer.x, pointer.y);
+                stick.setPosition(pointer.x, pointer.y);
+            }
+        });
+
+        this.input.on('pointermove', (pointer) => {
+            if (this.mobileJoystick.active && pointer.id === this.mobileJoystick.pointerId) {
+                const angle = Phaser.Math.Angle.Between(base.x, base.y, pointer.x, pointer.y);
+                let dist = Phaser.Math.Distance.Between(base.x, base.y, pointer.x, pointer.y);
+                if (dist > 60) dist = 60;
+                
+                stick.setPosition(base.x + Math.cos(angle) * dist, base.y + Math.sin(angle) * dist);
+                
+                this.mobileJoystick.vx = (Math.cos(angle) * dist) / 60;
+                this.mobileJoystick.vy = (Math.sin(angle) * dist) / 60;
+            }
+        });
+
+        this.input.on('pointerup', (pointer) => {
+            if (this.mobileJoystick.pointerId === pointer.id) {
+                this.mobileJoystick.active = false;
+                this.mobileJoystick.vx = 0;
+                this.mobileJoystick.vy = 0;
+                base.setPosition(100, 480);
+                stick.setPosition(100, 480);
+            }
+        });
     }
 
     getPlayerDamage() {
