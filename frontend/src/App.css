@@ -18,19 +18,40 @@ body {
   flex-direction: column;
   align-items: center;
   width: 100%;
-  height: 100vh;
+  min-height: 100vh;
 }
 
 .App-header h1 {
-  display: none; /* Hide header on mobile for more space */
+  margin-bottom: 0.2rem;
+  color: #ffcc00;
 }
 
 .game-container {
-  width: 100%;
-  height: 100%;
+  border: 4px solid #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(0,255,0,0.2);
+  margin-bottom: 1rem;
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+/* Mobile specific styling */
+@media (max-width: 768px) {
+  .App {
+    height: 100vh;
+  }
+  .App-header h1, .instructions, .controls-panel {
+    display: none; /* Hide HTML UI on mobile to maximize game space */
+  }
+  .game-container {
+    width: 100vw;
+    height: 100vh;
+    border: none;
+    border-radius: 0;
+    margin-bottom: 0;
+  }
 }
 
 .instructions {
