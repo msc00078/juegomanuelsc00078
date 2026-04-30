@@ -11,14 +11,23 @@ import InventoryScene from './scenes/InventoryScene';
 import PauseScene from './scenes/PauseScene';
 import LevelUpScene from './scenes/LevelUpScene';
 
+const isMobile = /Mobi|Android/i.test(navigator.userAgent) || navigator.maxTouchPoints > 0;
+let gameWidth = 800;
+const gameHeight = 600;
+
+if (isMobile) {
+    const ratio = Math.max(window.innerWidth, window.innerHeight) / Math.min(window.innerWidth, window.innerHeight);
+    gameWidth = Math.round(gameHeight * ratio);
+}
+
 export const config = {
     type: Phaser.AUTO,
     parent: 'phaser-container',
     scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_NONE,
-        width: 800,
-        height: 600
+        width: gameWidth,
+        height: gameHeight
     },
     backgroundColor: '#35682d',
     physics: {

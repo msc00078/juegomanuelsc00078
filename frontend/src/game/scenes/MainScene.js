@@ -49,11 +49,11 @@ export default class MainScene extends Phaser.Scene {
 
     create() {
         // Ajustar límites del mundo físico para respetar el HUD superior (60px)
-        this.physics.world.setBounds(0, 60, 800, 540);
+        this.physics.world.setBounds(0, 60, this.scale.width, 540);
 
-        this.add.grid(400, 300, 800, 600, 32, 32, 0x35682d, 1, 0x22441d, 1);
+        this.add.grid(this.scale.width / 2, 300, this.scale.width, 600, 32, 32, 0x35682d, 1, 0x22441d, 1);
 
-        this.player = new Player(this, 400, 500);
+        this.player = new Player(this, this.scale.width / 2, 500);
 
         this.enemies = [];
         this.golds = this.physics.add.group();
@@ -71,10 +71,10 @@ export default class MainScene extends Phaser.Scene {
         this.vignette = this.add.graphics();
         this.drawVignette();
 
-        this.topPanel = this.add.rectangle(400, 30, 800, 60, 0x000000, 0.6).setDepth(100).setScrollFactor(0);
+        this.topPanel = this.add.rectangle(this.scale.width / 2, 30, this.scale.width, 60, 0x000000, 0.6).setDepth(100).setScrollFactor(0);
 
         let nodeLabel = this.nodeType.toUpperCase();
-        this.levelText = this.add.text(400, 20, `NIVEL ${this.currentLevel} • ${nodeLabel}`, {
+        this.levelText = this.add.text(this.scale.width / 2, 20, `NIVEL ${this.currentLevel} • ${nodeLabel}`, {
             fontSize: '22px', fill: '#00ffff', fontStyle: 'bold', stroke: '#000', strokeThickness: 3
         }).setOrigin(0.5).setDepth(101).setScrollFactor(0);
 
@@ -92,11 +92,11 @@ export default class MainScene extends Phaser.Scene {
             fontSize: '12px', fill: '#00ffff', fontStyle: 'bold'
         }).setOrigin(0.5).setDepth(103).setScrollFactor(0);
 
-        this.goldText = this.add.text(780, 30, `🪙 ${this.gold}`, {
+        this.goldText = this.add.text(this.scale.width - 20, 30, `🪙 ${this.gold}`, {
             fontSize: '22px', fill: '#ffd700', fontStyle: 'bold'
         }).setOrigin(1, 0.5).setDepth(101).setScrollFactor(0);
 
-        this.weaponText = this.add.text(400, 570, "1 - ESPADA", {
+        this.weaponText = this.add.text(this.scale.width / 2, 570, "1 - ESPADA", {
             fontSize: '18px', fill: '#fff', backgroundColor: '#0077ff', padding: { x: 15, y: 5 }
         }).setOrigin(0.5).setDepth(101).setScrollFactor(0);
         
@@ -113,18 +113,18 @@ export default class MainScene extends Phaser.Scene {
         this.input.keyboard.on('keydown-P', () => this.pauseGame());
         this.input.keyboard.on('keydown-ESC', () => this.pauseGame());
 
-        this.gameOverText = this.add.text(400, 300, "", { fontSize: '40px', fill: '#fff', backgroundColor: '#000' }).setOrigin(0.5).setDepth(101);
+        this.gameOverText = this.add.text(this.scale.width / 2, 300, "", { fontSize: '40px', fill: '#fff', backgroundColor: '#000' }).setOrigin(0.5).setDepth(101);
         this.gameOverText.setVisible(false);
 
         // Barra de Boss Mejorada (Abajo)
-        this.bossHpContainer = this.add.container(400, 530).setVisible(false).setDepth(101).setScrollFactor(0);
+        this.bossHpContainer = this.add.container(this.scale.width / 2, 530).setVisible(false).setDepth(101).setScrollFactor(0);
         this.bossHpBg = this.add.rectangle(0, 0, 400, 20, 0x330000).setOrigin(0.5);
         this.bossHpBar = this.add.rectangle(-200, 0, 400, 20, 0xff0000).setOrigin(0, 0.5);
         this.bossNameText = this.add.text(0, -25, "JEFE FINAL", { fontSize: '18px', fill: '#ff0000', fontStyle: 'bold' }).setOrigin(0.5);
         this.bossHpContainer.add([this.bossHpBg, this.bossHpBar, this.bossNameText]);
 
         // Combo UI
-        this.comboText = this.add.text(780, 80, "", { fontSize: '24px', fill: '#ff00ff', fontStyle: 'bold' }).setOrigin(1, 0.5).setDepth(101).setScrollFactor(0);
+        this.comboText = this.add.text(this.scale.width - 20, 80, "", { fontSize: '24px', fill: '#ff00ff', fontStyle: 'bold' }).setOrigin(1, 0.5).setDepth(101).setScrollFactor(0);
         this.lastKillTime = 0;
 
         if (this.isBossLevel) {
@@ -132,11 +132,11 @@ export default class MainScene extends Phaser.Scene {
             this.cameras.main.flash(1000, 255, 0, 0);
             this.cameras.main.shake(1000, 0.02);
 
-            this.boss = new Boss(this, 400, 150, this.bossType);
+            this.boss = new Boss(this, this.scale.width / 2, 150, this.bossType);
             this.bossHpContainer.setVisible(true);
             this.bossNameText.setText(this.bossType.toUpperCase());
 
-            this.bossText = this.add.text(400, 110, "¡PREPÁRATE PARA TU FINAL!", {
+            this.bossText = this.add.text(this.scale.width / 2, 110, "¡PREPÁRATE PARA TU FINAL!", {
                 fontSize: '20px', fill: '#ff0000', backgroundColor: '#000', fontStyle: 'bold', padding: { x: 10, y: 5 }
             }).setOrigin(0.5).setDepth(101);
 
@@ -252,8 +252,8 @@ export default class MainScene extends Phaser.Scene {
         const base = this.add.circle(100, 480, 60, 0xffffff, 0.2).setDepth(1000).setScrollFactor(0);
         const stick = this.add.circle(100, 480, 30, 0x00ffff, 0.5).setDepth(1001).setScrollFactor(0);
         
-        const attackBtn = this.add.circle(700, 450, 45, 0xff0000, 0.5).setDepth(1000).setScrollFactor(0).setInteractive();
-        const attackTxt = this.add.text(700, 450, "ATK", { fontSize: '20px', fill: '#fff', fontStyle: 'bold' }).setOrigin(0.5).setDepth(1001).setScrollFactor(0);
+        const attackBtn = this.add.circle(this.scale.width - 100, 450, 45, 0xff0000, 0.5).setDepth(1000).setScrollFactor(0).setInteractive();
+        const attackTxt = this.add.text(this.scale.width - 100, 450, "ATK", { fontSize: '20px', fill: '#fff', fontStyle: 'bold' }).setOrigin(0.5).setDepth(1001).setScrollFactor(0);
         
         attackBtn.on('pointerdown', () => { 
             attackBtn.setAlpha(0.8);
@@ -262,8 +262,8 @@ export default class MainScene extends Phaser.Scene {
         attackBtn.on('pointerup', () => attackBtn.setAlpha(0.5));
         attackBtn.on('pointerout', () => attackBtn.setAlpha(0.5));
         
-        const dashBtn = this.add.circle(600, 520, 35, 0x00ff00, 0.5).setDepth(1000).setScrollFactor(0).setInteractive();
-        const dashTxt = this.add.text(600, 520, "DASH", { fontSize: '16px', fill: '#fff', fontStyle: 'bold' }).setOrigin(0.5).setDepth(1001).setScrollFactor(0);
+        const dashBtn = this.add.circle(this.scale.width - 200, 520, 35, 0x00ff00, 0.5).setDepth(1000).setScrollFactor(0).setInteractive();
+        const dashTxt = this.add.text(this.scale.width - 200, 520, "DASH", { fontSize: '16px', fill: '#fff', fontStyle: 'bold' }).setOrigin(0.5).setDepth(1001).setScrollFactor(0);
         
         dashBtn.on('pointerdown', () => { 
             dashBtn.setAlpha(0.8);
@@ -274,7 +274,7 @@ export default class MainScene extends Phaser.Scene {
 
         this.input.on('pointerdown', (pointer) => {
             // Ignorar clics en la mitad derecha para no interferir con los botones
-            if (pointer.x < 400 && pointer.y > 100) {
+            if (pointer.x < this.scale.width / 2 && pointer.y > 100) {
                 this.mobileJoystick.active = true;
                 this.mobileJoystick.pointerId = pointer.id;
                 base.setPosition(pointer.x, pointer.y);
@@ -318,14 +318,14 @@ export default class MainScene extends Phaser.Scene {
     }
 
     showElitePrompt() {
-        const bg = this.add.rectangle(400, 300, 400, 220, 0x000000, 0.95).setDepth(200).setStrokeStyle(2, 0xff0000);
-        const txt = this.add.text(400, 230, "¡UN ÉLITE BLOQUEA EL CAMINO!", { fontSize: '22px', fill: '#ff0000', fontStyle: 'bold' }).setOrigin(0.5).setDepth(201);
+        const bg = this.add.rectangle(this.scale.width / 2, 300, 400, 220, 0x000000, 0.95).setDepth(200).setStrokeStyle(2, 0xff0000);
+        const txt = this.add.text(this.scale.width / 2, 230, "¡UN ÉLITE BLOQUEA EL CAMINO!", { fontSize: '22px', fill: '#ff0000', fontStyle: 'bold' }).setOrigin(0.5).setDepth(201);
 
-        const fightBtn = this.add.rectangle(300, 330, 140, 50, 0xaa0000).setInteractive().setDepth(201);
-        const fightTxt = this.add.text(300, 330, "LUCHAR", { fontSize: '18px', fill: '#fff', fontStyle: 'bold' }).setOrigin(0.5).setDepth(202);
+        const fightBtn = this.add.rectangle(this.scale.width / 2 - 100, 330, 140, 50, 0xaa0000).setInteractive().setDepth(201);
+        const fightTxt = this.add.text(this.scale.width / 2 - 100, 330, "LUCHAR", { fontSize: '18px', fill: '#fff', fontStyle: 'bold' }).setOrigin(0.5).setDepth(202);
 
-        const escapeBtn = this.add.rectangle(500, 330, 160, 50, 0x555555).setInteractive().setDepth(201);
-        const escapeTxt = this.add.text(500, 330, "ESCAPAR (50%)", { fontSize: '18px', fill: '#fff', fontStyle: 'bold' }).setOrigin(0.5).setDepth(202);
+        const escapeBtn = this.add.rectangle(this.scale.width / 2 + 100, 330, 160, 50, 0x555555).setInteractive().setDepth(201);
+        const escapeTxt = this.add.text(this.scale.width / 2 + 100, 330, "ESCAPAR (50%)", { fontSize: '18px', fill: '#fff', fontStyle: 'bold' }).setOrigin(0.5).setDepth(202);
 
         const cleanup = () => {
             bg.destroy(); txt.destroy();
@@ -347,7 +347,7 @@ export default class MainScene extends Phaser.Scene {
 
         escapeBtn.on('pointerdown', () => {
             if (Math.random() < 0.5) {
-                const msg = this.add.text(400, 420, "¡Escapaste con éxito!", { fontSize: '24px', fill: '#00ff00', backgroundColor: '#000' }).setOrigin(0.5).setDepth(205);
+                const msg = this.add.text(this.scale.width / 2, 420, "¡Escapaste con éxito!", { fontSize: '24px', fill: '#00ff00', backgroundColor: '#000' }).setOrigin(0.5).setDepth(205);
                 this.time.delayedCall(1000, () => {
                     cleanup(); msg.destroy();
                     this.isWaitingForElite = false;
@@ -355,7 +355,7 @@ export default class MainScene extends Phaser.Scene {
                     this.spawnNormalEnemies();
                 });
             } else {
-                const msg = this.add.text(400, 420, "¡Te han atrapado!", { fontSize: '24px', fill: '#ff0000', backgroundColor: '#000' }).setOrigin(0.5).setDepth(205);
+                const msg = this.add.text(this.scale.width / 2, 420, "¡Te han atrapado!", { fontSize: '24px', fill: '#ff0000', backgroundColor: '#000' }).setOrigin(0.5).setDepth(205);
                 this.time.delayedCall(1000, () => {
                     cleanup(); msg.destroy();
                     this.isWaitingForElite = false;
@@ -378,7 +378,7 @@ export default class MainScene extends Phaser.Scene {
     }
 
     spawnElite() {
-        let elite = new TankEnemy(this, 400, 150);
+        let elite = new TankEnemy(this, this.scale.width / 2, 150);
         elite.hp = 300; elite.maxHp = 300;
         elite.sprite.setScale(1.5);
         elite.color = 0xff0000; elite.sprite.setFillStyle(0xff0000);
@@ -386,10 +386,9 @@ export default class MainScene extends Phaser.Scene {
         this.setupEnemyCollisions(elite);
     }
 
-    spawnNormalEnemies() {
         const numEnemies = 2 + this.currentLevel;
         for (let i = 0; i < numEnemies; i++) {
-            let rx = Phaser.Math.Between(100, 700);
+            let rx = Phaser.Math.Between(100, this.scale.width - 100);
             let ry = Phaser.Math.Between(100, 400);
             let rand = Math.random();
             let enemy;
@@ -607,7 +606,7 @@ export default class MainScene extends Phaser.Scene {
 
     spawnCrates() {
         for (let i = 0; i < 4; i++) {
-            const rx = Phaser.Math.Between(150, 650);
+            const rx = Phaser.Math.Between(150, this.scale.width - 150);
             const ry = Phaser.Math.Between(150, 450);
             const crate = this.crates.create(rx, ry, null);
             crate.setSize(30, 30);
@@ -650,14 +649,14 @@ export default class MainScene extends Phaser.Scene {
         }
 
         if (cleared) {
-            this.portal = this.add.rectangle(400, 300, 40, 40, 0x00ffff);
+            this.portal = this.add.rectangle(this.scale.width / 2, 300, 40, 40, 0x00ffff);
             this.physics.add.existing(this.portal);
             let portalMsg = "Al Mapa";
             if (this.isBossLevel) portalMsg = "Reliquia de Boss";
             else if (this.nodeType === 'elite') portalMsg = "Coger Reliquia";
             else if (this.nodeType === 'treasure') portalMsg = "Seguir";
 
-            this.add.text(400, 260, portalMsg, { fontSize: '16px', fill: '#0ff' }).setOrigin(0.5);
+            this.add.text(this.scale.width / 2, 260, portalMsg, { fontSize: '16px', fill: '#0ff' }).setOrigin(0.5);
             this.tweens.add({ targets: this.portal, angle: 360, duration: 2000, repeat: -1 });
             this.physics.add.overlap(this.player.sprite, this.portal, () => {
                 this.nextLevel();
@@ -702,10 +701,10 @@ export default class MainScene extends Phaser.Scene {
     }
 
     spawnTreasureRoom() {
-        this.add.text(400, 150, "SALA DEL TESORO", { fontSize: '32px', fill: '#ffd700', fontStyle: 'bold' }).setOrigin(0.5);
+        this.add.text(this.scale.width / 2, 150, "SALA DEL TESORO", { fontSize: '32px', fill: '#ffd700', fontStyle: 'bold' }).setOrigin(0.5);
 
         for (let i = 0; i < 5; i++) {
-            const rx = Phaser.Math.Between(200, 600);
+            const rx = Phaser.Math.Between(this.scale.width / 2 - 200, this.scale.width / 2 + 200);
             const ry = Phaser.Math.Between(250, 450);
             this.time.delayedCall(i * 200, () => {
                 this.spawnGold(rx, ry);
@@ -714,7 +713,7 @@ export default class MainScene extends Phaser.Scene {
         }
 
         if (Math.random() < 0.3) {
-            this.spawnHealth(400, 300);
+            this.spawnHealth(this.scale.width / 2, 300);
         }
     }
 
@@ -776,8 +775,8 @@ export default class MainScene extends Phaser.Scene {
         this.vignette.clear();
         this.vignette.fillStyle(0x000000, 0.3);
         // Dibujar un gradiente radial simple o solo esquinas oscuras
-        this.vignette.fillRect(0, 0, 800, 60); // Arriba
-        this.vignette.fillRect(0, 540, 800, 60); // Abajo
+        this.vignette.fillRect(0, 0, this.scale.width, 60); // Arriba
+        this.vignette.fillRect(0, 540, this.scale.width, 60); // Abajo
         this.vignette.setDepth(99).setScrollFactor(0);
     }
 
