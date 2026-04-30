@@ -32,9 +32,8 @@ body {
   overflow: hidden;
   box-shadow: 0 0 20px rgba(0,255,0,0.2);
   margin-bottom: 1rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  display: block;
+  position: relative;
 }
 
 /* Mobile specific styling */
