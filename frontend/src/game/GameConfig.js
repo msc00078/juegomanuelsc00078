@@ -11,23 +11,14 @@ import InventoryScene from './scenes/InventoryScene';
 import PauseScene from './scenes/PauseScene';
 import LevelUpScene from './scenes/LevelUpScene';
 
-const isMobile = /Mobi|Android/i.test(navigator.userAgent) || navigator.maxTouchPoints > 0;
-let gameWidth = 800;
-const gameHeight = 600;
-
-if (isMobile) {
-    const ratio = Math.max(window.innerWidth, window.innerHeight) / Math.min(window.innerWidth, window.innerHeight);
-    gameWidth = Math.round(gameHeight * ratio);
-}
-
 export const config = {
     type: Phaser.AUTO,
     parent: 'phaser-container',
     scale: {
-        mode: Phaser.Scale.FIT,
+        mode: Phaser.Scale.RESIZE,   // El canvas se estira al 100% del contenedor padre, siempre
         autoCenter: Phaser.Scale.CENTER_BOTH,
-        width: gameWidth,
-        height: gameHeight
+        width: '100%',
+        height: '100%',
     },
     backgroundColor: '#35682d',
     physics: {
