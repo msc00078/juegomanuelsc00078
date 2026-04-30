@@ -95,3 +95,38 @@ body {
   margin-left: 10px;
   cursor: pointer;
 }
+
+.mobile-warning {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100dvh;
+  background-color: #000;
+  color: #fff;
+  z-index: 999999;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
+}
+
+.mobile-warning h2 {
+  font-size: 2.5rem;
+  color: #ffcc00;
+  margin-bottom: 20px;
+  animation: pulse 1s infinite alternate;
+}
+
+.mobile-warning p {
+  font-size: 1.2rem;
+  color: #aaa;
+  padding: 0 20px;
+}
+
+@keyframes pulse {
+  from { transform: scale(1); }
+  to { transform: scale(1.1); }
+}
