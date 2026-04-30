@@ -11,6 +11,7 @@ export default class MainScene extends Phaser.Scene {
         this.apiCallInterval = 3000;
         this.gameOver = false;
         this.bossType = "poeta";
+        this.isCountdown = true;
     }
 
     init() {
@@ -45,6 +46,7 @@ export default class MainScene extends Phaser.Scene {
         this.gold = this.registry.get('gold');
         this.gameOver = false;
         this.isBossLevel = (this.currentLevel % 5 === 0);
+        this.isCountdown = true;
     }
 
     create() {
@@ -243,6 +245,32 @@ export default class MainScene extends Phaser.Scene {
         if (!this.sys.game.device.os.desktop || navigator.maxTouchPoints > 0) {
             this.createMobileControls();
         }
+
+        // Countdown Logic
+        this.startLevelCountdown();
+    }
+
+    startLevelCountdown() {
+        this.isCountdown = true;
+        const cx = this.scale.width / 2;
+        const cy = this.scale.height / 2;
+
+        const countText = this.add.text(cx, cy, "3", {
+            fontSize: '80px', fill: '#ffff00', fontStyle: 'bold', stroke: '#000', strokeThickness: 8
+        }).setOrigin(0.5).setDepth(200);
+
+        this.time.delayedCall(1000, () => {
+            countText.setText("2");
+            this.time.delayedCall(1000, () => {
+                countText.setText("1");
+                this.time.delayedCall(1000, () => {
+                    countText.setText("¡ACCIÓN!");
+                    countText.setFill('#00ff00');
+                    this.isCountdown = false;
+                    this.time.delayedCall(500, () => countText.destroy());
+                });
+            });
+        });
     }
 
     createMobileControls() {
@@ -672,31 +700,36 @@ export default class MainScene extends Phaser.Scene {
     }
 
     nextLevel() {
-        this.registry.set('currentLevel', this.currentLevel + 1);
+        const currentLevel = this.registry.get('currentLevel');
         this.registry.set('playerHp', this.player.hp);
 
-        const nextLevel = this.registry.get('currentLevel');
+        const nextLevelNumber = currentLevel + 1;
+        this.registry.set('currentLevel', nextLevelNumber);
 
-        // El Boss es cada 5 niveles
-        if (nextLevel % 5 === 0) {
+        // El Boss es cada 5 niveles (5, 10, 15...)
+        if (nextLevelNumber % 5 === 0) {
             this.registry.set('nextNodeType', 'boss');
-            this.scene.start('MainScene');
+            // Antes del boss, siempre ofrecemos una tienda o reliquia si es posible
+            if (Math.random() < 0.7) {
+                this.scene.start('ShopScene');
+            } else {
+                this.scene.start('RelicScene');
+            }
             return;
         }
 
-        // Probabilidades de sala
+        // Probabilidades de sala aumentadas para tienda y eventos
         const r = Math.random();
         let nextNode = 'combat';
-        if (r < 0.5) nextNode = 'combat';
-        else if (r < 0.65) nextNode = 'elite';
-        else if (r < 0.8) nextNode = 'treasure';
-        else if (r < 0.9) nextNode = 'shop';
-        else nextNode = 'event';
+        if (r < 0.4) nextNode = 'combat';
+        else if (r < 0.55) nextNode = 'elite';
+        else if (r < 0.7) nextNode = 'treasure';
+        else if (r < 0.85) nextNode = 'shop'; // Aumentado a 15%
+        else nextNode = 'event'; // Aumentado a 15%
 
         this.registry.set('nextNodeType', nextNode);
 
         if (this.isBossLevel || (this.nodeType === 'elite' && nextNode !== 'shop' && nextNode !== 'event')) {
-            // Si venimos de un elite o boss y no vamos a tienda/evento, vamos a RelicScene
             this.scene.start('RelicScene');
         } else if (nextNode === 'shop') {
             this.scene.start('ShopScene');
@@ -810,7 +843,12 @@ export default class MainScene extends Phaser.Scene {
     }
 
     update(time, delta) {
-        if (this.gameOver) return;
+        if (this.gameOver || this.isCountdown) {
+            if (this.player && this.player.sprite && this.player.sprite.body) {
+                this.player.sprite.body.setVelocity(0);
+            }
+            return;
+        }
         this.player.update(time);
 
         // Magnetismo de XP
