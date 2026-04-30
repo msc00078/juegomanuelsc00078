@@ -386,6 +386,7 @@ export default class MainScene extends Phaser.Scene {
         this.setupEnemyCollisions(elite);
     }
 
+    spawnNormalEnemies() {
         const numEnemies = 2 + this.currentLevel;
         for (let i = 0; i < numEnemies; i++) {
             let rx = Phaser.Math.Between(100, this.scale.width - 100);
