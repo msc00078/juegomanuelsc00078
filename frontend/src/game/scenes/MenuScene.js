@@ -6,21 +6,19 @@ export default class MenuScene extends Phaser.Scene {
     }
 
     create() {
-        this.add.rectangle(this.scale.width / 2, 300, this.scale.width, 600, 0x1a1a1a);
+        this.add.rectangle(this.scale.width / 2, this.scale.height / 2, this.scale.width, this.scale.height, 0x1a1a1a);
+        this.add.grid(this.scale.width / 2, this.scale.height / 2, this.scale.width, this.scale.height, 64, 64, 0x222222, 1, 0x333333, 1);
 
-        // Grid decorativo
-        this.add.grid(this.scale.width / 2, 300, this.scale.width, 600, 64, 64, 0x222222, 1, 0x333333, 1);
+        this.add.text(this.scale.width / 2, this.scale.height * 0.22, "AI BOSS ARENA", { fontSize: '72px', fill: '#ffcc00', fontStyle: 'bold', stroke: '#000', strokeThickness: 5 }).setOrigin(0.5);
+        this.add.text(this.scale.width / 2, this.scale.height * 0.36, "A Roguelite Experience", { fontSize: '28px', fill: '#fff' }).setOrigin(0.5);
 
-        this.add.text(this.scale.width / 2, 150, "AI BOSS ARENA", { fontSize: '60px', fill: '#ffcc00', fontStyle: 'bold', stroke: '#000', strokeThickness: 5 }).setOrigin(0.5);
-        this.add.text(this.scale.width / 2, 220, "A Roguelite Experience", { fontSize: '24px', fill: '#fff' }).setOrigin(0.5);
-
-        const playBtn = this.add.rectangle(this.scale.width / 2, 350, 250, 60, 0x0077ff).setInteractive();
+        const playBtn = this.add.rectangle(this.scale.width / 2, this.scale.height * 0.52, 300, 70, 0x0077ff).setInteractive();
         playBtn.setStrokeStyle(4, 0xffffff);
-        this.add.text(this.scale.width / 2, 350, "JUGAR", { fontSize: '30px', fill: '#fff', fontStyle: 'bold' }).setOrigin(0.5);
+        this.add.text(this.scale.width / 2, this.scale.height * 0.52, "JUGAR", { fontSize: '34px', fill: '#fff', fontStyle: 'bold' }).setOrigin(0.5);
 
-        const upgradeBtn = this.add.rectangle(this.scale.width / 2, 440, 250, 60, 0x7700ff).setInteractive();
+        const upgradeBtn = this.add.rectangle(this.scale.width / 2, this.scale.height * 0.67, 300, 70, 0x7700ff).setInteractive();
         upgradeBtn.setStrokeStyle(4, 0xffffff);
-        this.add.text(this.scale.width / 2, 440, "MEJORAS", { fontSize: '30px', fill: '#fff', fontStyle: 'bold' }).setOrigin(0.5);
+        this.add.text(this.scale.width / 2, this.scale.height * 0.67, "MEJORAS", { fontSize: '34px', fill: '#fff', fontStyle: 'bold' }).setOrigin(0.5);
 
         // Parpadeo botón
         this.tweens.add({ targets: playBtn, alpha: 0.7, duration: 800, yoyo: true, repeat: -1 });
@@ -64,6 +62,6 @@ export default class MenuScene extends Phaser.Scene {
             this.scene.start('MainScene');
         });
 
-        this.add.text(this.scale.width / 2, 530, "Usa WASD/Flechas para moverte y ESPACIO para atacar.\nSHIFT para Dash (I-Frames). Botones 1, 2, 3 cambio arma.", { fontSize: '14px', fill: '#aaa', align: 'center' }).setOrigin(0.5);
+        this.add.text(this.scale.width / 2, this.scale.height * 0.88, "Usa WASD/Flechas para moverte y ESPACIO para atacar.\nSHIFT para Dash (I-Frames). Botones 1, 2, 3 cambio arma.", { fontSize: '16px', fill: '#aaa', align: 'center' }).setOrigin(0.5);
     }
 }

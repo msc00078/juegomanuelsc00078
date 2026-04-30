@@ -11,14 +11,16 @@ import InventoryScene from './scenes/InventoryScene';
 import PauseScene from './scenes/PauseScene';
 import LevelUpScene from './scenes/LevelUpScene';
 
+// Mundo 16:9 — se escala uniformemente a cualquier pantalla
+// Phaser.Scale.FIT mantiene proporciones sin deformar
 export const config = {
     type: Phaser.AUTO,
     parent: 'phaser-container',
     scale: {
-        mode: Phaser.Scale.RESIZE,   // El canvas se estira al 100% del contenedor padre, siempre
+        mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH,
-        width: '100%',
-        height: '100%',
+        width: 1280,
+        height: 720,
     },
     backgroundColor: '#35682d',
     physics: {
