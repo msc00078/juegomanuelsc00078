@@ -43,7 +43,7 @@ body {
     background-color: #35682d;
   }
   .App-header h1, .instructions, .controls-panel {
-    display: none; /* Hide HTML UI on mobile to maximize game space */
+    display: none !important; /* Hide HTML UI on mobile to maximize game space */
   }
   .game-container {
     width: 100vw;
@@ -52,6 +52,19 @@ body {
     border-radius: 0;
     margin-bottom: 0;
     background-color: #35682d;
+  }
+}
+
+/* Force Landscape on Mobile Portrait */
+@media screen and (pointer: coarse) and (orientation: portrait) {
+  .game-container {
+    transform: rotate(90deg);
+    transform-origin: center center;
+    width: 100dvh; /* Width becomes the physical height */
+    height: 100vw; /* Height becomes the physical width */
+    position: absolute;
+    top: calc((100dvh - 100vw) / 2);
+    left: calc((100vw - 100dvh) / 2);
   }
 }
 
