@@ -6,28 +6,34 @@ export default class ShopScene extends Phaser.Scene {
     }
 
     create() {
-        this.add.rectangle(400, 300, 800, 600, 0x111111);
-        this.add.text(400, 100, "LA TIENDA MISTERIOSA", { fontSize: '40px', fill: '#ffd700', fontStyle: 'bold' }).setOrigin(0.5);
-        this.goldText = this.add.text(400, 150, `Oro disponible: ${this.registry.get('gold')}`, { fontSize: '24px', fill: '#fff' }).setOrigin(0.5);
+        const W = this.scale.width;
+        const H = this.scale.height;
+        const cx = W / 2;
 
-        // Opciones de compra Fila 1
-        this.createButton(200, 250, `Poción (Curar)\nCosto: ${this.getPrice(20)} Oro`, 0x00aa00, () => this.buyHeal());
-        this.createButton(400, 250, `Afilar (+Daño)\nCosto: ${this.getPrice(40)} Oro`, 0xaa0000, () => this.buyDamage());
-        this.createButton(600, 250, `Corazón (+20 HP)\nCosto: ${this.getPrice(50)} Oro`, 0xaa00aa, () => this.buyMaxHp());
+        this.add.rectangle(cx, H / 2, W, H, 0x111111);
+        this.add.text(cx, H * 0.12, "LA TIENDA MISTERIOSA", { fontSize: '40px', fill: '#ffd700', fontStyle: 'bold' }).setOrigin(0.5);
+        this.goldText = this.add.text(cx, H * 0.22, `Oro disponible: ${this.registry.get('gold')}`, { fontSize: '24px', fill: '#fff' }).setOrigin(0.5);
 
-        // Opciones de compra Fila 2
-        let bowPrice = this.getPrice(80);
-        let bowText = this.registry.get('hasBow') ? "Arco (Comprado)" : `Comprar Arco\nCosto: ${bowPrice} Oro`;
-        this.createButton(300, 370, bowText, 0xaaaa00, () => this.buyBow());
-        
-        let bombPrice = this.getPrice(100);
-        let bombText = this.registry.get('hasBombs') ? "Bombas (Comprado)" : `Comprar Bombas\nCosto: ${bombPrice} Oro`;
-        this.createButton(500, 370, bombText, 0x00aaaa, () => this.buyBombs());
+        const row1Y = H * 0.42;
+        const row2Y = H * 0.60;
+        const spacing = W * 0.18;
+
+        // Fila 1
+        this.createButton(cx - spacing, row1Y, `Poción (Curar)\nCosto: ${this.getPrice(20)} Oro`, 0x00aa00, () => this.buyHeal());
+        this.createButton(cx,           row1Y, `Afilar (+Daño)\nCosto: ${this.getPrice(40)} Oro`, 0xaa0000, () => this.buyDamage());
+        this.createButton(cx + spacing, row1Y, `Corazón (+20 HP)\nCosto: ${this.getPrice(50)} Oro`, 0xaa00aa, () => this.buyMaxHp());
+
+        // Fila 2
+        let bowText = this.registry.get('hasBow') ? "Arco (Comprado)" : `Comprar Arco\nCosto: ${this.getPrice(80)} Oro`;
+        this.createButton(cx - spacing * 0.6, row2Y, bowText, 0xaaaa00, () => this.buyBow());
+
+        let bombText = this.registry.get('hasBombs') ? "Bombas (Comprado)" : `Comprar Bombas\nCosto: ${this.getPrice(100)} Oro`;
+        this.createButton(cx + spacing * 0.6, row2Y, bombText, 0x00aaaa, () => this.buyBombs());
 
         // Botón Continuar
-        const continueBtn = this.add.rectangle(400, 500, 200, 50, 0x444444).setInteractive();
-        const continueTxt = this.add.text(400, 500, "Continuar >", { fontSize: '20px', fill: '#fff' }).setOrigin(0.5);
-        
+        const continueBtn = this.add.rectangle(cx, H * 0.80, 220, 55, 0x444444).setInteractive();
+        const continueTxt = this.add.text(cx, H * 0.80, "Continuar >", { fontSize: '22px', fill: '#fff' }).setOrigin(0.5);
+
         continueBtn.on('pointerover', () => continueBtn.setFillStyle(0x666666));
         continueBtn.on('pointerout', () => continueBtn.setFillStyle(0x444444));
         continueBtn.on('pointerdown', () => this.scene.start('MainScene'));
@@ -129,7 +135,7 @@ export default class ShopScene extends Phaser.Scene {
     }
 
     showFeedback(msg, color = 0x00ff00) {
-        const text = this.add.text(400, 350, msg, { fontSize: '20px', fill: Phaser.Display.Color.IntegerToColor(color).rgba }).setOrigin(0.5);
-        this.tweens.add({ targets: text, y: 300, alpha: 0, duration: 1500, onComplete: () => text.destroy() });
+        const text = this.add.text(this.scale.width / 2, this.scale.height * 0.52, msg, { fontSize: '20px', fill: Phaser.Display.Color.IntegerToColor(color).rgba }).setOrigin(0.5);
+        this.tweens.add({ targets: text, y: this.scale.height * 0.40, alpha: 0, duration: 1500, onComplete: () => text.destroy() });
     }
 }

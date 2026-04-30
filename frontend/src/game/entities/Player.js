@@ -175,19 +175,21 @@ export class Player {
     }
 
     updateSwordPosition() {
-        if (!this.sword) return;
+        if (!this.sword || !this.sword.body) return;
         let sx = this.sprite.x;
         let sy = this.sprite.y;
-        
-        if (this.facing === 1) { sx += 35; this.sword.setSize(60, 25); } // Derecha
-        else if (this.facing === -1) { sx -= 35; this.sword.setSize(60, 25); } // Izquierda
-        else if (this.facing === 2) { sy -= 35; this.sword.setSize(25, 60); } // Arriba
-        else if (this.facing === -2) { sy += 35; this.sword.setSize(25, 60); } // Abajo
+
+        // Offset de 42px desde el centro del jugador + hitbox generoso
+        if      (this.facing ===  1) { sx += 42; this.sword.setSize(70, 30); }  // Derecha
+        else if (this.facing === -1) { sx -= 42; this.sword.setSize(70, 30); }  // Izquierda
+        else if (this.facing ===  2) { sy -= 42; this.sword.setSize(30, 70); }  // Arriba
+        else if (this.facing === -2) { sy += 42; this.sword.setSize(30, 70); }  // Abajo
 
         this.sword.setPosition(sx, sy);
-        
-        // Actualizar el cuerpo de física de la espada para que coincida con la posición visual
+
+        // Forzar sincronización del cuerpo de física con la posición visual
         if (this.sword.body) {
+            this.sword.body.reset(sx, sy);
             if (this.isAttacking) {
                 this.sword.body.enable = true;
             }

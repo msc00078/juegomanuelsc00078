@@ -56,17 +56,32 @@ export default class EventScene extends Phaser.Scene {
     }
 
     create() {
-        this.add.rectangle(400, 300, 800, 600, 0x111122);
-        this.add.rectangle(400, 300, 600, 400, 0x000000, 0.8).setStrokeStyle(2, 0xffffff);
+        const W = this.scale.width;
+        const H = this.scale.height;
+        const cx = W / 2;
+        const cy = H / 2;
+
+        this.add.rectangle(cx, cy, W, H, 0x111122);
+        this.add.rectangle(cx, cy, Math.min(700, W * 0.85), H * 0.72, 0x000000, 0.85).setStrokeStyle(2, 0xffffff);
 
         const event = Phaser.Utils.Array.GetRandom(EVENTS);
-        
-        this.add.text(400, 150, event.title, { fontSize: '32px', fill: '#ffcc00', fontStyle: 'bold' }).setOrigin(0.5);
-        this.add.text(400, 240, event.text, { fontSize: '18px', fill: '#fff', align: 'center', wordWrap: { width: 500 } }).setOrigin(0.5);
+
+        this.add.text(cx, H * 0.20, event.title, {
+            fontSize: '32px', fill: '#ffcc00', fontStyle: 'bold'
+        }).setOrigin(0.5);
+
+        this.add.text(cx, H * 0.35, event.text, {
+            fontSize: '17px', fill: '#fff', align: 'center',
+            wordWrap: { width: Math.min(580, W * 0.75) }
+        }).setOrigin(0.5);
 
         event.options.forEach((opt, i) => {
-            const btn = this.add.rectangle(400, 380 + (i * 60), 450, 40, 0x333333).setInteractive();
-            const txt = this.add.text(400, 380 + (i * 60), opt.text, { fontSize: '16px', fill: '#fff' }).setOrigin(0.5);
+            const btnY = H * 0.56 + (i * H * 0.10);
+            const btn = this.add.rectangle(cx, btnY, Math.min(520, W * 0.70), 50, 0x333333).setInteractive();
+            const txt = this.add.text(cx, btnY, opt.text, {
+                fontSize: '16px', fill: '#fff', align: 'center',
+                wordWrap: { width: Math.min(490, W * 0.65) }
+            }).setOrigin(0.5);
 
             btn.on('pointerover', () => btn.setFillStyle(0x555555));
             btn.on('pointerout', () => btn.setFillStyle(0x333333));
@@ -78,15 +93,21 @@ export default class EventScene extends Phaser.Scene {
     }
 
     showResult(msg) {
+        const W = this.scale.width;
+        const H = this.scale.height;
+        const cx = W / 2;
+        const cy = H / 2;
+
         this.children.removeAll();
-        this.add.rectangle(400, 300, 800, 600, 0x000000, 0.9);
-        this.add.text(400, 300, msg, { fontSize: '24px', fill: '#fff', align: 'center', wordWrap: { width: 500 } }).setOrigin(0.5);
-        
-        const btn = this.add.rectangle(400, 450, 200, 50, 0x444444).setInteractive();
-        this.add.text(400, 450, "Continuar", { fontSize: '20px', fill: '#fff' }).setOrigin(0.5);
-        
-        btn.on('pointerdown', () => {
-            this.scene.start('MainScene');
-        });
+        this.add.rectangle(cx, cy, W, H, 0x000000, 0.92);
+        this.add.text(cx, cy - 60, msg, {
+            fontSize: '24px', fill: '#fff', align: 'center',
+            wordWrap: { width: Math.min(560, W * 0.75) }
+        }).setOrigin(0.5);
+
+        const btn = this.add.rectangle(cx, cy + 100, 220, 55, 0x444444).setInteractive();
+        this.add.text(cx, cy + 100, "Continuar", { fontSize: '22px', fill: '#fff' }).setOrigin(0.5);
+
+        btn.on('pointerdown', () => this.scene.start('MainScene'));
     }
 }

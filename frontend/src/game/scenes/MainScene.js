@@ -48,8 +48,9 @@ export default class MainScene extends Phaser.Scene {
     }
 
     create() {
-        // Ajustar límites del mundo físico para respetar el HUD superior (60px)
-        this.physics.world.setBounds(0, 60, this.scale.width, this.scale.height - 60);
+        // Límites del mundo: top=70 (bajo el HUD), bottom=scale.height
+        // Los enemigos tienen setCollideWorldBounds(true) → no pueden salir
+        this.physics.world.setBounds(0, 70, this.scale.width, this.scale.height - 70);
 
         this.add.grid(this.scale.width / 2, this.scale.height / 2, this.scale.width, this.scale.height, 32, 32, 0x35682d, 1, 0x22441d, 1);
 
@@ -788,7 +789,9 @@ export default class MainScene extends Phaser.Scene {
     pushBack(target, source, force) {
         if (!target || !target.body || !source || !source.x) return;
         const angle = Phaser.Math.Angle.Between(source.x, source.y, target.x, target.y);
-        target.body.setVelocity(Math.cos(angle) * force, Math.sin(angle) * force);
+        // Limitar la fuerza máxima para que los límites del mundo puedan detenerlos
+        const cappedForce = Math.min(force, 250);
+        target.body.setVelocity(Math.cos(angle) * cappedForce, Math.sin(angle) * cappedForce);
     }
 
     createParticles(x, y, color) {
@@ -843,6 +846,15 @@ export default class MainScene extends Phaser.Scene {
         this.enemies.forEach(enemy => {
             if (enemy.hp > 0 && enemy.sprite && enemy.sprite.active) {
                 enemy.update(this.player.sprite, time);
+                // Clamp de posición: evita que salgan del mundo por velocidades extremas
+                const minY = 80;
+                const maxY = this.scale.height - 10;
+                const minX = 10;
+                const maxX = this.scale.width - 10;
+                if (enemy.sprite.y < minY) { enemy.sprite.y = minY; enemy.sprite.body.setVelocityY(0); }
+                if (enemy.sprite.y > maxY) { enemy.sprite.y = maxY; enemy.sprite.body.setVelocityY(0); }
+                if (enemy.sprite.x < minX) { enemy.sprite.x = minX; enemy.sprite.body.setVelocityX(0); }
+                if (enemy.sprite.x > maxX) { enemy.sprite.x = maxX; enemy.sprite.body.setVelocityX(0); }
                 // Dibujar mini barra de vida para cada enemigo
                 this.drawEnemyHealthBar(enemy);
             }
