@@ -189,7 +189,7 @@ export class Player {
 
         // Forzar sincronización del cuerpo de física con la posición visual
         if (this.sword.body) {
-            this.sword.body.updateFromGameObject();
+            this.sword.body.reset(sx, sy);
             if (this.isAttacking) {
                 this.sword.body.enable = true;
             }
