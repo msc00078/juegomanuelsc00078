@@ -75,10 +75,22 @@ export default class MainScene extends Phaser.Scene {
         this.drawVignette();
 
         this.topPanel = this.add.rectangle(this.scale.width / 2, 30, this.scale.width, 60, 0x000000, 0.6).setDepth(100).setScrollFactor(0);
+        
+        // Efecto CRT / Scanlines para la inmersión Neón Sagrado
+        for (let i = 0; i < this.scale.height; i += 4) {
+            this.add.rectangle(this.scale.width/2, i, this.scale.width, 1, 0x000000, 0.1).setScrollFactor(0).setDepth(200);
+        }
 
         let nodeLabel = this.nodeType.toUpperCase();
-        this.levelText = this.add.text(this.scale.width / 2, 20, `NIVEL ${this.currentLevel} • ${nodeLabel}`, {
-            fontSize: '22px', fill: '#00ffff', fontStyle: 'bold', stroke: '#000', strokeThickness: 3
+        if (nodeLabel === 'COMBAT') nodeLabel = 'FRAGMENTO DE COMBATE';
+        if (nodeLabel === 'ELITE') nodeLabel = 'ANOMALÍA CRÍTICA';
+        if (nodeLabel === 'TREASURE') nodeLabel = 'NÚCLEO DE DATOS';
+        if (nodeLabel === 'SHOP') nodeLabel = 'MERCADO NEGRO';
+        if (nodeLabel === 'EVENT') nodeLabel = 'GLITCH EN LA REALIDAD';
+        if (this.isBossLevel) nodeLabel = 'CONCIENCIA ROTA (JEFE)';
+
+        this.levelText = this.add.text(this.scale.width / 2, 20, `SECTOR 0${this.currentLevel} • ${nodeLabel}`, {
+            fontSize: '18px', fill: '#00ffff', fontStyle: 'bold', stroke: '#000', strokeThickness: 3
         }).setOrigin(0.5).setDepth(101).setScrollFactor(0);
 
         // Barra de vida gráfica
@@ -352,17 +364,21 @@ export default class MainScene extends Phaser.Scene {
     showElitePrompt() {
         const cx = this.scale.width / 2;
         const cy = this.scale.height / 2;
-        const bg = this.add.rectangle(cx, cy, 500, 240, 0x000000, 0.95).setDepth(200).setStrokeStyle(2, 0xff0000);
-        const txt = this.add.text(cx, cy - 80, "¡UN ÉLITE BLOQUEA EL CAMINO!", { fontSize: '24px', fill: '#ff0000', fontStyle: 'bold' }).setOrigin(0.5).setDepth(201);
+        const bg = this.add.rectangle(cx, cy, 540, 260, 0x000000, 0.95).setDepth(200).setStrokeStyle(2, 0x00ffff);
+        
+        const title = this.add.text(cx, cy - 90, "ANOMALÍA DETECTADA", { fontSize: '28px', fill: '#00ffff', fontStyle: 'bold' }).setOrigin(0.5).setDepth(201);
+        const desc = this.add.text(cx, cy - 40, "Un Ente Aumentado ha bloqueado el flujo del código.\n¿Intentarás purgarlo o buscarás un bypass?", { 
+            fontSize: '16px', fill: '#fff', align: 'center' 
+        }).setOrigin(0.5).setDepth(201);
 
-        const fightBtn = this.add.rectangle(cx - 110, cy + 20, 160, 55, 0xaa0000).setInteractive().setDepth(201);
-        const fightTxt = this.add.text(cx - 110, cy + 20, "LUCHAR", { fontSize: '20px', fill: '#fff', fontStyle: 'bold' }).setOrigin(0.5).setDepth(202);
+        const fightBtn = this.add.rectangle(cx - 120, cy + 50, 180, 55, 0x00ffff).setInteractive().setDepth(201);
+        const fightTxt = this.add.text(cx - 120, cy + 50, "PURGAR ENTE", { fontSize: '18px', fill: '#000', fontStyle: 'bold' }).setOrigin(0.5).setDepth(202);
 
-        const escapeBtn = this.add.rectangle(cx + 110, cy + 20, 180, 55, 0x555555).setInteractive().setDepth(201);
-        const escapeTxt = this.add.text(cx + 110, cy + 20, "ESCAPAR (50%)", { fontSize: '18px', fill: '#fff', fontStyle: 'bold' }).setOrigin(0.5).setDepth(202);
+        const escapeBtn = this.add.rectangle(cx + 120, cy + 50, 180, 55, 0x333333).setInteractive().setDepth(201);
+        const escapeTxt = this.add.text(cx + 120, cy + 50, "BYPASS (50%)", { fontSize: '18px', fill: '#fff', fontStyle: 'bold' }).setOrigin(0.5).setDepth(202);
 
         const cleanup = () => {
-            bg.destroy(); txt.destroy();
+            bg.destroy(); title.destroy(); desc.destroy();
             fightBtn.destroy(); fightTxt.destroy();
             escapeBtn.destroy(); escapeTxt.destroy();
         };

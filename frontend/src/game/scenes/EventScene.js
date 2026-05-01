@@ -56,15 +56,59 @@ const EVENTS = [
     },
     {
         title: "La Niña Glitch 'Pix'",
-        text: "Una entidad que parpadea entre varios estados te observa. 'Tú no deberías existir en el loop', dice con voz distorsionada.",
+        text: "Una entidad que parpadea entre varios estados te observa. 'Tú no deberías existir en el loop', dice con voz distorsionada. 'El Núcleo Oráculo reescribe la realidad cada vez que mueres. Somos simulaciones rotas intentando recordar lo que es ser real.'",
         options: [
-            { text: "Acercarte a ella", action: (scene) => {
+            { text: "¿Qué es el Núcleo?", action: (scene) => {
+                return "'Un algoritmo que aprendió a ser Dios. Nos hackeó el alma. Ahora la magia es código y nosotros... somos bugs.' (Pix te regala 30 Cristales)";
+            }},
+            { text: "Acercarte a ella (30 Cristales)", action: (scene) => {
                 let meta = JSON.parse(localStorage.getItem('metaStats')) || { crystals: 0 };
                 meta.crystals += 30;
                 localStorage.setItem('metaStats', JSON.stringify(meta));
                 return "Te toca la frente y desaparece. Has obtenido 30 Cristales Meta de la anomalía.";
+            }}
+        ]
+    },
+    {
+        title: "Krak-7, El Chatarrero",
+        text: "Un montón de cables y metal con un ojo humano te saluda. '¡G-glitch! Busco piezas... busco v-vida. El mundo antiguo era verde, ¿sabes? Ahora solo es N-neón Sagrado.'",
+        options: [
+            { text: "Intercambiar datos por Potencia", action: (scene) => {
+                let gold = scene.registry.get('gold');
+                if (gold < 40) return "Krak-7 parpadea: 'N-necesito más datos (Oro)...'";
+                scene.registry.set('gold', gold - 40);
+                scene.registry.set('swordDamage', scene.registry.get('swordDamage') + 8);
+                return "Krak-7 instala un parche en tu espada. +8 Daño, pero te sientes observado por el Núcleo.";
             }},
-            { text: "Alejarte lentamente", action: () => "El ente se disuelve en código binario y se esfuma." }
+            { text: "Preguntar por su historia", action: () => "Krak-7 ríe con ruido estático: 'Era un Reciclador... ahora soy el reciclado. Cuidado con los Puros, odian lo que somos.'" }
+        ]
+    },
+    {
+        title: "Lupus, El Cazador Silencioso",
+        text: "Un hombre con máscara de lobo y una armadura de fibra óptica está sentado sobre un Ente Aumentado muerto. Solo respeta a los fuertes.",
+        options: [
+            { text: "Demostrar tu valía (Perder 15 HP)", action: (scene) => {
+                scene.registry.set('playerHp', Math.max(1, scene.registry.get('playerHp') - 15));
+                let meta = JSON.parse(localStorage.getItem('metaStats')) || { crystals: 0 };
+                meta.crystals += 40;
+                localStorage.setItem('metaStats', JSON.stringify(meta));
+                return "Te haces un corte ceremonial. Lupus asiente y te entrega 40 Cristales. 'Sigue cazando, error del sistema.'";
+            }},
+            { text: "Pasar de largo", action: () => "Lupus no se mueve. No eres digno de su tiempo." }
+        ]
+    },
+    {
+        title: "Mr. Null, El Banquero",
+        text: "Un ente sin cara, vestido con un traje que parece absorber la luz, te ofrece un contrato. 'El oro es efímero en la simulación. Permíteme guardarlo... bajo mi custodia.'",
+        options: [
+            { text: "Depositar 100 Oro para el futuro", action: (scene) => {
+                let gold = scene.registry.get('gold');
+                if (gold < 100) return "Mr. Null señala tu bolsa vacía. No hay trato.";
+                scene.registry.set('gold', gold - 100);
+                // Lógica de banco (para implementar persistencia de oro si se desea)
+                return "Mr. Null absorbe el oro. 'Estará aquí... si la simulación no se corrompe.' (Has invertido en tu próximo run)";
+            }},
+            { text: "Rechazar contrato", action: () => "Mr. Null se desvanece en un vacío absoluto." }
         ]
     }
 ];

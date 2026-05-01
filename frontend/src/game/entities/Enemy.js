@@ -1,16 +1,23 @@
 import * as Phaser from 'phaser';
 
 export class Enemy {
-    constructor(scene, x, y, hp, speed, color, size) {
+    constructor(scene, x, y, hp, speed, color, size, spriteKey = null) {
         this.scene = scene;
         this.hp = hp;
         this.maxHp = hp;
         this.speed = speed;
         this.color = color;
-        this.isDead = false;  // Track if enemy is already dead
+        this.isDead = false;
+        this.spriteKey = spriteKey;
         
-        this.sprite = scene.add.rectangle(x, y, size, size, color);
-        this.sprite.setStrokeStyle(2, 0x000000);
+        if (spriteKey) {
+            this.sprite = scene.add.sprite(x, y, spriteKey);
+            this.sprite.setDisplaySize(size, size);
+        } else {
+            this.sprite = scene.add.rectangle(x, y, size, size, color);
+            this.sprite.setStrokeStyle(2, 0x000000);
+        }
+        
         scene.physics.add.existing(this.sprite);
         this.sprite.body.setCollideWorldBounds(true);
         this.sprite.body.setBounce(0.5);
@@ -126,14 +133,18 @@ export class Enemy {
 // 1. Enemigo Estándar (El Slime original)
 export class StandardEnemy extends Enemy {
     constructor(scene, x, y) {
+        // Ente Glitch: El error más común del sistema
         super(scene, x, y, 30, 100, 0x004400, 25);
+        this.name = "Ente Glitch";
     }
 }
 
 // 2. Enemigo Tanque (Orco)
 export class TankEnemy extends Enemy {
     constructor(scene, x, y) {
-        super(scene, x, y, 100, 50, 0x555555, 40); // Más grande, gris, lento, mucha vida
+        // Protector Aumentado: Mitad humano, mitad algoritmo de defensa
+        super(scene, x, y, 100, 50, 0x555555, 40); 
+        this.name = "Protector Aumentado";
     }
     
     die() {
@@ -148,7 +159,9 @@ export class TankEnemy extends Enemy {
 // 3. Enemigo Kamikaze (Murciélago)
 export class KamikazeEnemy extends Enemy {
     constructor(scene, x, y) {
-        super(scene, x, y, 10, 250, 0x880088, 15); // Pequeño, morado, rapidísimo, poco HP
+        // Fragmento Volátil: Código corrupto que busca auto-borrarse
+        super(scene, x, y, 10, 250, 0x880088, 15);
+        this.name = "Fragmento Volátil";
     }
 
     update(playerSprite) {
@@ -193,7 +206,9 @@ export class KamikazeEnemy extends Enemy {
 // 4. Enemigo A Distancia (Arquero)
 export class RangedEnemy extends Enemy {
     constructor(scene, x, y) {
-        super(scene, x, y, 20, 80, 0xaa5500, 25); // Naranja
+        // Cazador de Datos: Reciclador que dispara ráfagas de código
+        super(scene, x, y, 20, 80, 0xaa5500, 25);
+        this.name = "Cazador de Datos";
         this.lastShotTime = 0;
     }
 
@@ -235,7 +250,9 @@ export class RangedEnemy extends Enemy {
 // 5. Enemigo Invocador (Nigromante)
 export class SummonerEnemy extends Enemy {
     constructor(scene, x, y) {
-        super(scene, x, y, 50, 60, 0x00ff00, 30); // Verde brillante
+        // Oráculo Roto: Conciencia fragmentada que replica errores
+        super(scene, x, y, 50, 60, 0x00ff00, 30);
+        this.name = "Oráculo Roto";
         this.lastSummonTime = 0;
         this.sprite.setStrokeStyle(3, 0xffffff);
     }
