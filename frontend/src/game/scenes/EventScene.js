@@ -2,50 +2,69 @@ import * as Phaser from 'phaser';
 
 const EVENTS = [
     {
-        title: "El Altar de Sangre",
-        text: "Encuentras un altar que emana una energía oscura. Una voz susurra: 'Sacrifica tu vitalidad a cambio de poder'.",
+        title: "Altar de Código",
+        text: "Encuentras un terminal antiguo. Una IA fragmentada susurra: 'Sacrifica integridad estructural a cambio de privilegios'.",
         options: [
-            { text: "Sacrificar 20 Max HP por +10 Daño", action: (scene) => {
+            { text: "Borrar 20 Max HP por +10 Daño", action: (scene) => {
                 scene.registry.set('playerMaxHp', Math.max(10, scene.registry.get('playerMaxHp') - 20));
                 scene.registry.set('playerHp', Math.min(scene.registry.get('playerHp'), scene.registry.get('playerMaxHp')));
                 scene.registry.set('swordDamage', scene.registry.get('swordDamage') + 10);
-                return "Tu fuerza aumenta, pero te sientes más débil...";
+                return "Tu código de ataque se ha optimizado, pero eres más frágil...";
             }},
-            { text: "Marcharte en silencio", action: () => "Decides no tentar al destino." }
+            { text: "Cerrar terminal", action: () => "Decides no alterar tu código fuente." }
         ]
     },
     {
-        title: "El Mercader Codicioso",
-        text: "Un pequeño duende te ofrece una bolsa misteriosa por 50 monedas de oro.",
+        title: "Don Byte, El Mercader",
+        text: "Un holograma con traje elegante y sonrisa dorada te mira. 'Tengo datos clasificados. Solo 50 de Oro.'",
         options: [
-            { text: "Pagar 50 Oro por el Misterio", action: (scene) => {
+            { text: "Pagar 50 Oro", action: (scene) => {
                 let gold = scene.registry.get('gold');
-                if (gold < 50) return "No tienes suficiente oro...";
+                if (gold < 50) return "No tienes suficiente oro (datos)...";
                 scene.registry.set('gold', gold - 50);
-                if (Math.random() < 0.5) {
+                let rnd = Math.random();
+                if (rnd < 0.4) {
                     scene.registry.set('gold', scene.registry.get('gold') + 150);
-                    return "¡Había 150 monedas dentro! ¡Qué suerte!";
+                    return "¡Te ha transferido 150 de Oro! ¡Un buen trato!";
+                } else if (rnd < 0.7) {
+                    let meta = JSON.parse(localStorage.getItem('metaStats')) || { crystals: 0 };
+                    meta.crystals += 20;
+                    localStorage.setItem('metaStats', JSON.stringify(meta));
+                    return "Te ha dado 20 Cristales Meta. ¡Información valiosa!";
                 } else {
-                    return "La bolsa estaba llena de piedras... Te han timado.";
+                    return "El archivo estaba corrupto... Te ha estafado limpiamente.";
                 }
             }},
-            { text: "Ignorarlo", action: () => "Sigues tu camino." }
+            { text: "Ignorar al holograma", action: () => "Desconfías de su sonrisa y te marchas." }
         ]
     },
     {
-        title: "La Fuente de la Vida",
-        text: "Una fuente de agua cristalina brilla en el centro de la sala.",
+        title: "Backup de Memoria",
+        text: "Encuentras una cápsula de hibernación parpadeando con la palabra 'RESTORE'.",
         options: [
-            { text: "Beber de la fuente (Cura 40 HP)", action: (scene) => {
+            { text: "Restaurar sistema (Cura 40 HP)", action: (scene) => {
                 let hp = scene.registry.get('playerHp');
                 let max = scene.registry.get('playerMaxHp');
                 scene.registry.set('playerHp', Math.min(max, hp + 40));
-                return "Te sientes rejuvenecido.";
+                return "Tu sistema ha recuperado integridad.";
             }},
-            { text: "Llenar tus bolsillos de oro (Gana 30 Oro)", action: (scene) => {
+            { text: "Extraer componentes (Gana 30 Oro)", action: (scene) => {
                 scene.registry.set('gold', scene.registry.get('gold') + 30);
-                return "Recoges unas monedas del fondo de la fuente.";
+                return "Has desmantelado la cápsula. Oro obtenido.";
             }}
+        ]
+    },
+    {
+        title: "La Niña Glitch 'Pix'",
+        text: "Una entidad que parpadea entre varios estados te observa. 'Tú no deberías existir en el loop', dice con voz distorsionada.",
+        options: [
+            { text: "Acercarte a ella", action: (scene) => {
+                let meta = JSON.parse(localStorage.getItem('metaStats')) || { crystals: 0 };
+                meta.crystals += 30;
+                localStorage.setItem('metaStats', JSON.stringify(meta));
+                return "Te toca la frente y desaparece. Has obtenido 30 Cristales Meta de la anomalía.";
+            }},
+            { text: "Alejarte lentamente", action: () => "El ente se disuelve en código binario y se esfuma." }
         ]
     }
 ];

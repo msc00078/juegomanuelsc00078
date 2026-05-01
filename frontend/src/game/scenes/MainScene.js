@@ -589,7 +589,8 @@ export default class MainScene extends Phaser.Scene {
 
     gainXp(amount) {
         const combo = this.registry.get('combo') || 0;
-        const multiplier = 1 + (combo * 0.1);
+        // Combo da ventaja, pero XP base es pequeña (mundo hostil)
+        const multiplier = 1 + (combo * 0.05);
         let xp = this.registry.get('runXp') + (amount * multiplier);
         let next = this.registry.get('xpToNext');
         let level = this.registry.get('runLevel');
@@ -597,7 +598,7 @@ export default class MainScene extends Phaser.Scene {
         if (xp >= next) {
             xp -= next;
             level++;
-            next = Math.floor(next * 1.3);
+            next = Math.floor(next * 1.5); // Escala más agresiva entre niveles
             this.registry.set('runLevel', level);
             this.registry.set('xpToNext', next);
             this.levelUp();
@@ -960,13 +961,14 @@ export default class MainScene extends Phaser.Scene {
     endGame(message) {
         this.gameOver = true;
 
-        // Recompensa de Cristales Persistentes
-        let crystalsEarned = Math.floor(this.currentLevel * 1.5);
-        if (message === "¡HAS MUERTO!") {
+        // Los cristales son escasos en el mundo del Núcleo.
+        // Solo 1 cristal por cada 3 niveles completados. Los NPCs raros son la fuente principal.
+        let crystalsEarned = Math.floor(this.currentLevel / 3);
+        if (crystalsEarned > 0) {
             let meta = JSON.parse(localStorage.getItem('metaStats')) || { crystals: 0 };
             meta.crystals = (meta.crystals || 0) + crystalsEarned;
             localStorage.setItem('metaStats', JSON.stringify(meta));
-            message += `\nGanaste ${crystalsEarned} 💎`;
+            message += `\n+${crystalsEarned} 💎 recuperados del caos`;
         }
 
         if (this.player.sprite.body) this.player.sprite.body.setVelocity(0);

@@ -9,8 +9,8 @@ export default class MenuScene extends Phaser.Scene {
         this.add.rectangle(this.scale.width / 2, this.scale.height / 2, this.scale.width, this.scale.height, 0x1a1a1a);
         this.add.grid(this.scale.width / 2, this.scale.height / 2, this.scale.width, this.scale.height, 64, 64, 0x222222, 1, 0x333333, 1);
 
-        this.add.text(this.scale.width / 2, this.scale.height * 0.22, "AI BOSS ARENA", { fontSize: '72px', fill: '#ffcc00', fontStyle: 'bold', stroke: '#000', strokeThickness: 5 }).setOrigin(0.5);
-        this.add.text(this.scale.width / 2, this.scale.height * 0.36, "A Roguelite Experience", { fontSize: '28px', fill: '#fff' }).setOrigin(0.5);
+        this.add.text(this.scale.width / 2, this.scale.height * 0.22, "NEÓN SAGRADO", { fontSize: '72px', fill: '#ffcc00', fontStyle: 'bold', stroke: '#000', strokeThickness: 5 }).setOrigin(0.5);
+        this.add.text(this.scale.width / 2, this.scale.height * 0.36, "Un error en el sistema. Tú no deberías existir.", { fontSize: '22px', fill: '#aaffff' }).setOrigin(0.5);
 
         const playBtn = this.add.rectangle(this.scale.width / 2, this.scale.height * 0.52, 300, 70, 0x0077ff).setInteractive();
         playBtn.setStrokeStyle(4, 0xffffff);
@@ -18,7 +18,7 @@ export default class MenuScene extends Phaser.Scene {
 
         const upgradeBtn = this.add.rectangle(this.scale.width / 2, this.scale.height * 0.67, 300, 70, 0x7700ff).setInteractive();
         upgradeBtn.setStrokeStyle(4, 0xffffff);
-        this.add.text(this.scale.width / 2, this.scale.height * 0.67, "MEJORAS", { fontSize: '34px', fill: '#fff', fontStyle: 'bold' }).setOrigin(0.5);
+        this.add.text(this.scale.width / 2, this.scale.height * 0.67, "EL REFUGIO NEÓN", { fontSize: '28px', fill: '#fff', fontStyle: 'bold' }).setOrigin(0.5);
 
         // Parpadeo botón
         this.tweens.add({ targets: playBtn, alpha: 0.7, duration: 800, yoyo: true, repeat: -1 });
@@ -51,10 +51,9 @@ export default class MenuScene extends Phaser.Scene {
             this.registry.set('equippedWeapon', 1);
             this.registry.set('relics', []);
             
-            // Inicializar XP y Niveles de Run
             this.registry.set('runXp', 0);
             this.registry.set('runLevel', 1);
-            this.registry.set('xpToNext', 50);
+            this.registry.set('xpToNext', 100); // Mundo hostil: XP difícil de ganar
             this.registry.set('combo', 0);
             this.registry.set('maxCombo', 0);
             
@@ -62,6 +61,6 @@ export default class MenuScene extends Phaser.Scene {
             this.scene.start('MainScene');
         });
 
-        this.add.text(this.scale.width / 2, this.scale.height * 0.88, "Usa WASD/Flechas para moverte y ESPACIO para atacar.\nSHIFT para Dash (I-Frames). Botones 1, 2, 3 cambio arma.", { fontSize: '16px', fill: '#aaa', align: 'center' }).setOrigin(0.5);
+        this.add.text(this.scale.width / 2, this.scale.height * 0.88, "Los dioses murieron... y ahora venden upgrades.\nWASD/Flechas: Moverse | ESPACIO: Atacar | SHIFT: Dash | 1,2,3: Arma", { fontSize: '14px', fill: '#888', align: 'center' }).setOrigin(0.5);
     }
 }

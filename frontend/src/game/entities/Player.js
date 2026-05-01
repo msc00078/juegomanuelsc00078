@@ -180,16 +180,16 @@ export class Player {
         let sy = this.sprite.y;
 
         // Offset de 42px desde el centro del jugador + hitbox generoso
-        if      (this.facing ===  1) { sx += 42; this.sword.setSize(70, 30); }  // Derecha
-        else if (this.facing === -1) { sx -= 42; this.sword.setSize(70, 30); }  // Izquierda
-        else if (this.facing ===  2) { sy -= 42; this.sword.setSize(30, 70); }  // Arriba
-        else if (this.facing === -2) { sy += 42; this.sword.setSize(30, 70); }  // Abajo
+        if      (this.facing ===  1) { sx += 42; this.sword.setSize(70, 30); this.sword.body.setSize(70, 30); }  // Derecha
+        else if (this.facing === -1) { sx -= 42; this.sword.setSize(70, 30); this.sword.body.setSize(70, 30); }  // Izquierda
+        else if (this.facing ===  2) { sy -= 42; this.sword.setSize(30, 70); this.sword.body.setSize(30, 70); }  // Arriba
+        else if (this.facing === -2) { sy += 42; this.sword.setSize(30, 70); this.sword.body.setSize(30, 70); }  // Abajo
 
         this.sword.setPosition(sx, sy);
 
         // Forzar sincronización del cuerpo de física con la posición visual
         if (this.sword.body) {
-            this.sword.body.reset(sx, sy);
+            this.sword.body.updateFromGameObject();
             if (this.isAttacking) {
                 this.sword.body.enable = true;
             }

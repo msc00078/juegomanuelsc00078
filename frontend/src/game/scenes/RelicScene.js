@@ -1,21 +1,21 @@
 import * as Phaser from 'phaser';
 
 const ALL_RELICS = [
-    { id: 'hermes', name: "Botas de Hermes", desc: "+20% Velocidad de movimiento", color: 0x00ffff },
-    { id: 'titan', name: "Corazón de Titán", desc: "+50 Max HP, -10% Velocidad", color: 0xff0000 },
-    { id: 'vampiro', name: "Vampirismo Menor", desc: "5% de probabilidad de\ncurar 5 HP al matar", color: 0xaa0022 },
-    { id: 'berserker', name: "Furia Berserker", desc: "+50% Daño con vida < 30%", color: 0xff5500 },
-    { id: 'iman', name: "Imán de Codicia", desc: "Atrae el oro desde lejos", color: 0xffff00 },
-    { id: 'espinas', name: "Manto de Espinas", desc: "Daño a enemigos al tocarte", color: 0x44ff44 },
-    { id: 'perforante', name: "Flechas Perforantes", desc: "Las flechas atraviesan enemigos", color: 0xaaaaaa },
-    { id: 'reloj', name: "Reloj de Arena", desc: "Cooldowns de armas -30%", color: 0x8888ff },
-    { id: 'hierro', name: "Piel de Hierro", desc: "Reduce el daño recibido en 2", color: 0x555555 },
-    { id: 'polvora', name: "Pólvora Negra", desc: "+50% Radio de explosión", color: 0x111111 },
-    { id: 'sniper', name: "Ojo del Francotirador", desc: "Más daño de arco a distancia", color: 0x00aa00 },
-    { id: 'vip', name: "Tarjeta VIP", desc: "Tienda 20% más barata", color: 0xffdd00 },
-    { id: 'sangrado', name: "Filo Sangrante", desc: "Espada aplica daño en el tiempo", color: 0x880000 },
-    { id: 'artemisa', name: "Arco de Artemisa", desc: "Dispara 3 flechas en abanico", color: 0x00ffaa },
-    { id: 'pegajosa', name: "Bomba Pegajosa", desc: "Las bombas se pegan a enemigos", color: 0x005500 }
+    { id: 'hermes', name: "Botas de Hermes.exe", desc: "+20% Velocidad de procesamiento", color: 0x00ffff },
+    { id: 'titan', name: "Corazón de Kernel", desc: "+50 Max HP, -10% Velocidad. Late como una CPU", color: 0xff0000 },
+    { id: 'vampiro', name: "Protocolo Sanguijuela", desc: "5% de probabilidad de\ncurar 5 HP al borrar un Ente", color: 0xaa0022 },
+    { id: 'berserker', name: "Furia.dll", desc: "+50% Daño con integridad < 30%", color: 0xff5500 },
+    { id: 'iman', name: "Imán de Cripto", desc: "Atrae el oro (datos) desde lejos", color: 0xffff00 },
+    { id: 'espinas', name: "Manto de Firewall", desc: "Devuelve daño a los atacantes", color: 0x44ff44 },
+    { id: 'perforante', name: "Flechas Perforantes", desc: "Las flechas atraviesan el código enemigo", color: 0xaaaaaa },
+    { id: 'reloj', name: "Overclock", desc: "Cooldowns de armas -30%", color: 0x8888ff },
+    { id: 'hierro', name: "Carcasa de Titanio", desc: "Reduce el daño recibido en 2", color: 0x555555 },
+    { id: 'polvora', name: "Polvora Negativa", desc: "+50% Radio de explosión", color: 0x111111 },
+    { id: 'sniper', name: "Ojo del Debugger", desc: "Más daño de arco a distancia", color: 0x00aa00 },
+    { id: 'vip', name: "Acceso Root", desc: "Tienda 20% más barata", color: 0xffdd00 },
+    { id: 'sangrado', name: "Filo Corrupto", desc: "Espada aplica daño en el tiempo", color: 0x880000 },
+    { id: 'artemisa', name: "Matriz de Artemisa", desc: "Dispara 3 flechas en abanico", color: 0x00ffaa },
+    { id: 'pegajosa', name: "Glitch Adhesivo", desc: "Las bombas se pegan al objetivo", color: 0x005500 }
 ];
 
 export default class RelicScene extends Phaser.Scene {

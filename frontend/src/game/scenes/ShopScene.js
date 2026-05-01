@@ -10,29 +10,31 @@ export default class ShopScene extends Phaser.Scene {
         const H = this.scale.height;
         const cx = W / 2;
 
-        this.add.rectangle(cx, H / 2, W, H, 0x111111);
-        this.add.text(cx, H * 0.12, "LA TIENDA MISTERIOSA", { fontSize: '40px', fill: '#ffd700', fontStyle: 'bold' }).setOrigin(0.5);
-        this.goldText = this.add.text(cx, H * 0.22, `Oro disponible: ${this.registry.get('gold')}`, { fontSize: '24px', fill: '#fff' }).setOrigin(0.5);
+        this.add.rectangle(cx, H / 2, W, H, 0x080c14);
+        this.add.grid(cx, H/2, W, H, 48, 48, 0x0d1020, 1, 0x111833, 1);
+        this.add.text(cx, H * 0.08, "DON BYTE", { fontSize: '46px', fill: '#ffd700', fontStyle: 'bold', stroke: '#000', strokeThickness: 4 }).setOrigin(0.5);
+        this.add.text(cx, H * 0.16, '"Siempre sonríe... demasiado."', { fontSize: '16px', fill: '#ffaa00', fontStyle: 'italic' }).setOrigin(0.5);
+        this.goldText = this.add.text(cx, H * 0.24, `Datos (Oro): ${this.registry.get('gold')}`, { fontSize: '22px', fill: '#aaffff' }).setOrigin(0.5);
 
         const row1Y = H * 0.42;
         const row2Y = H * 0.60;
         const spacing = W * 0.18;
 
         // Fila 1
-        this.createButton(cx - spacing, row1Y, `Poción (Curar)\nCosto: ${this.getPrice(20)} Oro`, 0x00aa00, () => this.buyHeal());
-        this.createButton(cx,           row1Y, `Afilar (+Daño)\nCosto: ${this.getPrice(40)} Oro`, 0xaa0000, () => this.buyDamage());
-        this.createButton(cx + spacing, row1Y, `Corazón (+20 HP)\nCosto: ${this.getPrice(50)} Oro`, 0xaa00aa, () => this.buyMaxHp());
+        this.createButton(cx - spacing, row1Y, `Nanito Curativo\n(Restaurar HP)\n${this.getPrice(25)} Oro`, 0x006622, () => this.buyHeal());
+        this.createButton(cx,           row1Y, `Afilar Byte\n(+Daño)\n${this.getPrice(50)} Oro`,          0x880000, () => this.buyDamage());
+        this.createButton(cx + spacing, row1Y, `Implante (+20 HP)\n${this.getPrice(60)} Oro`,              0x770077, () => this.buyMaxHp());
 
         // Fila 2
-        let bowText = this.registry.get('hasBow') ? "Arco (Comprado)" : `Comprar Arco\nCosto: ${this.getPrice(80)} Oro`;
-        this.createButton(cx - spacing * 0.6, row2Y, bowText, 0xaaaa00, () => this.buyBow());
+        let bowText = this.registry.get('hasBow') ? "Arco.exe\n(Instalado)" : `Arco.exe\n${this.getPrice(90)} Oro`;
+        this.createButton(cx - spacing * 0.6, row2Y, bowText, 0x886600, () => this.buyBow());
 
-        let bombText = this.registry.get('hasBombs') ? "Bombas (Comprado)" : `Comprar Bombas\nCosto: ${this.getPrice(100)} Oro`;
-        this.createButton(cx + spacing * 0.6, row2Y, bombText, 0x00aaaa, () => this.buyBombs());
+        let bombText = this.registry.get('hasBombs') ? "Bombas Glítch\n(Instaladas)" : `Bombas Glítch\n${this.getPrice(120)} Oro`;
+        this.createButton(cx + spacing * 0.6, row2Y, bombText, 0x006666, () => this.buyBombs());
 
-        // Botón Continuar
-        const continueBtn = this.add.rectangle(cx, H * 0.80, 220, 55, 0x444444).setInteractive();
-        const continueTxt = this.add.text(cx, H * 0.80, "Continuar >", { fontSize: '22px', fill: '#fff' }).setOrigin(0.5);
+        const continueBtn = this.add.rectangle(cx, H * 0.82, 240, 55, 0x221100).setInteractive();
+        continueBtn.setStrokeStyle(2, 0xffd700);
+        this.add.text(cx, H * 0.82, "Salir del mercado >", { fontSize: '20px', fill: '#ffd700' }).setOrigin(0.5);
 
         continueBtn.on('pointerover', () => continueBtn.setFillStyle(0x666666));
         continueBtn.on('pointerout', () => continueBtn.setFillStyle(0x444444));
