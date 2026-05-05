@@ -138,57 +138,7 @@ export default class MainScene extends Phaser.Scene {
             this.updateUI();
         });
 
-        // ------- MOBILE CONTROLS (joystick + botones) -------
-        const isMobile = this.scale.width < 600 || this.sys.game.device.os.android || this.sys.game.device.os.iOS;
-        if (isMobile) {
-            // Joystick base
-            const joyBase = this.add.circle(80, this.scale.height - 80, 50, 0x222222, 0.6).setScrollFactor(0).setDepth(200);
-            const joyKnob = this.add.circle(80, this.scale.height - 80, 30, 0xaaaaaa, 0.9).setScrollFactor(0).setDepth(201);
-            this.mobileJoystick = { vx: 0, vy: 0, active: false };
 
-            // Drag handling
-            joyKnob.setInteractive({ draggable: true });
-            this.input.setDraggable(joyKnob);
-            joyKnob.on('drag', (pointer, x, y) => {
-                const dx = x - joyBase.x;
-                const dy = y - joyBase.y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-                const maxDist = 40; // radio máximo del joystick
-                const angle = Math.atan2(dy, dx);
-                const limitedDist = Math.min(dist, maxDist);
-                const nx = joyBase.x + Math.cos(angle) * limitedDist;
-                const ny = joyBase.y + Math.sin(angle) * limitedDist;
-                joyKnob.setPosition(nx, ny);
-                // Normalizar a -1..1
-                this.mobileJoystick.vx = Math.cos(angle) * (limitedDist / maxDist);
-                this.mobileJoystick.vy = Math.sin(angle) * (limitedDist / maxDist);
-                this.mobileJoystick.active = true;
-            });
-            joyKnob.on('dragend', () => {
-                joyKnob.setPosition(joyBase.x, joyBase.y);
-                this.mobileJoystick.vx = 0;
-                this.mobileJoystick.vy = 0;
-                this.mobileJoystick.active = false;
-            });
-
-            // Botón de Dash (derecha inferior)
-            const dashBtn = this.add.rectangle(this.scale.width - 80, this.scale.height - 80, 60, 60, 0x0044ff, 0.8).setInteractive();
-            dashBtn.setStrokeStyle(2, 0xffffff);
-            this.add.text(dashBtn.x, dashBtn.y, '⇆', { fontSize: '28px', fill: '#fff' }).setOrigin(0.5);
-            dashBtn.on('pointerdown', () => this.player.isDashing = true);
-
-            // Botón de Ataque (arriba derecha del dash)
-            const atkBtn = this.add.rectangle(this.scale.width - 150, this.scale.height - 80, 60, 60, 0xff4400, 0.8).setInteractive();
-            atkBtn.setStrokeStyle(2, 0xffffff);
-            this.add.text(atkBtn.x, atkBtn.y, '⨂', { fontSize: '28px', fill: '#fff' }).setOrigin(0.5);
-            atkBtn.on('pointerdown', () => this.player.isAttacking = true);
-
-            // Botón de Pausa (esquina superior derecha)
-            const pauseBtn = this.add.rectangle(this.scale.width - 40, 40, 40, 40, 0x555555, 0.7).setInteractive();
-            pauseBtn.setStrokeStyle(2, 0xffffff);
-            this.add.text(pauseBtn.x, pauseBtn.y, '⏸', { fontSize: '20px', fill: '#fff' }).setOrigin(0.5);
-            pauseBtn.on('pointerdown', () => this.pauseGame());
-        }
 
         // Atajos de teclado adicionales
         this.input.keyboard.on('keydown-P', () => this.pauseGame());
