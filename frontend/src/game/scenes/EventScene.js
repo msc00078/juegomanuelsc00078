@@ -4,6 +4,7 @@ const EVENTS = [
     {
         title: "Altar de Código",
         text: "Encuentras un terminal antiguo. Una IA fragmentada susurra: 'Sacrifica integridad estructural a cambio de privilegios'.",
+        npc: "Terminal Antiguo",
         options: [
             { text: "Borrar 20 Max HP por +10 Daño", action: (scene) => {
                 scene.registry.set('playerMaxHp', Math.max(10, scene.registry.get('playerMaxHp') - 20));
@@ -17,6 +18,7 @@ const EVENTS = [
     {
         title: "Don Byte, El Mercader",
         text: "Un holograma con traje elegante y sonrisa dorada te mira. 'Tengo datos clasificados. Solo 50 de Oro.'",
+        npc: "Don Byte",
         options: [
             { text: "Pagar 50 Oro", action: (scene) => {
                 let gold = scene.registry.get('gold');
@@ -41,6 +43,7 @@ const EVENTS = [
     {
         title: "Backup de Memoria",
         text: "Encuentras una cápsula de hibernación parpadeando con la palabra 'RESTORE'.",
+        npc: "Cápsula de Hibernación",
         options: [
             { text: "Restaurar sistema (Cura 40 HP)", action: (scene) => {
                 let hp = scene.registry.get('playerHp');
@@ -57,6 +60,7 @@ const EVENTS = [
     {
         title: "La Niña Glitch 'Pix'",
         text: "Una entidad que parpadea entre varios estados te observa. 'Tú no deberías existir en el loop', dice con voz distorsionada. 'El Núcleo Oráculo reescribe la realidad cada vez que mueres. Somos simulaciones rotas intentando recordar lo que es ser real.'",
+        npc: "Pix",
         options: [
             { text: "¿Qué es el Núcleo?", action: (scene) => {
                 return "'Un algoritmo que aprendió a ser Dios. Nos hackeó el alma. Ahora la magia es código y nosotros... somos bugs.' (Pix te regala 30 Cristales)";
@@ -72,6 +76,7 @@ const EVENTS = [
     {
         title: "Krak-7, El Chatarrero",
         text: "Un montón de cables y metal con un ojo humano te saluda. '¡G-glitch! Busco piezas... busco v-vida. El mundo antiguo era verde, ¿sabes? Ahora solo es N-neón Sagrado.'",
+        npc: "Krak-7",
         options: [
             { text: "Intercambiar datos por Potencia", action: (scene) => {
                 let gold = scene.registry.get('gold');
@@ -86,6 +91,7 @@ const EVENTS = [
     {
         title: "Lupus, El Cazador Silencioso",
         text: "Un hombre con máscara de lobo y una armadura de fibra óptica está sentado sobre un Ente Aumentado muerto. Solo respeta a los fuertes.",
+        npc: "Lupus",
         options: [
             { text: "Demostrar tu valía (Perder 15 HP)", action: (scene) => {
                 scene.registry.set('playerHp', Math.max(1, scene.registry.get('playerHp') - 15));
@@ -100,6 +106,7 @@ const EVENTS = [
     {
         title: "Mr. Null, El Banquero",
         text: "Un ente sin cara, vestido con un traje que parece absorber la luz, te ofrece un contrato. 'El oro es efímero en la simulación. Permíteme guardarlo... bajo mi custodia.'",
+        npc: "Mr. Null",
         options: [
             { text: "Depositar 100 Oro para el futuro", action: (scene) => {
                 let gold = scene.registry.get('gold');
@@ -134,9 +141,16 @@ export default class EventScene extends Phaser.Scene {
         }).setOrigin(0.5);
 
         this.add.text(cx, H * 0.35, event.text, {
-            fontSize: '17px', fill: '#fff', align: 'center',
-            wordWrap: { width: Math.min(580, W * 0.75) }
+            fontSize: '18px', fill: '#fff', align: 'center', fontStyle: 'italic',
+            wordWrap: { width: Math.min(620, W * 0.80) }
         }).setOrigin(0.5);
+
+        // Si el evento tiene un NPC asignado, mostramos su nombre de forma especial
+        if (event.npc) {
+            this.add.text(cx, H * 0.28, `[ CONVERSACIÓN CON ${event.npc.toUpperCase()} ]`, {
+                fontSize: '14px', fill: '#00ffff', fontStyle: 'bold'
+            }).setOrigin(0.5);
+        }
 
         event.options.forEach((opt, i) => {
             const btnY = H * 0.56 + (i * H * 0.10);

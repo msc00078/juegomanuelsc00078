@@ -39,6 +39,27 @@ export default class ShopScene extends Phaser.Scene {
         continueBtn.on('pointerover', () => continueBtn.setFillStyle(0x666666));
         continueBtn.on('pointerout', () => continueBtn.setFillStyle(0x444444));
         continueBtn.on('pointerdown', () => this.scene.start('MainScene'));
+
+        // Mostrar diálogo al entrar
+        this.showDialogue("DON BYTE", '"Bienvenido al mercado de datos, error. Aquí el código es ley y el oro es el lenguaje. Compra algo... o piérdete en el loop."');
+    }
+
+    showDialogue(character, message) {
+        const cx = this.scale.width / 2;
+        const cy = this.scale.height / 2;
+        
+        const box = this.add.rectangle(cx, this.scale.height - 100, this.scale.width * 0.8, 120, 0x000000, 0.9).setDepth(200).setStrokeStyle(2, 0x00ffff);
+        const nameTxt = this.add.text(cx - (this.scale.width * 0.38), this.scale.height - 150, character, { fontSize: '20px', fill: '#00ffff', fontStyle: 'bold' }).setDepth(201);
+        const msgTxt = this.add.text(cx, this.scale.height - 100, message, { fontSize: '18px', fill: '#fff', align: 'center', wordWrap: { width: this.scale.width * 0.7 } }).setOrigin(0.5).setDepth(201);
+        
+        // Auto-destruir tras unos segundos o al hacer click
+        this.input.once('pointerdown', () => {
+            box.destroy(); nameTxt.destroy(); msgTxt.destroy();
+        });
+        
+        this.time.delayedCall(5000, () => {
+            if (box.active) { box.destroy(); nameTxt.destroy(); msgTxt.destroy(); }
+        });
     }
 
     getPrice(base) {

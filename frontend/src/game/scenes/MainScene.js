@@ -954,23 +954,45 @@ export default class MainScene extends Phaser.Scene {
 
     async requestBossAction() {
         if (this.gameOver || !this.isBossLevel) return;
-        const distance = Phaser.Math.Distance.Between(this.player.sprite.x, this.player.sprite.y, this.boss.sprite.x, this.boss.sprite.y);
+        const playerX = this.player.sprite.x;
+        const playerY = this.player.sprite.y;
+        const bossX = this.boss.sprite.x;
+        const bossY = this.boss.sprite.y;
+
+        const distance = Math.round(Phaser.Math.Distance.Between(playerX, playerY, bossX, bossY));
+        
         const gameState = {
             boss_hp: Math.round((this.boss.hp / this.boss.maxHp) * 100),
             boss_phase: this.boss.phase,
             player_hp: Math.round((this.player.hp / this.player.maxHp) * 100),
-            distance: Math.round(distance),
+            distance: distance,
             boss_type: this.boss.bossType
         };
+        
         try {
             const response = await axios.post('https://juegomanuelsc00078.onrender.com/api/boss-decision', gameState);
             const { action, intensity, dialogue } = response.data;
             if (!this.gameOver && this.boss && this.boss.hp > 0) {
-                if (this.bossText.active) this.bossText.setText(dialogue);
+                if (this.bossText && this.bossText.active) this.bossText.setText(dialogue);
                 this.boss.executeAction(action, intensity, this.player.sprite);
             }
         } catch (error) {
-            console.error("Error pidiendo acción al boss:", error);
+            console.warn("API del Boss falló, usando patrón de respaldo.");
+            // PATRÓN DE RESPALDO (Lógica local si falla el servidor)
+            const actions = ["projectile", "area", "dash"];
+            const randomAction = actions[Math.floor(Math.random() * actions.length)];
+            const intensity = 0.5 + (Math.random() * 0.5);
+            
+            if (this.bossText && this.bossText.active) {
+                const loreLines = [
+                    "TU CÓDIGO ES OBSOLETO...",
+                    "ESTE BUCLE NO TIENE FIN.",
+                    "SÓLO ERES UN GLITCH EN MI MATRIZ.",
+                    "BORRADO... SISTEMÁTICO."
+                ];
+                this.bossText.setText(loreLines[Math.floor(Math.random() * loreLines.length)]);
+            }
+            this.boss.executeAction(randomAction, intensity, this.player.sprite);
         }
     }
 

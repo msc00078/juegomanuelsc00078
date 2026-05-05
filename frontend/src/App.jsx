@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import * as Phaser from 'phaser';
 import { config } from './game/GameConfig';
+import Auth from './components/Auth';
 import './App.css';
 
 function App() {
@@ -8,6 +9,7 @@ function App() {
   const [personality, setPersonality] = useState("poeta");
   const [showMobileWarning, setShowMobileWarning] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
+  const [user, setUser] = useState(null);
 
   // Sincronizar personalidad con el motor del juego
   useEffect(() => {
@@ -24,12 +26,10 @@ function App() {
     }
   }, []);
 
-  // Arrancar Phaser SOLO cuando gameStarted sea true
+  // Arrancar Phaser SOLO cuando gameStarted y user sean true
   useEffect(() => {
-    if (!gameStarted) return;
+    if (!gameStarted || !user) return;
 
-    // Breve timeout para que el DOM actualice el tamaño del contenedor
-    // ANTES de que Phaser lea las dimensiones del parent
     const timeout = setTimeout(() => {
       const game = new Phaser.Game(config);
       gameRef.current = game;
@@ -80,11 +80,15 @@ function App() {
           <h2>GIRA TU MÓVIL</h2>
           <p>Para la mejor experiencia, pon el móvil en <strong>horizontal</strong> y toca la pantalla.</p>
           <div className="tap-prompt">▶ TOCA PARA EMPEZAR</div>
-        </div>
+      )}
+      
+      {/* ---- Pantalla de Login (Supabase) ---- */}
+      {!user && !showMobileWarning && (
+        <Auth onLogin={(user) => setUser(user)} />
       )}
 
-      {/* ---- Cabecera (solo escritorio) ---- */}
-      {!showMobileWarning && (
+      {/* ---- Cabecera (solo escritorio y logueado) ---- */}
+      {user && !showMobileWarning && (
         <header className="App-header">
           <h1>AI Boss Arena</h1>
           <div className="controls-panel">
