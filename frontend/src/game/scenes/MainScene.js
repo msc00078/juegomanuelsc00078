@@ -2,6 +2,7 @@ import * as Phaser from 'phaser';
 import { Player } from '../entities/Player';
 import { Boss } from '../entities/Boss';
 import { StandardEnemy, TankEnemy, RangedEnemy, KamikazeEnemy, SummonerEnemy } from '../entities/Enemy';
+import { saveRunResult } from '../supabase';
 import axios from 'axios';
 
 export default class MainScene extends Phaser.Scene {
@@ -10,11 +11,11 @@ export default class MainScene extends Phaser.Scene {
         this.lastApiCallTime = 0;
         this.apiCallInterval = 3000;
         this.gameOver = false;
-        this.bossType = "poeta";
         this.isCountdown = true;
     }
 
     init() {
+        this.bossType = window.gamePersonality || "poeta";
         if (this.registry.get('currentLevel') === undefined) {
             this.registry.set('currentLevel', 1);
             this.registry.set('gold', 0);
@@ -30,6 +31,7 @@ export default class MainScene extends Phaser.Scene {
             this.registry.set('xpToNext', 50);
             this.registry.set('combo', 0);
             this.registry.set('maxCombo', 0);
+            this.registry.set('score', 0);
         }
 
         // Reparar posibles NaNs o indefinidos de sesiones anteriores corruptas
@@ -41,9 +43,11 @@ export default class MainScene extends Phaser.Scene {
         if (this.registry.get('runXp') === undefined) this.registry.set('runXp', 0);
         if (this.registry.get('xpToNext') === undefined) this.registry.set('xpToNext', 50);
         if (this.registry.get('combo') === undefined) this.registry.set('combo', 0);
+        if (this.registry.get('score') === undefined) this.registry.set('score', 0);
 
         this.currentLevel = this.registry.get('currentLevel') || 1;
         this.gold = this.registry.get('gold');
+        this.score = this.registry.get('score');
         this.gameOver = false;
         this.isBossLevel = (this.currentLevel % 5 === 0);
         this.isCountdown = true;
@@ -107,8 +111,16 @@ export default class MainScene extends Phaser.Scene {
             fontSize: '12px', fill: '#00ffff', fontStyle: 'bold'
         }).setOrigin(0.5).setDepth(103).setScrollFactor(0);
 
-        this.goldText = this.add.text(this.scale.width - 20, 30, `🪙 ${this.gold}`, {
-            fontSize: '22px', fill: '#ffd700', fontStyle: 'bold'
+        this.goldText = this.add.text(this.scale.width - 200, 25, `ORO: ${this.gold} 💎`, {
+            fontSize: '18px', fill: '#ffd700', fontStyle: 'bold'
+        }).setOrigin(1, 0.5).setDepth(101).setScrollFactor(0);
+
+        this.scoreText = this.add.text(this.scale.width - 200, 45, `SCORE: ${this.score}`, {
+            fontSize: '14px', fill: '#00ffff', fontStyle: 'bold'
+        }).setOrigin(1, 0.5).setDepth(101).setScrollFactor(0);
+
+        this.comboText = this.add.text(this.scale.width - 50, 35, `x${this.registry.get('combo') || 0}`, {
+            fontSize: '18px', fill: '#ff00ff', fontStyle: 'bold'
         }).setOrigin(1, 0.5).setDepth(101).setScrollFactor(0);
 
         this.weaponText = this.add.text(this.scale.width / 2, this.scale.height - 30, "1 - ESPADA", {
@@ -138,8 +150,6 @@ export default class MainScene extends Phaser.Scene {
         this.bossNameText = this.add.text(0, -25, "JEFE FINAL", { fontSize: '18px', fill: '#ff0000', fontStyle: 'bold' }).setOrigin(0.5);
         this.bossHpContainer.add([this.bossHpBg, this.bossHpBar, this.bossNameText]);
 
-        // Combo UI
-        this.comboText = this.add.text(this.scale.width - 20, 90, "", { fontSize: '24px', fill: '#ff00ff', fontStyle: 'bold' }).setOrigin(1, 0.5).setDepth(101).setScrollFactor(0);
         this.lastKillTime = 0;
 
         if (this.isBossLevel) {
@@ -775,17 +785,13 @@ export default class MainScene extends Phaser.Scene {
     }
 
     updateUI() {
-        if (this.player.hp <= 0) this.player.hp = 0;
-
-        // Actualizar HP Bar
-        if (this.playerHpText.active) {
-            this.playerHpText.setText(`HP: ${this.player.hp}/${this.player.maxHp}`);
-            const percent = this.player.hp / this.player.maxHp;
-            this.hpBar.width = 150 * percent;
-            if (percent < 0.3) this.hpBar.setFillStyle(0xff0000);
-            else if (percent < 0.6) this.hpBar.setFillStyle(0xffff00);
-            else this.hpBar.setFillStyle(0x00ff00);
-        }
+        if (!this.playerHpText.active) return;
+        this.playerHpText.setText(`HP: ${Math.floor(this.player.hp)}/${this.player.maxHp}`);
+        this.hpBar.width = Math.max(0, 150 * (this.player.hp / this.player.maxHp));
+        const percent = this.player.hp / this.player.maxHp;
+        if (percent < 0.3) this.hpBar.setFillStyle(0xff0000);
+        else if (percent < 0.6) this.hpBar.setFillStyle(0xffff00);
+        else this.hpBar.setFillStyle(0x00ff00);
 
         // Actualizar XP Bar
         if (this.xpBar.active) {
@@ -931,6 +937,11 @@ export default class MainScene extends Phaser.Scene {
         this.lastKillTime = this.time.now;
         const currentCombo = this.registry.get('combo') || 0;
         this.registry.set('combo', currentCombo + 1);
+        
+        // Puntuación: Vida máxima del enemigo * multiplicador de combo
+        const points = Math.floor((enemy.maxHp || 50) * (1 + (currentCombo * 0.1)));
+        this.score += points;
+        this.registry.set('score', this.score);
 
         // Efecto visual de combo
         this.cameras.main.shake(100, 0.005);
@@ -1003,11 +1014,12 @@ export default class MainScene extends Phaser.Scene {
         // Solo 1 cristal por cada 3 niveles completados. Los NPCs raros son la fuente principal.
         let crystalsEarned = Math.floor(this.currentLevel / 3);
         if (crystalsEarned > 0) {
-            let meta = JSON.parse(localStorage.getItem('metaStats')) || { crystals: 0 };
-            meta.crystals = (meta.crystals || 0) + crystalsEarned;
-            localStorage.setItem('metaStats', JSON.stringify(meta));
             message += `\n+${crystalsEarned} 💎 recuperados del caos`;
         }
+        message += `\nSCORE FINAL: ${this.score}`;
+
+        // GUARDAR EN SUPABASE EL RESULTADO FINAL
+        saveRunResult(this.score, this.currentLevel, crystalsEarned).catch(err => console.error(err));
 
         if (this.player.sprite.body) this.player.sprite.body.setVelocity(0);
         if (this.boss && this.boss.sprite.body) this.boss.sprite.body.setVelocity(0);

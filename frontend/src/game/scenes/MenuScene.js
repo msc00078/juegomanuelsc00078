@@ -30,6 +30,24 @@ export default class MenuScene extends Phaser.Scene {
         upgradeBtn.on('pointerout', () => upgradeBtn.setFillStyle(0x7700ff));
         upgradeBtn.on('pointerdown', () => this.scene.start('UpgradeScene'));
 
+        // Selector de Personalidad del Boss
+        const personalities = ['poeta', 'logico', 'glitch'];
+        let currentPersonality = personalities.indexOf(window.gamePersonality || 'poeta');
+        if (currentPersonality === -1) currentPersonality = 0;
+        window.gamePersonality = personalities[currentPersonality];
+
+        const personalityText = this.add.text(this.scale.width / 2, this.scale.height * 0.80, `[ IA BOSS: ${personalities[currentPersonality].toUpperCase()} ]`, { 
+            fontSize: '20px', fill: '#00ffff', fontStyle: 'bold', backgroundColor: '#111'
+        }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+        
+        personalityText.on('pointerdown', () => {
+            currentPersonality = (currentPersonality + 1) % personalities.length;
+            window.gamePersonality = personalities[currentPersonality];
+            personalityText.setText(`[ IA BOSS: ${personalities[currentPersonality].toUpperCase()} ]`);
+        });
+        personalityText.on('pointerover', () => personalityText.setFillStyle(0xffffff));
+        personalityText.on('pointerout', () => personalityText.setFillStyle(0x00ffff));
+
         playBtn.on('pointerdown', () => {
             let savedMeta = JSON.parse(localStorage.getItem('metaStats')) || {};
             let meta = {
@@ -41,6 +59,7 @@ export default class MenuScene extends Phaser.Scene {
             // Reiniciar estado global con bonos
             this.registry.set('currentLevel', 1);
             this.registry.set('gold', 0);
+            this.registry.set('score', 0);
             this.registry.set('playerHp', 100 + (meta.hpLevel * 10));
             this.registry.set('playerMaxHp', 100 + (meta.hpLevel * 10));
             this.registry.set('swordDamage', 10 + (meta.dmgLevel * 2));
@@ -61,6 +80,6 @@ export default class MenuScene extends Phaser.Scene {
             this.scene.start('MainScene');
         });
 
-        this.add.text(this.scale.width / 2, this.scale.height * 0.88, "Los dioses murieron... y ahora venden upgrades.\nWASD/Flechas: Moverse | ESPACIO: Atacar | SHIFT: Dash | 1,2,3: Arma", { fontSize: '14px', fill: '#888', align: 'center' }).setOrigin(0.5);
+        this.add.text(this.scale.width / 2, this.scale.height * 0.92, "Los dioses murieron... y ahora venden upgrades.\nWASD/Flechas: Moverse | ESPACIO: Atacar | SHIFT: Dash | 1,2,3: Arma", { fontSize: '14px', fill: '#888', align: 'center' }).setOrigin(0.5);
     }
 }

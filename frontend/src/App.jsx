@@ -6,15 +6,9 @@ import './App.css';
 
 function App() {
   const gameRef = useRef(null);
-  const [personality, setPersonality] = useState("poeta");
   const [showMobileWarning, setShowMobileWarning] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
   const [user, setUser] = useState(null);
-
-  // Sincronizar personalidad con el motor del juego
-  useEffect(() => {
-    window.gamePersonality = personality;
-  }, [personality]);
 
   // Detectar móvil al montar
   useEffect(() => {
@@ -92,14 +86,6 @@ function App() {
       {user && !showMobileWarning && (
         <header className="App-header">
           <h1>AI Boss Arena</h1>
-          <div className="controls-panel">
-            <label>Personalidad IA del Boss: </label>
-            <select value={personality} onChange={(e) => setPersonality(e.target.value)}>
-              <option value="poeta">Poeta (Equilibrado)</option>
-              <option value="logico">Lógico (Calculador)</option>
-              <option value="glitch">Glitch (Caótico)</option>
-            </select>
-          </div>
         </header>
       )}
 
@@ -110,7 +96,6 @@ function App() {
       {!showMobileWarning && (
         <div className="instructions">
           <p>🕹️ <strong>WASD / Flechas:</strong> Moverse | ⚔️ <strong>ESPACIO:</strong> Atacar con espada</p>
-          <p>El comportamiento de la IA cambiará según la personalidad seleccionada arriba.</p>
         </div>
       )}
     </div>
