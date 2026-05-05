@@ -811,7 +811,8 @@ export default class MainScene extends Phaser.Scene {
             this.runLevelText.setText(`LVL: ${this.registry.get('runLevel')}`);
         }
 
-        if (this.goldText.active) this.goldText.setText(`🪙 ${this.gold}`);
+        if (this.goldText && this.goldText.active) this.goldText.setText(`ORO: ${this.gold} 💎`);
+        if (this.scoreText && this.scoreText.active) this.scoreText.setText(`SCORE: ${this.score}`);
 
         // Combo
         const combo = this.registry.get('combo');

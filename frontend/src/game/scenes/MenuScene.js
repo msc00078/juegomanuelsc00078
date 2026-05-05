@@ -95,6 +95,25 @@ export default class MenuScene extends Phaser.Scene {
             }
         });
 
-        this.add.text(this.scale.width / 2, this.scale.height * 0.92, "Los dioses murieron... y ahora venden upgrades.\nWASD/Flechas: Moverse | ESPACIO: Atacar | SHIFT: Dash | 1,2,3: Arma", { fontSize: '14px', fill: '#888', align: 'center' }).setOrigin(0.5);
+        // Mostrar Controles (Derecha) en la pantalla de inicio
+        const rightX = this.scale.width - 50;
+        this.add.text(rightX, 50, "CÓDIGOS DE ACCESO", { fontSize: '24px', fill: '#00ffcc', fontStyle: 'bold' }).setOrigin(1, 0);
+        
+        const controls = [
+            "WASD / Flechas : Mover el Avatar",
+            "ESPACIO : Atacar con el Arma",
+            "SHIFT : Dash de Evasión",
+            "1, 2, 3 : Cambiar de Arma",
+            "Tecla I / TAB : Abrir Inventario",
+            "ESC / P : Pausar Simulación"
+        ];
+        
+        let cy = 90;
+        controls.forEach(ctrl => {
+            this.add.text(rightX, cy, ctrl, { fontSize: '16px', fill: '#cccccc' }).setOrigin(1, 0);
+            cy += 30;
+        });
+
+        this.add.text(this.scale.width / 2, this.scale.height * 0.92, "Los dioses murieron... y ahora venden upgrades.", { fontSize: '14px', fill: '#555', align: 'center' }).setOrigin(0.5);
     }
 }
