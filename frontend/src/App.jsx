@@ -80,6 +80,7 @@ function App() {
           <h2>GIRA TU MÓVIL</h2>
           <p>Para la mejor experiencia, pon el móvil en <strong>horizontal</strong> y toca la pantalla.</p>
           <div className="tap-prompt">▶ TOCA PARA EMPEZAR</div>
+        </div>
       )}
       
       {/* ---- Pantalla de Login (Supabase) ---- */}
