@@ -981,15 +981,15 @@ export default class MainScene extends Phaser.Scene {
         };
         
         try {
-            const response = await axios.post('https://juegomanuelsc00078.onrender.com/api/boss-decision', gameState);
+            const response = await axios.post('https://juegomanuelsc00078.onrender.com/api/boss-decision', gameState, { timeout: 2500 });
             const { action, intensity, dialogue } = response.data;
             if (!this.gameOver && this.boss && this.boss.hp > 0) {
                 if (this.bossText && this.bossText.active) this.bossText.setText(dialogue);
                 this.boss.executeAction(action, intensity, this.player.sprite);
             }
         } catch (error) {
-            console.warn("API del Boss falló, usando patrón de respaldo.");
-            // PATRÓN DE RESPALDO (Lógica local si falla el servidor)
+            console.warn("API del Boss falló (o es muy lenta), usando patrón de respaldo.");
+            // PATRÓN DE RESPALDO (Lógica local si falla el servidor o está hibernando)
             const actions = ["projectile", "area", "dash"];
             const randomAction = actions[Math.floor(Math.random() * actions.length)];
             const intensity = 0.5 + (Math.random() * 0.5);

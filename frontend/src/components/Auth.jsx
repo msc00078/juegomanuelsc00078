@@ -8,6 +8,7 @@ export default function Auth({ onLogin }) {
   const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
   const [leaderboard, setLeaderboard] = useState([]);
+  const [leaderboardLoading, setLeaderboardLoading] = useState(true);
 
   useEffect(() => {
     const fetchLeaderboard = async () => {
@@ -18,6 +19,8 @@ export default function Auth({ onLogin }) {
         }
       } catch (err) {
         console.error("No se pudo cargar el ranking", err);
+      } finally {
+        setLeaderboardLoading(false);
       }
     };
     fetchLeaderboard();
@@ -101,8 +104,10 @@ export default function Auth({ onLogin }) {
         <div className="leaderboard-box neon-border">
           <h2 className="glitch-text" style={{fontSize: '1.5rem', marginBottom: '20px'}}>RANKING GLOBAL</h2>
           <div className="leaderboard-list">
-            {leaderboard.length === 0 ? (
+            {leaderboardLoading ? (
               <p>Cargando datos del Núcleo...</p>
+            ) : leaderboard.length === 0 ? (
+              <p style={{color: '#888'}}>Aún no hay registros. ¡Sé el primero!</p>
             ) : (
               leaderboard.map((player, index) => (
                 <div key={index} className="leaderboard-item">

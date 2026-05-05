@@ -32,30 +32,40 @@ export const signIn = async (email, password) => {
 
 // Función para guardar puntuación y progreso
 export const saveRunResult = async (score, sector, crystalsEarned) => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
 
-    // Primero obtenemos los datos actuales para sumar los cristales
-    const { data: profile } = await supabase
-        .from('profiles')
-        .select('total_crystals, high_score, max_sector')
-        .eq('id', user.id)
-        .single();
+        // Primero obtenemos los datos actuales para sumar los cristales
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('total_crystals, high_score, max_sector')
+            .eq('id', user.id)
+            .single();
 
-    if (profile) {
-        const newHighScore = Math.max(profile.high_score, score);
-        const newMaxSector = Math.max(profile.max_sector, sector);
-        const newTotalCrystals = (profile.total_crystals || 0) + crystalsEarned;
+        let newHighScore = score || 0;
+        let newMaxSector = sector || 1;
+        let newTotalCrystals = crystalsEarned || 0;
 
-        await supabase
+        if (profile) {
+            newHighScore = Math.max(profile.high_score || 0, score || 0);
+            newMaxSector = Math.max(profile.max_sector || 1, sector || 1);
+            newTotalCrystals = (profile.total_crystals || 0) + (crystalsEarned || 0);
+        }
+
+        const { error } = await supabase
             .from('profiles')
             .update({ 
                 high_score: newHighScore, 
                 max_sector: newMaxSector,
                 total_crystals: newTotalCrystals,
-                updated_at: new Date()
+                updated_at: new Date().toISOString()
             })
             .eq('id', user.id);
+            
+        if (error) console.error("Error guardando run:", error);
+    } catch (err) {
+        console.error("Error crítico en saveRunResult:", err);
     }
 };
 
