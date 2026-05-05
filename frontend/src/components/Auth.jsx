@@ -10,24 +10,24 @@ export default function Auth({ onLogin }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Check if Supabase is properly configured
-    if (!signUp || !signIn) { // If the file failed to load properly
-      alert("ERROR CRÍTICO: La conexión al Núcleo (Supabase) ha fallado.");
-      return;
-    }
-
     setLoading(true);
-    if (isSignUp) {
-      const { data, error } = await signUp(email, password, username);
-      if (!error && data.user) onLogin(data.user);
-      else alert(error?.message || "Error al registrarse");
-    } else {
-      const { data, error } = await signIn(email, password);
-      if (!error && data.user) onLogin(data.user);
-      else alert("Error: Credenciales inválidas o cuenta no confirmada.");
+    
+    try {
+      if (isSignUp) {
+        const { data, error } = await signUp(email, password, username);
+        if (!error && data?.user) onLogin(data.user);
+        else alert(error?.message || "Error al registrarse. ¿Ejecutaste el código SQL en Supabase?");
+      } else {
+        const { data, error } = await signIn(email, password);
+        if (!error && data?.user) onLogin(data.user);
+        else alert(error?.message || "Error: Credenciales inválidas.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error crítico de conexión: " + (err.message || err) + "\n\n1. ¿Reiniciaste el servidor (npm run dev)?\n2. ¿Pusiste bien tu ANON_KEY en el archivo .env?");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (

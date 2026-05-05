@@ -11,6 +11,7 @@ export const supabase = (supabaseUrl && supabaseKey && supabaseKey !== 'TU_ANON_
 
 // Función para registrarse
 export const signUp = async (email, password, username) => {
+    if (!supabase) throw new Error("Supabase no está inicializado. Verifica las llaves en el .env.");
     const { data, error } = await supabase.auth.signUp({ email, password });
     if (error) return { error };
     
