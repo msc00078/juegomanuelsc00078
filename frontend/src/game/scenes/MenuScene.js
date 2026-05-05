@@ -1,4 +1,5 @@
 import * as Phaser from 'phaser';
+import { getLeaderboard } from '../supabase';
 
 export default class MenuScene extends Phaser.Scene {
     constructor() {
@@ -78,6 +79,20 @@ export default class MenuScene extends Phaser.Scene {
             
             this.registry.set('nextNodeType', 'combat'); // Empezar con combate
             this.scene.start('MainScene');
+        });
+
+        // Mostrar Leaderboard (Top 5) en la pantalla de inicio
+        this.add.text(50, 50, "TOP 5 GLOBAL", { fontSize: '24px', fill: '#ff00ff', fontStyle: 'bold' });
+        
+        getLeaderboard().then(({ data, error }) => {
+            if (!error && data) {
+                let yPos = 90;
+                data.slice(0, 5).forEach((player, index) => {
+                    let color = index === 0 ? '#ffcc00' : '#00ffff';
+                    this.add.text(50, yPos, `#${index + 1} ${player.username} - ${player.high_score} pts`, { fontSize: '18px', fill: color });
+                    yPos += 30;
+                });
+            }
         });
 
         this.add.text(this.scale.width / 2, this.scale.height * 0.92, "Los dioses murieron... y ahora venden upgrades.\nWASD/Flechas: Moverse | ESPACIO: Atacar | SHIFT: Dash | 1,2,3: Arma", { fontSize: '14px', fill: '#888', align: 'center' }).setOrigin(0.5);

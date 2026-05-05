@@ -938,8 +938,8 @@ export default class MainScene extends Phaser.Scene {
         const currentCombo = this.registry.get('combo') || 0;
         this.registry.set('combo', currentCombo + 1);
         
-        // Puntuación: Vida máxima del enemigo * multiplicador de combo
-        const points = Math.floor((enemy.maxHp || 50) * (1 + (currentCombo * 0.1)));
+        // Puntuación: Vida base muy baja + pequeño bono por combo
+        const points = Math.floor((enemy.maxHp / 10) + (currentCombo * 2));
         this.score += points;
         this.registry.set('score', this.score);
 

@@ -1,4 +1,5 @@
 import * as Phaser from 'phaser';
+import { getLeaderboard } from '../supabase';
 
 export default class UpgradeScene extends Phaser.Scene {
     constructor() {
@@ -42,6 +43,20 @@ export default class UpgradeScene extends Phaser.Scene {
         backBtn.on('pointerover', () => backBtn.setStrokeStyle(2, 0xffffff));
         backBtn.on('pointerout',  () => backBtn.setStrokeStyle(0));
         backBtn.on('pointerdown', () => this.scene.start('MenuScene'));
+
+        // Mostrar Leaderboard (Top 5) en la pantalla de mejoras
+        this.add.text(50, 50, "TOP 5 GLOBAL", { fontSize: '20px', fill: '#ff00ff', fontStyle: 'bold' });
+        
+        getLeaderboard().then(({ data, error }) => {
+            if (!error && data) {
+                let yPos = 80;
+                data.slice(0, 5).forEach((player, index) => {
+                    let color = index === 0 ? '#ffcc00' : '#00ffff';
+                    this.add.text(50, yPos, `#${index + 1} ${player.username} - ${player.high_score} pts`, { fontSize: '14px', fill: color });
+                    yPos += 25;
+                });
+            }
+        });
     }
 
     createUpgradeRow(stats, y, label, key, costPerLevel, cx, W) {
