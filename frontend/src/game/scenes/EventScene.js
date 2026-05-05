@@ -1,4 +1,5 @@
 import * as Phaser from 'phaser';
+import { supabase } from '../supabase';
 
 const EVENTS = [
     {
