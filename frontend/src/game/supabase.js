@@ -64,9 +64,13 @@ export const saveRunResult = async (score, sector, crystalsEarned) => {
                 updated_at: new Date().toISOString()
             }, { onConflict: 'id' });
             
-        if (error) console.error("Error guardando run:", error);
+        if (error) {
+            console.error("Error guardando run:", error);
+            alert("⚠️ Error guardando tu puntuación en Supabase: " + error.message + "\n\n¿Tienes configuradas las políticas RLS de INSERT/UPDATE para la tabla 'profiles'?");
+        }
     } catch (err) {
         console.error("Error crítico en saveRunResult:", err);
+        alert("⚠️ Error crítico conectando con el ranking: " + err.message);
     }
 };
 

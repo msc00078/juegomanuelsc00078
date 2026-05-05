@@ -793,13 +793,14 @@ export default class MainScene extends Phaser.Scene {
     }
 
     updateUI() {
-        if (!this.playerHpText.active) return;
-        this.playerHpText.setText(`HP: ${Math.floor(this.player.hp)}/${this.player.maxHp}`);
-        this.hpBar.width = Math.max(0, 150 * (this.player.hp / this.player.maxHp));
-        const percent = this.player.hp / this.player.maxHp;
-        if (percent < 0.3) this.hpBar.setFillStyle(0xff0000);
-        else if (percent < 0.6) this.hpBar.setFillStyle(0xffff00);
-        else this.hpBar.setFillStyle(0x00ff00);
+        if (this.playerHpText && this.playerHpText.active) {
+            this.playerHpText.setText(`HP: ${Math.floor(this.player.hp)}/${this.player.maxHp}`);
+            this.hpBar.width = Math.max(0, 150 * (this.player.hp / this.player.maxHp));
+            const percent = this.player.hp / this.player.maxHp;
+            if (percent < 0.3) this.hpBar.setFillStyle(0xff0000);
+            else if (percent < 0.6) this.hpBar.setFillStyle(0xffff00);
+            else this.hpBar.setFillStyle(0x00ff00);
+        }
 
         // Actualizar XP Bar
         if (this.xpBar.active) {
