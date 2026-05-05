@@ -10,6 +10,13 @@ export default function Auth({ onLogin }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Check if Supabase is properly configured
+    if (!signUp || !signIn) { // If the file failed to load properly
+      alert("ERROR CRÍTICO: La conexión al Núcleo (Supabase) ha fallado.");
+      return;
+    }
+
     setLoading(true);
     if (isSignUp) {
       const { data, error } = await signUp(email, password, username);

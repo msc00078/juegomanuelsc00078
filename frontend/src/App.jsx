@@ -42,7 +42,7 @@ function App() {
         gameRef.current = null;
       }
     };
-  }, [gameStarted]);
+  }, [gameStarted, user]);
 
   const handleStartMobile = async () => {
     try {

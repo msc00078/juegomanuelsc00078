@@ -1,9 +1,13 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
-export const supabase = createClient(supabaseUrl, supabaseKey);
+// Inicializar solo si las llaves no son los placeholders
+export const supabase = (supabaseUrl && supabaseKey && supabaseKey !== 'TU_ANON_KEY_AQUI') 
+    ? createClient(supabaseUrl, supabaseKey) 
+    : null;
+
 
 // Función para registrarse
 export const signUp = async (email, password, username) => {
