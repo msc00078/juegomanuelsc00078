@@ -55,13 +55,14 @@ export const saveRunResult = async (score, sector, crystalsEarned) => {
 
         const { error } = await supabase
             .from('profiles')
-            .update({ 
+            .upsert({ 
+                id: user.id,
+                username: profile?.username || user.email.split('@')[0],
                 high_score: newHighScore, 
                 max_sector: newMaxSector,
                 total_crystals: newTotalCrystals,
                 updated_at: new Date().toISOString()
-            })
-            .eq('id', user.id);
+            }, { onConflict: 'id' });
             
         if (error) console.error("Error guardando run:", error);
     } catch (err) {

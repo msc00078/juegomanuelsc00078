@@ -260,6 +260,14 @@ export default class MainScene extends Phaser.Scene {
             }
         });
 
+        // Evento Resume: Cuando volvemos de LevelUpScene, actualizar stats del jugador
+        this.events.on('resume', () => {
+            this.player.maxHp = this.registry.get('playerMaxHp');
+            this.player.hp = this.registry.get('playerHp');
+            // La velocidad extra y el daño se leen dinámicamente o se aplican si la lógica lo requiere
+            this.updateUI();
+        });
+
         this.spawnCrates();
         this.updateUI();
         
