@@ -276,11 +276,6 @@ export default class MainScene extends Phaser.Scene {
             this.showElitePrompt();
         } else if (this.nodeType === 'treasure') {
             this.spawnTreasureRoom();
-        } else if (this.nodeType === 'shop') {
-            // Si venimos de la tienda, mostramos una sala de suministros segura y el portal de salida
-            this.add.text(this.scale.width / 2, 180, "ZONA DE SUMINISTROS", { fontSize: '32px', fill: '#00f2ff', fontStyle: 'bold' }).setOrigin(0.5);
-            this.add.text(this.scale.width / 2, 230, "Módulos de datos adquiridos. Continúa al siguiente sector.", { fontSize: '16px', fill: '#aaa' }).setOrigin(0.5);
-            // No spawneamos enemigos, solo el portal
         } else {
             this.spawnNormalEnemies();
         }
