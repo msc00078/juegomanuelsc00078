@@ -1365,8 +1365,8 @@ export default class MainScene extends Phaser.Scene {
 
         goContainer.add([box, title, statsText, hint]);
 
-        // Guardar resultado
-        saveRunResult(this.score, this.currentLevel, crystalsEarned).catch(err => console.error(err));
+        // Guardar resultado (El servidor calculará los cristales ganados de forma segura)
+        saveRunResult(this.score, this.currentLevel).catch(err => console.error(err));
 
         // Auto-reinicio tras 5 segundos
         const restartTimer = this.time.delayedCall(5000, () => {
