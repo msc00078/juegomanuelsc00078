@@ -13,17 +13,14 @@ export default class MainScene extends Phaser.Scene {
         this.lastApiCallTime = 0;
         this.gameOver = false;
         this.isCountdown = true;
-        
-        // Intervalo de IA dinámico según nivel (más lento al inicio, más rápido después)
-        // Nivel 5: ~3.5s, Nivel 50: ~1.5s
-        const currentLvl = this.registry.get('currentLevel') || 1;
-        this.apiCallInterval = Math.max(1200, 4000 - (currentLvl * 60));
-        // Mobile joystick placeholder
+        this.apiCallInterval = 3000;
         this.mobileJoystick = null; // {vx, vy, active}
     }
 
     init() {
         this.bossType = window.gamePersonality || "poeta";
+        const currentLvl = this.registry.get('currentLevel') || 1;
+        this.apiCallInterval = Math.max(1200, 4000 - (currentLvl * 60));
         if (this.registry.get('currentLevel') === undefined) {
             this.registry.set('currentLevel', 1);
             this.registry.set('gold', 0);
