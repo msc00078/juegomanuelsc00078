@@ -311,12 +311,12 @@ export default class MainScene extends Phaser.Scene {
             arrow.destroy();
         });
 
-        // Daño al jugador por obstáculos peligrosos
-        this.physics.add.overlap(this.player.sprite, this.crates, (player, obstacle) => {
+        // Daño al jugador por obstáculos peligrosos (Collider para mejor detección física)
+        this.physics.add.collider(this.player.sprite, this.crates, (player, obstacle) => {
             if (obstacle.doesDamage && !this.player.isInvulnerable) {
                 this.player.takeDamage(10);
                 this.updateUI();
-                this.pushBack(this.player.sprite, obstacle, 300);
+                this.pushBack(this.player.sprite, obstacle, 400);
             }
         });
 
@@ -1051,11 +1051,16 @@ export default class MainScene extends Phaser.Scene {
             if (w === 3) this.weaponText.setText("3 - BOMBAS").setBackgroundColor('#555555');
         }
 
-        if (this.isBossLevel && this.boss) {
-            const percent = this.boss.hp / this.boss.maxHp;
+        if (this.isBossLevel && this.bosses && this.bosses.length > 0) {
+            const totalHp = this.bosses.reduce((acc, b) => acc + Math.max(0, b.hp), 0);
+            const totalMaxHp = this.bosses.reduce((acc, b) => acc + b.maxHp, 0);
+            const percent = totalMaxHp > 0 ? totalHp / totalMaxHp : 0;
+            
             this.bossHpBar.width = 400 * percent;
-            if (this.boss.hp <= 0) {
+            if (totalHp <= 0) {
                 this.bossHpContainer.setVisible(false);
+            } else {
+                this.bossHpContainer.setVisible(true);
             }
         }
 

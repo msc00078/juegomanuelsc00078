@@ -51,81 +51,77 @@ export default function Auth({ onLogin }) {
   return (
     <div className="auth-overlay">
       <div className="auth-container-flex">
-        {/* FORM PANEL */}
-        <div className="auth-box neon-border">
-          <h2 className="glitch-text">{isSignUp ? 'REGISTRO DE USUARIO' : 'ACCESO AL NÚCLEO'}</h2>
-          <p className="auth-subtitle">IDENTIFÍCATE PARA ENTRAR EN LA SIMULACIÓN</p>
+        {/* PANEL DE AUTENTICACIÓN */}
+        <div className="auth-box">
+          <h2 className="glitch-text">{isSignUp ? 'REGISTRO' : 'ACCESO AL NÚCLEO'}</h2>
+          <span className="auth-subtitle">PROTOCOLO DE SEGURIDAD ACTIVADO</span>
+          
           <form onSubmit={handleSubmit} className="auth-form">
             {isSignUp && (
               <div className="input-group">
-                <input type="text" placeholder="USERNAME" value={username} onChange={e => setUsername(e.target.value)} required />
+                <input 
+                  type="text" 
+                  placeholder="USERNAME" 
+                  value={username} 
+                  onChange={e => setUsername(e.target.value)} 
+                  required 
+                />
               </div>
             )}
             <div className="input-group">
-              <input type="email" placeholder="EMAIL" value={email} onChange={e => setEmail(e.target.value)} required />
+              <input 
+                type="email" 
+                placeholder="EMAIL" 
+                value={email} 
+                onChange={e => setEmail(e.target.value)} 
+                required 
+              />
             </div>
             <div className="input-group">
-              <input type="password" placeholder="PASSWORD" value={password} onChange={e => setPassword(e.target.value)} required />
+              <input 
+                type="password" 
+                placeholder="PASSWORD" 
+                value={password} 
+                onChange={e => setPassword(e.target.value)} 
+                required 
+              />
             </div>
             <button type="submit" className="auth-submit-btn" disabled={loading}>
-              {loading ? 'CARGANDO...' : isSignUp ? 'CREAR PERFIL' : 'INICIAR SESIÓN'}
+              {loading ? 'SINCRONIZANDO...' : isSignUp ? 'CREAR PERFIL' : 'INICIAR SESIÓN'}
             </button>
           </form>
+
           <div className="auth-toggle">
             <p onClick={() => setIsSignUp(!isSignUp)}>
-              {isSignUp ? '¿Ya tienes una cuenta? Inicia sesión' : '¿Eres nuevo? Crea un perfil aquí'}
+              {isSignUp ? '¿Ya tienes acceso? Entra aquí' : '¿Nuevo sujeto? Regístrate aquí'}
             </p>
           </div>
         </div>
-        {/* LEADERBOARD PANEL */}
-        {isMobile ? (
-          <div className="leaderboard-toggle">
-            <button onClick={() => setShowLeaderboardMobile(!showLeaderboardMobile)} className="leaderboard-btn">
-              {showLeaderboardMobile ? 'Ocultar Ranking' : 'Mostrar Ranking'}
-            </button>
-            {showLeaderboardMobile && (
-              <div className="leaderboard-box neon-border">
-                <h2 className="glitch-text" style={{ fontSize: '1.5rem', marginBottom: '20px' }}>RANKING GLOBAL</h2>
-                <div className="leaderboard-list">
-                  {leaderboardLoading ? (
-                    <p>Cargando datos del Núcleo...</p>
-                  ) : leaderboard.length === 0 ? (
-                    <p style={{ color: '#888' }}>Aún no hay registros. ¡Sé el primero!</p>
-                  ) : (
-                    leaderboard.map((player, index) => (
-                      <div key={index} className="leaderboard-item">
-                        <span className="rank">#{index + 1}</span>
-                        <span className="name">{player.username || 'Anónimo'}</span>
-                        <span className="score">{player.high_score} pts</span>
-                        <span className="sector">S{player.max_sector}</span>
-                      </div>
-                    ))
-                  )}
+
+        {/* PANEL DE RANKING GLOBAL */}
+        <div className="leaderboard-box">
+          <div className="leaderboard-title-flex">
+            <h2 className="glitch-text" style={{ fontSize: '1.4rem' }}>RANKING GLOBAL</h2>
+            <span style={{ color: 'var(--primary)', fontSize: '0.8rem', fontWeight: 'bold' }}>📡 LIVE</span>
+          </div>
+
+          <div className="leaderboard-list">
+            {leaderboardLoading ? (
+              <div className="status-msg">Cargando datos del Núcleo...</div>
+            ) : leaderboard.length === 0 ? (
+              <div className="status-msg">Aún no hay registros en la simulación.</div>
+            ) : (
+              leaderboard.map((player, index) => (
+                <div key={index} className={`leaderboard-item ${index === 0 ? 'top-1' : ''}`}>
+                  <span className="rank">{index === 0 ? '👑' : `#${index + 1}`}</span>
+                  <span className="name">{player.username || 'Sujeto Anónimo'}</span>
+                  <span className="score">{player.high_score.toLocaleString()} PTS</span>
+                  <span className="sector">S.{player.max_sector}</span>
                 </div>
-              </div>
+              ))
             )}
           </div>
-        ) : (
-          <div className="leaderboard-box neon-border">
-            <h2 className="glitch-text" style={{ fontSize: '1.5rem', marginBottom: '20px' }}>RANKING GLOBAL</h2>
-            <div className="leaderboard-list">
-              {leaderboardLoading ? (
-                <p>Cargando datos del Núcleo...</p>
-              ) : leaderboard.length === 0 ? (
-                <p style={{ color: '#888' }}>Aún no hay registros. ¡Sé el primero!</p>
-              ) : (
-                leaderboard.map((player, index) => (
-                  <div key={index} className="leaderboard-item">
-                    <span className="rank">#{index + 1}</span>
-                    <span className="name">{player.username || 'Anónimo'}</span>
-                    <span className="score">{player.high_score} pts</span>
-                    <span className="sector">S{player.max_sector}</span>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-        )}
+        </div>
       </div>
     </div>
   );
