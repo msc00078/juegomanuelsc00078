@@ -1018,11 +1018,11 @@ export default class MainScene extends Phaser.Scene {
         // Probabilidades de sala aumentadas para tienda y eventos
         const r = Math.random();
         let nextNode = 'combat';
-        if (r < 0.4) nextNode = 'combat';
-        else if (r < 0.55) nextNode = 'elite';
+        if (r < 0.3) nextNode = 'combat';
+        else if (r < 0.6) nextNode = 'elite'; // Aumentado a 30%
         else if (r < 0.7) nextNode = 'treasure';
-        else if (r < 0.85) nextNode = 'shop'; // Aumentado a 15%
-        else nextNode = 'event'; // Aumentado a 15%
+        else if (r < 0.85) nextNode = 'shop';
+        else nextNode = 'event';
 
         this.registry.set('nextNodeType', nextNode);
 
