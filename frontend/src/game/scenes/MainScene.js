@@ -177,13 +177,16 @@ export default class MainScene extends Phaser.Scene {
 
             this.bosses = [];
             
-            // Si el nivel es >= 20, hay un 40% de probabilidad de Dual Boss
-            const isDual = this.currentLevel >= 20 && Math.random() < 0.4;
+            // Si el nivel es >= 35, hay un 25% de probabilidad de Dual Boss (Más progresivo)
+            const isDual = this.currentLevel >= 35 && Math.random() < 0.25;
             
             if (isDual) {
-                const boss1 = new Boss(this, this.scale.width / 4, 180, this.bossType, this.currentLevel);
-                const boss2 = new Boss(this, (this.scale.width / 4) * 3, 180, this.bossType, this.currentLevel);
-                this.bosses.push(boss1, boss2);
+                const b1 = new Boss(this, this.scale.width / 4, 180, this.bossType, this.currentLevel);
+                const b2 = new Boss(this, (this.scale.width / 4) * 3, 180, this.bossType, this.currentLevel);
+                // Nerf de HP para duales
+                b1.hp = Math.round(b1.hp * 0.85); b1.maxHp = b1.hp;
+                b2.hp = Math.round(b2.hp * 0.85); b2.maxHp = b2.hp;
+                this.bosses.push(b1, b2);
                 this.bossNameText.setText(`${this.bossType.toUpperCase()}S (DUAL)`);
             } else {
                 const boss = new Boss(this, this.scale.width / 2, 180, this.bossType, this.currentLevel);
@@ -309,11 +312,11 @@ export default class MainScene extends Phaser.Scene {
         });
 
         // Daño al jugador por obstáculos peligrosos
-        this.physics.add.collider(this.player.sprite, this.crates, (player, obstacle) => {
+        this.physics.add.overlap(this.player.sprite, this.crates, (player, obstacle) => {
             if (obstacle.doesDamage && !this.player.isInvulnerable) {
                 this.player.takeDamage(10);
                 this.updateUI();
-                this.pushBack(this.player.sprite, obstacle, 200);
+                this.pushBack(this.player.sprite, obstacle, 300);
             }
         });
 
@@ -503,12 +506,36 @@ export default class MainScene extends Phaser.Scene {
     }
 
     spawnElite() {
-        let elite = new TankEnemy(this, this.scale.width / 2, 180);
-        elite.hp = 300; elite.maxHp = 300;
-        elite.sprite.setScale(1.5);
-        elite.color = 0xff0000; elite.sprite.setFillStyle(0xff0000);
+        // Un Élite es una anomalía con nivel superior al actual (+15)
+        const eliteLevel = this.currentLevel + 15;
+        let elite;
+
+        // Selección dinámica del tipo de Élite según el nivel
+        if (this.currentLevel < 15) {
+            elite = new TankEnemy(this, this.scale.width / 2, 220);
+        } else if (this.currentLevel < 40) {
+            elite = new TeleporterEnemy(this, this.scale.width / 2, 220);
+        } else {
+            elite = new GuardianEnemy(this, this.scale.width / 2, 220);
+        }
+
+        // Aplicar escalado de 20 rangos + Alpha asegurado
+        applyEnemyScaling(elite, eliteLevel);
+        elite.applyAlpha(); 
+
+        // Bonus de estadísticas para que sea un mini-boss real
+        elite.hp = Math.round(elite.hp * 2.5);
+        elite.maxHp = elite.hp;
+        elite.contactDamage = Math.round(elite.contactDamage * 1.5);
+        elite.sprite.setScale(elite.sprite.scale * 1.3);
+
         this.enemies.push(elite);
         this.setupEnemyCollisions(elite);
+        
+        if (this.bossText) {
+            this.bossText.setText("¡ADVERTENCIA: ANOMALÍA CRÍTICA!");
+            this.bossText.setFill("#ff00ff");
+        }
     }
 
     spawnNormalEnemies() {
@@ -795,7 +822,8 @@ export default class MainScene extends Phaser.Scene {
     }
 
     showDamageNumber(x, y, damage) {
-        const txt = this.add.text(x, y - 20, Math.round(damage).toString(), {
+        const displayVal = typeof damage === 'number' ? Math.round(damage).toString() : damage;
+        const txt = this.add.text(x, y - 20, displayVal, {
             fontSize: '18px', fill: '#fff', fontStyle: 'bold', stroke: '#000', strokeThickness: 3
         }).setOrigin(0.5);
         this.tweens.add({
