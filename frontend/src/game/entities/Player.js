@@ -256,19 +256,26 @@ export class Player {
         }
 
         this.hp -= amount;
+        this.isInvulnerable = true;
         
-        this.sprite.setFillStyle(0xff0000);
+        this.scene.registry.set('hp', this.hp);
+        this.scene.updateHealthUI?.();
+        
+        this.sprite.setFillStyle?.(0xff0000);
         this.scene.time.delayedCall(100, () => {
-            if (this.sprite.active && !this.isDashing) this.sprite.setFillStyle(0x0000ff);
+            if (this.sprite.active && !this.isDashing) this.sprite.setFillStyle?.(0x0000ff);
+            this.isInvulnerable = false;
         });
 
-        this.scene.createParticles(this.sprite.x, this.sprite.y, 0xff0000);
-        this.scene.cameras.main.shake(100, 0.01);
+        this.scene.createParticles?.(this.sprite.x, this.sprite.y, 0xff0000);
+        this.scene.cameras?.main?.shake(100, 0.01);
 
         if (this.hp <= 0) {
             this.hp = 0;
-            this.sprite.setActive(false).setVisible(false);
-            if (this.sword) this.sword.destroy();
+            this.sprite.setActive?.(false);
+            this.sprite.setVisible?.(false);
+            if (this.sword) this.sword.destroy?.();
+            this.scene.gameOver?.();
         }
     }
 }

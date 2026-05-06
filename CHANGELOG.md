@@ -2,6 +2,27 @@
 
 Todas las novedades y mejoras implementadas en el proyecto.
 
+## [1.6.2] - 2026-05-06
+### Añadido
+- **Suite de Tests Completa**: Se creó una batería de **31 tests** repartidos en 8 archivos (2 backend + 6 frontend). Todos los tests pasan en verde.
+  - Backend: `boss.test.js` (2 tests: happy path y fallback de API), `bossRoute.test.js` (2 tests: respuesta exitosa y error 500).
+  - Frontend: `supabase.test.js` (signUp, signIn, saveRunResult, leaderboard), `Auth.test.jsx` (5 tests del componente de login), `Player.test.js` (7 tests de lógica de daño, invulnerabilidad, game over), `Enemy.test.js` (5 tests de vida, daño, muerte), `GameConfig.test.js` (5 tests de configuración de Phaser).
+
+### Modificado
+- **`Player.js`** y **`Enemy.js`**: Se usó optional chaining (`?.`) en las llamadas a `scene.showDamageNumber`, `scene.createParticles`, `scene.cameras`, etc., para que las clases sean seguras de instanciar fuera de una escena Phaser real (en tests).
+
+
+- **Entorno de Testing y Cobertura**: Se integró `Vitest` y `@vitest/coverage-v8` tanto en el `frontend` como en el `backend`. Esto permite realizar pruebas unitarias y medir el porcentaje de código cubierto.
+  - Scripts configurados: `npm run test` y `npm run coverage`.
+  - Se añadieron tests de ejemplo para ilustrar el funcionamiento (ej. `boss.test.js`).
+
+### Eliminado
+- **Archivos de Prueba Huérfanos**: Se eliminaron los archivos `test_boss_fix.js`, `test_enemy_fix.js` y `test_sword_fix.js` en el `frontend` al no tener uso.
+- **Directorio de Trabajo (`@workspace`)**: Se eliminó la carpeta completa `@workspace` que contenía scripts de prueba obsoletos y resúmenes de correcciones antiguos que ya no son relevantes para el proyecto.
+
+### Modificado
+- **Revisión de Código**: Auditoría completa de `backend` y `frontend`, confirmando que todas las funciones exportadas están en uso.
+
 ## [1.6.0] - 2026-04-30
 ### Añadido
 - **Optimización Móvil (Responsive Total)**: Todo el juego ha pasado de una resolución fija (800x600) a un ratio panorámico 16:9 (`1280x720`) dinámico usando `FIT`. Todos los menús (Tiendas, Inventario, Nivel, Eventos, Pausa) ahora usan coordenadas relativas al tamaño de pantalla.

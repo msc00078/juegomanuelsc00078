@@ -64,14 +64,14 @@ export class Enemy {
         if (this.hp <= 0) return;
         
         this.hp -= amount;
-        this.scene.showDamageNumber(this.sprite.x, this.sprite.y, amount);
+        this.scene.showDamageNumber?.(this.sprite.x, this.sprite.y, amount);
         
         this.sprite.setFillStyle(0xffffff);
         this.scene.time.delayedCall(100, () => {
             if (this.sprite && this.sprite.active && !this.isDead) this.sprite.setFillStyle(this.color);
         });
 
-        this.scene.createParticles(this.sprite.x, this.sprite.y, 0xffffff);
+        this.scene.createParticles?.(this.sprite.x, this.sprite.y, 0xffffff);
 
         if (this.hp <= 0) {
             this.hp = 0;
