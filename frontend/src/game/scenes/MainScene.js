@@ -330,7 +330,16 @@ export default class MainScene extends Phaser.Scene {
             if (obstacle.doesDamage && !this.player.isInvulnerable) {
                 this.player.takeDamage(10);
                 this.updateUI();
-                this.pushBack(this.player.sprite, obstacle, 400);
+                this.pushBack(this.player.sprite, obstacle, 500); // Fuerza aumentada
+            }
+        });
+
+        // Refuerzo con Overlap para asegurar daño constante si el jugador está sobre el bloque
+        this.physics.add.overlap(this.player.sprite, this.crates, (player, obstacle) => {
+            if (obstacle.doesDamage && !this.player.isInvulnerable) {
+                this.player.takeDamage(1); // Daño menor pero continuo
+                this.updateUI();
+                this.pushBack(this.player.sprite, obstacle, 100);
             }
         });
 
@@ -1293,7 +1302,7 @@ export default class MainScene extends Phaser.Scene {
 
     endGame(message) {
         this.gameOver = true;
-        this.scene.pause(); // Pausar lógica física
+        this.physics.pause(); // Pausar solo la física, no la escena completa
 
         // Oscurecer fondo
         const overlay = this.add.rectangle(this.scale.width / 2, this.scale.height / 2, this.scale.width, this.scale.height, 0x000000, 0.8).setDepth(1000);

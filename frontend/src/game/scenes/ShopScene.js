@@ -79,7 +79,7 @@ export default class ShopScene extends Phaser.Scene {
             fontFamily: 'Orbitron, sans-serif', fontSize: '18px', fill: '#fff', fontStyle: 'bold' 
         }).setOrigin(0.5);
         const descTxt = this.add.text(0, -10, desc, { 
-            fontFamily: 'Inter, sans-serif', fontSize: '12px', fill: '#888' 
+            fontFamily: 'Inter, sans-serif', fontSize: '12px', fill: '#ffffff' 
         }).setOrigin(0.5);
         const priceTxt = this.add.text(0, 35, typeof priceLabel === 'number' ? `${priceLabel} 💎` : priceLabel, { 
             fontFamily: 'Orbitron, sans-serif', fontSize: '16px', fill: color, fontStyle: 'bold' 
@@ -113,7 +113,7 @@ export default class ShopScene extends Phaser.Scene {
             fontFamily: 'Orbitron, sans-serif', fontSize: '18px', fill: '#00f2ff', fontStyle: 'bold' 
         });
         const msgTxt = this.add.text(0, 5, message, { 
-            fontFamily: 'Inter, sans-serif', fontSize: '16px', fill: '#fff', align: 'center', wordWrap: { width: this.scale.width * 0.75 } 
+            fontFamily: 'Inter, sans-serif', fontSize: '16px', fill: '#ffffff', align: 'center', wordWrap: { width: this.scale.width * 0.75 } 
         }).setOrigin(0.5);
         
         panel.add([bg, charTxt, msgTxt]);
