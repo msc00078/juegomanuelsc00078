@@ -2,7 +2,7 @@ import * as Phaser from 'phaser';
 import { Player } from '../entities/Player';
 import { Boss } from '../entities/Boss';
 import { StandardEnemy, TankEnemy, RangedEnemy, KamikazeEnemy, SummonerEnemy,
-         TeleporterEnemy, HealerEnemy, GuardianEnemy, TrapperEnemy,
+         TeleporterEnemy, HealerEnemy, GuardianEnemy, TrapperEnemy, LaserEliteEnemy,
          applyEnemyScaling } from '../entities/Enemy';
 import { saveRunResult } from '../supabase';
 import axios from 'axios';
@@ -481,8 +481,13 @@ export default class MainScene extends Phaser.Scene {
         const fightBtn = this.add.rectangle(cx - 120, cy + 50, 180, 55, 0x00ffff).setInteractive().setDepth(201);
         const fightTxt = this.add.text(cx - 120, cy + 50, "PURGAR ENTE", { fontSize: '18px', fill: '#000', fontStyle: 'bold' }).setOrigin(0.5).setDepth(202);
 
+        const relics = this.registry.get('relics') || [];
+        let baseProb = Phaser.Math.Between(30, 70); // Probability between 30 and 70
+        if (relics.includes('bypass_key')) baseProb += 25;
+        if (baseProb > 95) baseProb = 95; // Cap at 95%
+
         const escapeBtn = this.add.rectangle(cx + 120, cy + 50, 180, 55, 0x333333).setInteractive().setDepth(201);
-        const escapeTxt = this.add.text(cx + 120, cy + 50, "BYPASS (50%)", { fontSize: '18px', fill: '#fff', fontStyle: 'bold' }).setOrigin(0.5).setDepth(202);
+        const escapeTxt = this.add.text(cx + 120, cy + 50, `BYPASS (${baseProb}%)`, { fontSize: '18px', fill: '#fff', fontStyle: 'bold' }).setOrigin(0.5).setDepth(202);
 
         const cleanup = () => {
             bg.destroy(); title.destroy(); desc.destroy();
@@ -494,6 +499,8 @@ export default class MainScene extends Phaser.Scene {
         fightBtn.on('pointerout', () => fightBtn.setFillStyle(0xaa0000));
 
         fightBtn.on('pointerdown', () => {
+            fightBtn.disableInteractive();
+            escapeBtn.disableInteractive();
             cleanup();
             this.isWaitingForElite = false;
             this.spawnElite();
@@ -503,7 +510,9 @@ export default class MainScene extends Phaser.Scene {
         escapeBtn.on('pointerout', () => escapeBtn.setFillStyle(0x555555));
 
         escapeBtn.on('pointerdown', () => {
-            if (Math.random() < 0.5) {
+            fightBtn.disableInteractive();
+            escapeBtn.disableInteractive();
+            if (Math.random() * 100 <= baseProb) {
                 const msg = this.add.text(this.scale.width / 2, this.scale.height / 2 + 80, "¡Escapaste con éxito!", { fontSize: '24px', fill: '#00ff00', backgroundColor: '#000' }).setOrigin(0.5).setDepth(205);
                 this.time.delayedCall(1000, () => {
                     cleanup(); msg.destroy();
@@ -535,28 +544,19 @@ export default class MainScene extends Phaser.Scene {
     }
 
     spawnElite() {
-        // Un Élite es una anomalía con nivel superior al actual (+15)
-        const eliteLevel = this.currentLevel + 15;
-        let elite;
-
-        // Selección dinámica del tipo de Élite según el nivel
-        if (this.currentLevel < 15) {
-            elite = new TankEnemy(this, this.scale.width / 2, 220);
-        } else if (this.currentLevel < 40) {
-            elite = new TeleporterEnemy(this, this.scale.width / 2, 220);
-        } else {
-            elite = new GuardianEnemy(this, this.scale.width / 2, 220);
-        }
+        // Un Élite es una anomalía con nivel ligeramente superior (+2) para que sea posible de matar
+        const eliteLevel = this.currentLevel + 2;
+        let elite = new LaserEliteEnemy(this, this.scale.width / 2, 220);
 
         // Aplicar escalado de 20 rangos + Alpha asegurado
         applyEnemyScaling(elite, eliteLevel);
         elite.applyAlpha(); 
 
-        // Bonus de estadísticas para que sea un mini-boss real
-        elite.hp = Math.round(elite.hp * 2.5);
+        // Bonus de estadísticas reducidos significativamente a petición del usuario
+        elite.hp = Math.round(elite.hp * 1.2);
         elite.maxHp = elite.hp;
-        elite.contactDamage = Math.round(elite.contactDamage * 1.5);
-        elite.sprite.setScale(elite.sprite.scale * 1.3);
+        elite.contactDamage = Math.round(elite.contactDamage * 1.1);
+        elite.sprite.setScale(elite.sprite.scale * 1.2);
 
         this.enemies.push(elite);
         this.setupEnemyCollisions(elite);
@@ -579,35 +579,46 @@ export default class MainScene extends Phaser.Scene {
             let enemy;
 
             if (level < 5) {
-                // NIVEL 1-4: Solo Glitchers y algún Tanque desde el 3
-                if (level >= 3 && rand < 0.2) enemy = new TankEnemy(this, rx, ry);
-                else enemy = new StandardEnemy(this, rx, ry);
+                // NIVEL 1-4: Mayormente Glitchers, pero con raros avistamientos
+                if (rand < 0.01)      enemy = new RangedEnemy(this, rx, ry);
+                else if (rand < 0.02) enemy = new KamikazeEnemy(this, rx, ry);
+                else if (rand < 0.03) enemy = new SummonerEnemy(this, rx, ry);
+                else if (level >= 3 && rand < 0.2) enemy = new TankEnemy(this, rx, ry);
+                else                  enemy = new StandardEnemy(this, rx, ry);
             } 
             else if (level < 12) {
-                // NIVEL 5-11: Introducimos Arqueros y Kamikazes
-                if (rand < 0.5)      enemy = new StandardEnemy(this, rx, ry);
-                else if (rand < 0.7) enemy = new TankEnemy(this, rx, ry);
-                else if (rand < 0.85)enemy = new RangedEnemy(this, rx, ry);
-                else                 enemy = new KamikazeEnemy(this, rx, ry);
+                // NIVEL 5-11: Introducimos Arqueros y Kamikazes, con raros Summoners/Trappers
+                if (rand < 0.02)      enemy = new SummonerEnemy(this, rx, ry);
+                else if (rand < 0.04) enemy = new TrapperEnemy(this, rx, ry);
+                else if (rand < 0.05) enemy = new TeleporterEnemy(this, rx, ry);
+                else if (rand < 0.5)  enemy = new StandardEnemy(this, rx, ry);
+                else if (rand < 0.7)  enemy = new TankEnemy(this, rx, ry);
+                else if (rand < 0.85) enemy = new RangedEnemy(this, rx, ry);
+                else                  enemy = new KamikazeEnemy(this, rx, ry);
             } 
             else if (level < 25) {
-                // NIVEL 12-24: Introducimos Invocadores y Trampas
-                if (rand < 0.3)      enemy = new StandardEnemy(this, rx, ry);
-                else if (rand < 0.5) enemy = new TankEnemy(this, rx, ry);
-                else if (rand < 0.65)enemy = new RangedEnemy(this, rx, ry);
-                else if (rand < 0.75)enemy = new KamikazeEnemy(this, rx, ry);
-                else if (rand < 0.88)enemy = new SummonerEnemy(this, rx, ry);
-                else                 enemy = new TrapperEnemy(this, rx, ry);
+                // NIVEL 12-24: Introducimos Invocadores y Trampas, con raros Healers/Guardians
+                if (rand < 0.02)      enemy = new HealerEnemy(this, rx, ry);
+                else if (rand < 0.04) enemy = new GuardianEnemy(this, rx, ry);
+                else if (rand < 0.06) enemy = new TeleporterEnemy(this, rx, ry);
+                else if (rand < 0.3)  enemy = new StandardEnemy(this, rx, ry);
+                else if (rand < 0.5)  enemy = new TankEnemy(this, rx, ry);
+                else if (rand < 0.65) enemy = new RangedEnemy(this, rx, ry);
+                else if (rand < 0.75) enemy = new KamikazeEnemy(this, rx, ry);
+                else if (rand < 0.88) enemy = new SummonerEnemy(this, rx, ry);
+                else                  enemy = new TrapperEnemy(this, rx, ry);
             } 
             else if (level < 45) {
-                // NIVEL 25-44: El Teletransportador entra en juego
-                if (rand < 0.25)     enemy = new StandardEnemy(this, rx, ry);
-                else if (rand < 0.45)enemy = new TankEnemy(this, rx, ry);
-                else if (rand < 0.6) enemy = new RangedEnemy(this, rx, ry);
-                else if (rand < 0.7) enemy = new KamikazeEnemy(this, rx, ry);
-                else if (rand < 0.8) enemy = new SummonerEnemy(this, rx, ry);
-                else if (rand < 0.9) enemy = new TrapperEnemy(this, rx, ry);
-                else                 enemy = new TeleporterEnemy(this, rx, ry);
+                // NIVEL 25-44: El Teletransportador entra en juego, Healer/Guardian raros
+                if (rand < 0.03)      enemy = new HealerEnemy(this, rx, ry);
+                else if (rand < 0.06) enemy = new GuardianEnemy(this, rx, ry);
+                else if (rand < 0.25) enemy = new StandardEnemy(this, rx, ry);
+                else if (rand < 0.45) enemy = new TankEnemy(this, rx, ry);
+                else if (rand < 0.6)  enemy = new RangedEnemy(this, rx, ry);
+                else if (rand < 0.7)  enemy = new KamikazeEnemy(this, rx, ry);
+                else if (rand < 0.8)  enemy = new SummonerEnemy(this, rx, ry);
+                else if (rand < 0.9)  enemy = new TrapperEnemy(this, rx, ry);
+                else                  enemy = new TeleporterEnemy(this, rx, ry);
             } 
             else {
                 // NIVEL 45+: Pool completo con Sanadores y Guardianes
@@ -747,6 +758,7 @@ export default class MainScene extends Phaser.Scene {
     spawnBomb(x, y, isSticky = false) {
         const bomb = this.add.circle(x, y, 10, 0x000000);
         bomb.setStrokeStyle(2, 0xff0000);
+        this.physics.add.existing(bomb); // Necesario para que moveToObject funcione
         this.tweens.add({ targets: bomb, scale: 1.2, duration: 200, yoyo: true, repeat: 9 });
 
         if (isSticky) {

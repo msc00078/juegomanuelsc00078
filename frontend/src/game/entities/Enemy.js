@@ -749,3 +749,75 @@ export class TrapperEnemy extends Enemy {
         this.scene.tweens.add({ targets: trap, alpha: { from: 0, to: 0.35 }, duration: 300 });
     }
 }
+
+// ─── 10. ELITE DE BYPASS (Laser) ──────────────────────────────────────────────
+export class LaserEliteEnemy extends Enemy {
+    constructor(scene, x, y) {
+        super(scene, x, y, 180, 60, 0xff00ff, 50); // HP base más bajo para que sea más débil
+        this.name = 'Anomalía de Bypass';
+        this.lastLaserTime = 0;
+        this.laserCooldown = 3000;
+        this.isFiringLaser = false;
+    }
+
+    update(playerSprite, time) {
+        if (!this.sprite?.active || this.isDead) return;
+        
+        if (this.isFiringLaser) {
+            if (this.sprite.body) this.sprite.body.setVelocity(0, 0);
+            return;
+        }
+        
+        super.update(playerSprite, time);
+
+        if (time > this.lastLaserTime + this.laserCooldown) {
+            this.lastLaserTime = time;
+            this._fireLaser(playerSprite);
+        }
+    }
+
+    _fireLaser(playerSprite) {
+        if (!this.sprite?.active || this.isDead) return;
+        
+        this.isFiringLaser = true;
+        this.sprite.setTint(0xffffff);
+        
+        // Indicador de carga (línea de aviso)
+        const line = this.scene.add.line(0, 0, this.sprite.x, this.sprite.y, playerSprite.x, playerSprite.y, 0xff00ff, 0.3).setOrigin(0).setDepth(50);
+        
+        this.scene.time.delayedCall(800, () => {
+            line.destroy();
+            if (!this.sprite?.active || this.isDead) {
+                this.isFiringLaser = false;
+                return;
+            }
+
+            // Disparo del rayo (un rectángulo largo)
+            const angle = Phaser.Math.Angle.Between(this.sprite.x, this.sprite.y, playerSprite.x, playerSprite.y);
+            const beam = this.scene.add.rectangle(this.sprite.x, this.sprite.y, 1000, 20, 0xff00ff, 0.6).setOrigin(0, 0.5).setDepth(51);
+            beam.setRotation(angle);
+            
+            this.scene.physics.add.existing(beam);
+            
+            // Detección de colisión con el jugador
+            this.scene.physics.add.overlap(beam, playerSprite, () => {
+                if (!this.scene.player.isInvulnerable) {
+                    this.scene.player.takeDamage(15);
+                    this.scene.updateUI();
+                }
+            });
+
+            // Efecto visual y destrucción
+            this.scene.tweens.add({
+                targets: beam,
+                alpha: 0,
+                duration: 400,
+                onComplete: () => {
+                    beam.destroy();
+                    this.isFiringLaser = false;
+                    if (this.sprite?.active) this.sprite.clearTint();
+                }
+            });
+        });
+    }
+}
