@@ -797,14 +797,29 @@ export class LaserEliteEnemy extends Enemy {
             const beam = this.scene.add.rectangle(this.sprite.x, this.sprite.y, 1000, 20, 0xff00ff, 0.6).setOrigin(0, 0.5).setDepth(51);
             beam.setRotation(angle);
             
-            this.scene.physics.add.existing(beam);
-            
-            // Detección de colisión con el jugador
-            this.scene.physics.add.overlap(beam, playerSprite, () => {
-                if (!this.scene.player.isInvulnerable) {
-                    this.scene.player.takeDamage(15);
+            // Detección de colisión manual (Arcade Physics no soporta rotación para cuerpos)
+            let hasHit = false;
+            const checkCollision = () => {
+                if (hasHit || !beam.active || !this.scene.player) return;
+                const player = this.scene.player;
+                const dist = Phaser.Math.Distance.Between(this.sprite.x, this.sprite.y, player.sprite.x, player.sprite.y);
+                if (dist > 1000) return; // Fuera de rango
+                
+                const angToPlayer = Phaser.Math.Angle.Between(this.sprite.x, this.sprite.y, player.sprite.x, player.sprite.y);
+                const diff = Math.abs(Phaser.Math.Angle.Wrap(angToPlayer - angle));
+                
+                if (diff < 0.12 && !player.isInvulnerable) { // Margen de 0.12 radianes para el ancho del rayo
+                    hasHit = true;
+                    player.takeDamage(15);
                     this.scene.updateUI();
                 }
+            };
+            
+            // Comprobar colisión varias veces durante el disparo
+            const collisionTimer = this.scene.time.addEvent({
+                delay: 50,
+                repeat: 7,
+                callback: checkCollision
             });
 
             // Efecto visual y destrucción
@@ -814,6 +829,7 @@ export class LaserEliteEnemy extends Enemy {
                 duration: 400,
                 onComplete: () => {
                     beam.destroy();
+                    collisionTimer.destroy();
                     this.isFiringLaser = false;
                     if (this.sprite?.active) this.sprite.setFillStyle(this.color);
                 }
