@@ -1,29 +1,36 @@
 import * as Phaser from 'phaser';
 
 export class Boss {
-    constructor(scene, x, y, type) {
+    constructor(scene, x, y, type, level = 1) {
         this.scene    = scene;
-        this.hp       = 600;
-        this.maxHp    = 600;
+        this.level    = level;
+        
+        // Escalado de vida por nivel: 600 base + 150 por cada 5 niveles
+        const hpMultiplier = 1 + (Math.floor(level / 5) * 0.25);
+        this.hp       = Math.round(600 * hpMultiplier);
+        this.maxHp    = this.hp;
+        
         this.bossType = type;
         this.phase    = 1;
         this.isDead   = false;
 
-        // Posición del jugador predicha (para apuntar mejor)
+        // Daño de contacto y ataques escala con nivel
+        this.contactDamage = Math.round(15 * (1 + (level / 20))); 
+        this.attackDamage  = Math.round(20 * (1 + (level / 20)));
+
+        // Posición del jugador predicha
         this._predictedPlayerX = scene.scale.width  / 2;
         this._predictedPlayerY = scene.scale.height / 2;
 
-        this.sprite = scene.add.rectangle(x, y, 70, 70, 0xff0000);
-        this.sprite.setStrokeStyle(3, 0x000000);
+        this.sprite = scene.add.rectangle(x, y, 75, 75, 0xff0000);
+        this.sprite.setStrokeStyle(4, 0x000000);
         scene.physics.add.existing(this.sprite);
         this.sprite.body.setCollideWorldBounds(true);
-        this.sprite.body.setImmovable(false); // El boss puede moverse más libremente
+        this.sprite.body.setImmovable(false);
 
         this.attacks = scene.physics.add.group();
+        this.aura = scene.add.circle(x, y, 60, 0xff0000, 0.18).setVisible(false);
 
-        this.aura = scene.add.circle(x, y, 55, 0xff0000, 0.18).setVisible(false);
-
-        // Loop de movimiento autónomo (entre calls de la API)
         this._startAutonomousLoop();
     }
 
@@ -111,7 +118,7 @@ export class Boss {
             this.aura.setFillStyle?.(0xffffff, 0.5);
             this.sprite.setStrokeStyle?.(5, 0xffffff);
             this.scene.bossText?.setText('¡MUERE, INSECTO!');
-            if (this.scene.apiCallInterval > 1200) this.scene.apiCallInterval = 1200;
+            if (this.scene.apiCallInterval > 800) this.scene.apiCallInterval = 800; // Mucho más agresivo
             // Invocar 2 kamikazes inmediatamente al entrar en fase 3
             this.scene.spawnKamikazeFromBoss?.();
             this.scene.spawnKamikazeFromBoss?.();
@@ -136,6 +143,8 @@ export class Boss {
             this._doProjectile(aimX, aimY, speedMult, playerSprite);
         } else if (action === 'area') {
             this._doArea(speedMult, phaseMod);
+        } else if (action === 'bomb') {
+            this._doBombAttack(playerSprite);
         }
 
         // Fase 3: invocar kamikaze con probabilidad
@@ -219,10 +228,10 @@ export class Boss {
         if (!this.sprite?.active) return;
         this.sprite.body.setVelocity(0);
 
-        // En fase 3 lanza 2 ondas de área concéntricas
-        const waves = this.phase === 3 ? 2 : 1;
+        // En fase 3 lanza 3 ondas de área concéntricas si el nivel es alto
+        const waves = (this.phase === 3 && this.level > 10) ? 3 : (this.phase === 3 ? 2 : 1);
         for (let w = 0; w < waves; w++) {
-            this.scene.time.delayedCall(w * 400, () => {
+            this.scene.time.delayedCall(w * 350, () => {
                 if (this.isDead || !this.sprite?.active) return;
                 const area = this.scene.add.circle(
                     this.sprite.x, this.sprite.y, 20, 0x8a2be2, 0.55
@@ -230,14 +239,30 @@ export class Boss {
                 this.attacks.add(area);
                 area.body.setCircle(20);
                 area.body.setImmovable(true);
+                // El daño de área escala con el boss
+                area.damage = this.attackDamage * 1.5;
 
                 this.scene.tweens.add({
                     targets: area,
-                    scale: 8 * speedMult,
+                    scale: 9 * speedMult,
                     alpha: 0,
                     duration: 1200 / phaseMod,
                     onComplete: () => area.destroy()
                 });
+            });
+        }
+    }
+
+    _doBombAttack(playerSprite) {
+        if (!this.sprite?.active) return;
+        // El boss suelta 3 bombas alrededor suyo o hacia el jugador
+        for (let i = 0; i < 3; i++) {
+            this.scene.time.delayedCall(i * 300, () => {
+                if (this.isDead || !this.sprite?.active) return;
+                const bx = this.sprite.x + Phaser.Math.Between(-50, 50);
+                const by = this.sprite.y + Phaser.Math.Between(-50, 50);
+                // Usamos la función de la escena para spawnear la bomba pero con flag de 'enemigo'
+                this.scene.spawnEnemyBomb?.(bx, by, this.attackDamage * 2);
             });
         }
     }

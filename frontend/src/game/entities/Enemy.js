@@ -144,6 +144,11 @@ export class Enemy {
         }
         this.scene.physics.moveToObject(this.sprite, playerSprite, this.speed);
 
+        // --- Habilidades Especiales según el Tier ---
+        if (this.tier >= 3) { // Desde Rango 3 (Nivel 11+)
+            this._handleSpecialAbilities(playerSprite, time);
+        }
+
         // Actualizar posición de auras
         this._updateAuras();
 
@@ -161,6 +166,46 @@ export class Enemy {
             if (this._alphaCrown) this._alphaCrown.setPosition(this.sprite.x, this.sprite.y - 40 * this.sprite.scale);
             if (this._eliteAura) this._eliteAura.setPosition(this.sprite.x, this.sprite.y);
         }
+    }
+
+    _handleSpecialAbilities(playerSprite, time) {
+        // Implementado en subclases o acción genérica
+        if (this.isDashing) return;
+
+        // Probabilidad de Dash según el Tier
+        // Tier 3: 0.5% cada frame | Tier 20: 2% cada frame aprox
+        const dashChance = 0.005 + (this.tier * 0.001);
+        const cooldown = 5000 - (this.tier * 100);
+
+        if (Math.random() < dashChance && (!this.lastSpecialTime || time > this.lastSpecialTime + cooldown)) {
+            this.lastSpecialTime = time;
+            this._doDash(playerSprite);
+        }
+    }
+
+    _doDash(playerSprite) {
+        if (!this.sprite || !this.sprite.body) return;
+        this.isDashing = true;
+        
+        const dashSpeed = this.speed * 2.5;
+        const angle = Phaser.Math.Angle.Between(this.sprite.x, this.sprite.y, playerSprite.x, playerSprite.y);
+        
+        this.sprite.body.setVelocity(Math.cos(angle) * dashSpeed, Math.sin(angle) * dashSpeed);
+        
+        // Estela visual
+        const trailTimer = this.scene.time.addEvent({
+            delay: 50,
+            repeat: 5,
+            callback: () => {
+                if (!this.sprite?.active) return;
+                const trail = this.scene.add.rectangle(this.sprite.x, this.sprite.y, this.size * this.sprite.scale, this.size * this.sprite.scale, this.color, 0.4);
+                this.scene.tweens.add({ targets: trail, alpha: 0, duration: 200, onComplete: () => trail.destroy() });
+            }
+        });
+
+        this.scene.time.delayedCall(400, () => {
+            this.isDashing = false;
+        });
     }
 
     startBleed() {

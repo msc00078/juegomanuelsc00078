@@ -175,9 +175,23 @@ export default class MainScene extends Phaser.Scene {
             this.cameras.main.flash(1000, 255, 0, 0);
             this.cameras.main.shake(1000, 0.02);
 
-            this.boss = new Boss(this, this.scale.width / 2, 180, this.bossType);
+            this.bosses = [];
+            
+            // Si el nivel es >= 20, hay un 40% de probabilidad de Dual Boss
+            const isDual = this.currentLevel >= 20 && Math.random() < 0.4;
+            
+            if (isDual) {
+                const boss1 = new Boss(this, this.scale.width / 4, 180, this.bossType, this.currentLevel);
+                const boss2 = new Boss(this, (this.scale.width / 4) * 3, 180, this.bossType, this.currentLevel);
+                this.bosses.push(boss1, boss2);
+                this.bossNameText.setText(`${this.bossType.toUpperCase()}S (DUAL)`);
+            } else {
+                const boss = new Boss(this, this.scale.width / 2, 180, this.bossType, this.currentLevel);
+                this.bosses.push(boss);
+                this.bossNameText.setText(this.bossType.toUpperCase());
+            }
+
             this.bossHpContainer.setVisible(true);
-            this.bossNameText.setText(this.bossType.toUpperCase());
 
             this.bossText = this.add.text(this.scale.width / 2, 130, "¡PREPÁRATE PARA TU FINAL!", {
                 fontSize: '20px', fill: '#ff0000', backgroundColor: '#000', fontStyle: 'bold', padding: { x: 10, y: 5 }
@@ -191,37 +205,41 @@ export default class MainScene extends Phaser.Scene {
                 repeat: -1
             });
 
-            this.physics.add.overlap(this.player.sword, this.boss.sprite, () => {
-                if (this.player.isAttacking && this.boss.hp > 0) {
-                    this.pushBack(this.boss.sprite, this.player.sprite, 100);
-                    this.boss.takeDamage(this.getPlayerDamage() / 2);
-                    this.updateUI();
-                }
-            });
+            this.bosses.forEach(boss => {
+                this.physics.add.overlap(this.player.sword, boss.sprite, () => {
+                    if (this.player.isAttacking && boss.hp > 0) {
+                        this.pushBack(boss.sprite, this.player.sprite, 100);
+                        boss.takeDamage(this.getPlayerDamage() / 2);
+                        this.updateUI();
+                    }
+                });
 
-            this.physics.add.collider(this.player.sprite, this.boss.sprite, () => {
-                if (!this.gameOver && this.boss.hp > 0) {
-                    this.player.takeDamage(10);
-                    this.updateUI();
-                    this.pushBack(this.player.sprite, this.boss.sprite, 300);
-                }
-            });
+                this.physics.add.collider(this.player.sprite, boss.sprite, () => {
+                    if (!this.gameOver && boss.hp > 0) {
+                        // El daño de contacto del boss escala con su nivel
+                        this.player.takeDamage(boss.contactDamage || 15);
+                        this.updateUI();
+                        this.pushBack(this.player.sprite, boss.sprite, 300);
+                    }
+                });
 
-            this.physics.add.overlap(this.player.sprite, this.boss.attacks, (playerSprite, attackObj) => {
-                if (!this.gameOver && this.boss.hp > 0) {
-                    this.player.takeDamage(15);
-                    this.updateUI();
-                    attackObj.destroy();
-                }
-            });
+                this.physics.add.overlap(this.player.sprite, boss.attacks, (playerSprite, attackObj) => {
+                    if (!this.gameOver && boss.hp > 0) {
+                        // El daño del proyectil/área escala
+                        this.player.takeDamage(boss.attackDamage || 20);
+                        this.updateUI();
+                        attackObj.destroy();
+                    }
+                });
 
-            this.physics.add.overlap(this.arrows, this.boss.sprite, (bossSprite, arrow) => {
-                if (this.boss.hp > 0) {
-                    const relics = this.registry.get('relics') || [];
-                    if (!relics.includes('perforante')) arrow.destroy();
-                    this.boss.takeDamage(10);
-                    this.updateUI();
-                }
+                this.physics.add.overlap(this.arrows, boss.sprite, (bossSprite, arrow) => {
+                    if (boss.hp > 0) {
+                        const relics = this.registry.get('relics') || [];
+                        if (!relics.includes('perforante')) arrow.destroy();
+                        boss.takeDamage(10);
+                        this.updateUI();
+                    }
+                });
             });
 
         } else if (this.nodeType === 'elite') {
@@ -272,9 +290,30 @@ export default class MainScene extends Phaser.Scene {
         // Usar group en lugar de map para que afecte a futuros enemigos
         this.physics.add.collider(this.enemySprites, this.crates);
 
-        this.physics.add.overlap(this.player.sword, this.crates, (sword, crate) => {
+        this.physics.add.overlap(this.player.sword, this.crates, (sword, obstacle) => {
             if (this.player.isAttacking) {
-                this.destroyCrate(crate);
+                if (obstacle.isIndestructible) {
+                    this.showDamageNumber(obstacle.x, obstacle.y, "BLOQ");
+                    return;
+                }
+                this.destroyCrate(obstacle);
+            }
+        });
+
+        // Colisión de flechas con obstáculos
+        this.physics.add.collider(this.arrows, this.crates, (arrow, obstacle) => {
+            if (!obstacle.isIndestructible) {
+                this.destroyCrate(obstacle);
+            }
+            arrow.destroy();
+        });
+
+        // Daño al jugador por obstáculos peligrosos
+        this.physics.add.collider(this.player.sprite, this.crates, (player, obstacle) => {
+            if (obstacle.doesDamage && !this.player.isInvulnerable) {
+                this.player.takeDamage(10);
+                this.updateUI();
+                this.pushBack(this.player.sprite, obstacle, 200);
             }
         });
 
@@ -535,6 +574,22 @@ export default class MainScene extends Phaser.Scene {
         }
     }
 
+    spawnKamikazeFromBoss() {
+        if (this.gameOver) return;
+        // Spawnea un kamikaze cerca de un boss aleatorio
+        const activeBosses = this.bosses.filter(b => b.hp > 0);
+        if (activeBosses.length === 0) return;
+        
+        const b = activeBosses[Math.floor(Math.random() * activeBosses.length)];
+        const rx = b.sprite.x + Phaser.Math.Between(-100, 100);
+        const ry = b.sprite.y + Phaser.Math.Between(-100, 100);
+        
+        const k = new KamikazeEnemy(this, rx, ry);
+        applyEnemyScaling(k, this.currentLevel);
+        this.enemies.push(k);
+        this.setupEnemyCollisions(k);
+    }
+
     setupEnemyCollisions(enemy) {
         if (!enemy.sprite) return;
         this.enemySprites.add(enemy.sprite);
@@ -610,6 +665,29 @@ export default class MainScene extends Phaser.Scene {
         this.time.delayedCall(1000, () => { if (arrow.active) arrow.destroy() });
     }
 
+    spawnEnemyBomb(x, y, damage = 30) {
+        const bomb = this.add.circle(x, y, 12, 0x000000);
+        bomb.setStrokeStyle(3, 0xff0000);
+        this.tweens.add({ targets: bomb, scale: 1.3, duration: 250, yoyo: true, repeat: 5 });
+
+        this.time.delayedCall(1500, () => {
+            if (!bomb.active) return;
+            this.createParticles(bomb.x, bomb.y, 0xffaa00);
+            
+            // Explosión visual
+            const explosion = this.add.circle(bomb.x, bomb.y, 80, 0xff0000, 0.4);
+            this.tweens.add({ targets: explosion, alpha: 0, duration: 400, onComplete: () => explosion.destroy() });
+
+            // Daño al jugador
+            const dist = Phaser.Math.Distance.Between(bomb.x, bomb.y, this.player.sprite.x, this.player.sprite.y);
+            if (dist < 90 && !this.gameOver) {
+                this.player.takeDamage(damage);
+                this.updateUI();
+            }
+            bomb.destroy();
+        });
+    }
+
     spawnBomb(x, y, isSticky = false) {
         const bomb = this.add.circle(x, y, 10, 0x000000);
         bomb.setStrokeStyle(2, 0xff0000);
@@ -637,12 +715,16 @@ export default class MainScene extends Phaser.Scene {
         this.tweens.add({ targets: explosion, alpha: 0, duration: 300, onComplete: () => explosion.destroy() });
         this.createParticles(x, y, 0xffaa00);
 
-        if (this.isBossLevel && this.boss && this.boss.hp > 0) {
-            const dist = Phaser.Math.Distance.Between(x, y, this.boss.sprite.x, this.boss.sprite.y);
-            if (dist <= radius + 50) {
-                this.boss.takeDamage(50);
-                this.updateUI();
-            }
+        if (this.isBossLevel && this.bosses) {
+            this.bosses.forEach(boss => {
+                if (boss.hp > 0) {
+                    const dist = Phaser.Math.Distance.Between(x, y, boss.sprite.x, boss.sprite.y);
+                    if (dist <= radius + 50) {
+                        boss.takeDamage(50);
+                        this.updateUI();
+                    }
+                }
+            });
         }
         this.enemies.forEach(enemy => {
             if (enemy.hp > 0 && enemy.sprite && enemy.sprite.active) {
@@ -741,21 +823,58 @@ export default class MainScene extends Phaser.Scene {
     }
 
     spawnCrates() {
-        for (let i = 0; i < 4; i++) {
+        const level = this.currentLevel;
+        // Más obstáculos conforme sube el nivel
+        const count = 4 + Math.floor(level / 3);
+
+        for (let i = 0; i < count; i++) {
             const rx = Phaser.Math.Between(150, this.scale.width - 150);
-            const ry = Phaser.Math.Between(150, this.scale.height - 200);
-            const crate = this.crates.create(rx, ry, null);
-            crate.setSize(30, 30);
-            const rect = this.add.rectangle(rx, ry, 30, 30, 0x5d4037).setStrokeStyle(2, 0x3e2723);
-            crate.rect = rect;
+            const ry = Phaser.Math.Between(150, this.scale.height - 250);
+            
+            const obstacle = this.crates.create(rx, ry, null);
+            obstacle.setSize(30, 30);
+            
+            const rand = Math.random();
+            let color = 0x5d4037; // Madera normal
+            let stroke = 0x3e2723;
+
+            if (rand < 0.2) {
+                // OBSTÁCULO INDESTRUCTIBLE (Metálico)
+                obstacle.isIndestructible = true;
+                color = 0x444444;
+                stroke = 0xffffff;
+            } else if (rand < 0.35) {
+                // OBSTÁCULO DAÑINO (Spikes / Error)
+                obstacle.doesDamage = true;
+                color = 0xcc0000;
+                stroke = 0xff00ff;
+                // Efecto visual de parpadeo para avisar
+                this.tweens.add({
+                    targets: obstacle,
+                    alpha: 0.6,
+                    duration: 500,
+                    yoyo: true,
+                    repeat: -1
+                });
+            }
+
+            const rect = this.add.rectangle(rx, ry, 30, 30, color).setStrokeStyle(2, stroke);
+            obstacle.rect = rect;
+            
+            // Si es dañino, añadir un pequeño indicativo visual extra (un rombo interno)
+            if (obstacle.doesDamage) {
+                const spike = this.add.rectangle(rx, ry, 15, 15, 0xffffff, 0.8).setAngle(45);
+                obstacle.spike = spike;
+            }
         }
     }
 
     destroyCrate(crate) {
-        if (!crate || !crate.active) return;
+        if (!crate || !crate.active || crate.isIndestructible) return;
         const x = crate.x;
         const y = crate.y;
         if (crate.rect) crate.rect.destroy();
+        if (crate.spike) crate.spike.destroy();
         crate.destroy();
         this.createParticles(x, y, 0x5d4037);
 
@@ -767,9 +886,17 @@ export default class MainScene extends Phaser.Scene {
     }
 
     spawnKamikazeFromBoss() {
-        const rx = this.boss.sprite.x + Phaser.Math.Between(-50, 50);
-        const ry = this.boss.sprite.y + Phaser.Math.Between(-50, 50);
+        if (this.gameOver) return;
+        // Spawnea un kamikaze cerca de un boss aleatorio activo
+        const activeBosses = this.bosses.filter(b => b.hp > 0);
+        if (activeBosses.length === 0) return;
+        
+        const b = activeBosses[Math.floor(Math.random() * activeBosses.length)];
+        const rx = b.sprite.x + Phaser.Math.Between(-80, 80);
+        const ry = b.sprite.y + Phaser.Math.Between(-80, 80);
+        
         const k = new KamikazeEnemy(this, rx, ry);
+        applyEnemyScaling(k, this.currentLevel);
         this.enemies.push(k);
         this.setupEnemyCollisions(k);
     }
@@ -778,7 +905,7 @@ export default class MainScene extends Phaser.Scene {
         if (this.portal || this.gameOver || this.isWaitingForElite) return;
         let cleared = false;
         if (this.isBossLevel) {
-            if (this.boss && this.boss.hp <= 0) cleared = true;
+            if (this.bosses && this.bosses.every(b => b.hp <= 0)) cleared = true;
         } else {
             this.enemies = this.enemies.filter(e => e.hp > 0);
             if (this.enemies.length === 0) cleared = true;
@@ -970,14 +1097,20 @@ export default class MainScene extends Phaser.Scene {
             this.updateUI();
         }
 
-        if (this.isBossLevel && this.boss && this.boss.hp > 0) {
-            if (window.gamePersonality && window.gamePersonality !== this.boss.bossType) {
-                this.boss.bossType = window.gamePersonality;
-            }
-            if (time > this.lastApiCallTime + this.apiCallInterval) {
-                this.lastApiCallTime = time;
-                this.requestBossAction();
-            }
+        if (this.isBossLevel && this.bosses) {
+            this.bosses.forEach(boss => {
+                if (boss.hp > 0) {
+                    // Sincronizar personalidad si es necesario
+                    if (window.gamePersonality && window.gamePersonality !== boss.bossType) {
+                        boss.bossType = window.gamePersonality;
+                    }
+                    // Llamar a la IA individualmente (con un pequeño offset para que no todas disparen a la vez)
+                    if (time > (boss.lastApiCallTime || 0) + this.apiCallInterval) {
+                        boss.lastApiCallTime = time;
+                        this.requestBossAction(boss);
+                    }
+                }
+            });
         }
 
         this.enemies.forEach(enemy => {
@@ -1057,38 +1190,46 @@ export default class MainScene extends Phaser.Scene {
         }
     }
 
-    async requestBossAction() {
-        if (this.gameOver || !this.isBossLevel) return;
+    async requestBossAction(targetBoss) {
+        if (this.gameOver || !this.isBossLevel || !targetBoss || targetBoss.hp <= 0) return;
+        
         const playerX = this.player.sprite.x;
         const playerY = this.player.sprite.y;
-        const bossX = this.boss.sprite.x;
-        const bossY = this.boss.sprite.y;
-
+        const bossX = targetBoss.sprite.x;
+        const bossY = targetBoss.sprite.y;
         const distance = Math.round(Phaser.Math.Distance.Between(playerX, playerY, bossX, bossY));
-        
+
         const gameState = {
-            boss_hp: Math.round((this.boss.hp / this.boss.maxHp) * 100),
-            boss_phase: this.boss.phase,
+            boss_hp: Math.round((targetBoss.hp / targetBoss.maxHp) * 100),
+            boss_phase: targetBoss.phase,
             player_hp: Math.round((this.player.hp / this.player.maxHp) * 100),
             distance: distance,
-            boss_type: this.boss.bossType
+            boss_type: targetBoss.bossType
         };
         
         try {
-            const response = await axios.post('https://juegomanuelsc00078.onrender.com/api/boss-decision', gameState, { timeout: 8000 });
+            // Usamos la URL de render si está disponible, si no localhost (fallback dinámico)
+            const apiUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+                ? 'http://localhost:5000/api/boss-decision'
+                : 'https://juegomanuelsc00078.onrender.com/api/boss-decision';
+
+            const response = await axios.post(apiUrl, gameState, { timeout: 8000 });
             const { action, intensity, dialogue } = response.data;
-            if (!this.gameOver && this.boss && this.boss.hp > 0) {
-                if (this.bossText && this.bossText.active) this.bossText.setText(dialogue);
-                this.boss.executeAction(action, intensity, this.player.sprite);
+            
+            if (!this.gameOver && targetBoss.hp > 0) {
+                if (this.bossText && this.bossText.active) {
+                    this.bossText.setText(dialogue);
+                }
+                targetBoss.executeAction(action, intensity, this.player.sprite);
             }
         } catch (error) {
-            console.warn("API del Boss falló (o es muy lenta), usando patrón de respaldo.");
-            // PATRÓN DE RESPALDO (Lógica local si falla el servidor o está hibernando)
-            const actions = ["projectile", "area", "dash"];
+            console.warn("API del Boss falló, usando patrón de respaldo local.");
+            // PATRÓN DE RESPALDO (Lógica local)
+            const actions = ["projectile", "area", "dash", "bomb"];
             const randomAction = actions[Math.floor(Math.random() * actions.length)];
             const intensity = 0.5 + (Math.random() * 0.5);
             
-            if (this.bossText && this.bossText.active) {
+            if (this.bossText && this.bossText.active && !this.bosses.some(b => b.isTalking)) {
                 const loreLines = [
                     "TU CÓDIGO ES OBSOLETO...",
                     "ESTE BUCLE NO TIENE FIN.",
@@ -1096,8 +1237,10 @@ export default class MainScene extends Phaser.Scene {
                     "BORRADO... SISTEMÁTICO."
                 ];
                 this.bossText.setText(loreLines[Math.floor(Math.random() * loreLines.length)]);
+                targetBoss.isTalking = true;
+                this.time.delayedCall(3000, () => { targetBoss.isTalking = false; });
             }
-            this.boss.executeAction(randomAction, intensity, this.player.sprite);
+            targetBoss.executeAction(randomAction, intensity, this.player.sprite);
         }
     }
 
