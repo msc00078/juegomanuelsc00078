@@ -54,8 +54,10 @@ export default class MainScene extends Phaser.Scene {
         this.gold = this.registry.get('gold');
         this.score = this.registry.get('score');
         this.gameOver = false;
+        this.isChangingLevel = false;
         this.isBossLevel = (this.currentLevel % 5 === 0);
         this.isCountdown = true;
+        this.nodeType = this.registry.get('nextNodeType') || 'combat';
     }
 
     create() {
@@ -1004,7 +1006,11 @@ export default class MainScene extends Phaser.Scene {
             this.add.text(this.scale.width / 2, this.scale.height / 2 - 50, portalMsg, { fontSize: '18px', fill: '#0ff' }).setOrigin(0.5);
             this.tweens.add({ targets: this.portal, angle: 360, duration: 2000, repeat: -1 });
             this.physics.add.overlap(this.player.sprite, this.portal, () => {
-                this.nextLevel();
+                if (!this.isChangingLevel) {
+                    this.isChangingLevel = true;
+                    if (this.portal.body) this.portal.body.enable = false; // Desactivar física inmediatamente
+                    this.nextLevel();
+                }
             });
         }
     }
