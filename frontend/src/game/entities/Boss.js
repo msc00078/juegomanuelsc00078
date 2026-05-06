@@ -113,13 +113,15 @@ export class Boss {
                 duration: 800, yoyo: true, repeat: -1
             });
             this.scene.bossText?.setText('¡ESTO NO HA TERMINADO!');
-            // Reducir intervalo de llamadas a la API para más acción
-            if (this.scene.apiCallInterval > 2000) this.scene.apiCallInterval = 2000;
+            // Reducir intervalo de llamadas a la API para más acción (Escalado por nivel)
+            const minInterval = Math.max(1000, 2000 - (this.level * 20));
+            if (this.scene.apiCallInterval > minInterval) this.scene.apiCallInterval = minInterval;
         } else if (newPhase === 3) {
             this.aura.setFillStyle?.(0xffffff, 0.5);
             this.sprite.setStrokeStyle?.(5, 0xffffff);
             this.scene.bossText?.setText('¡MUERE, INSECTO!');
-            if (this.scene.apiCallInterval > 800) this.scene.apiCallInterval = 800; // Mucho más agresivo
+            const minInterval = Math.max(600, 1000 - (this.level * 10));
+            if (this.scene.apiCallInterval > minInterval) this.scene.apiCallInterval = minInterval; 
             // Invocar 2 kamikazes inmediatamente al entrar en fase 3
             this.scene.spawnKamikazeFromBoss?.();
             this.scene.spawnKamikazeFromBoss?.();

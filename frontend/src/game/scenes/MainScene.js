@@ -11,9 +11,13 @@ export default class MainScene extends Phaser.Scene {
     constructor() {
         super('MainScene');
         this.lastApiCallTime = 0;
-        this.apiCallInterval = 3000;
         this.gameOver = false;
         this.isCountdown = true;
+        
+        // Intervalo de IA dinámico según nivel (más lento al inicio, más rápido después)
+        // Nivel 5: ~3.5s, Nivel 50: ~1.5s
+        const currentLvl = this.registry.get('currentLevel') || 1;
+        this.apiCallInterval = Math.max(1200, 4000 - (currentLvl * 60));
         // Mobile joystick placeholder
         this.mobileJoystick = null; // {vx, vy, active}
     }
@@ -322,6 +326,11 @@ export default class MainScene extends Phaser.Scene {
             if (!obstacle.isIndestructible) {
                 this.destroyCrate(obstacle);
             }
+            arrow.destroy();
+        });
+
+        // LOS BLOQUES CANCELAN PROYECTILES ENEMIGOS
+        this.physics.add.collider(this.enemyArrows, this.crates, (arrow) => {
             arrow.destroy();
         });
 
