@@ -795,7 +795,7 @@ export class LaserEliteEnemy extends Enemy {
 
             // Disparo del rayo (un rectángulo largo)
             const angle = Phaser.Math.Angle.Between(this.sprite.x, this.sprite.y, playerSprite.x, playerSprite.y);
-            const beam = this.scene.add.rectangle(this.sprite.x, this.sprite.y, 1200, 40, 0xff00ff, 0.7).setOrigin(0, 0.5).setDepth(51);
+            const beam = this.scene.add.rectangle(this.sprite.x, this.sprite.y, 1200, 25, 0xff00ff, 0.7).setOrigin(0, 0.5).setDepth(51);
             beam.setRotation(angle);
             
             // Detección de colisión manual (Arcade Physics no soporta rotación para cuerpos)
@@ -809,7 +809,7 @@ export class LaserEliteEnemy extends Enemy {
                 const angToPlayer = Phaser.Math.Angle.Between(this.sprite.x, this.sprite.y, player.sprite.x, player.sprite.y);
                 const diff = Math.abs(Phaser.Math.Angle.Wrap(angToPlayer - angle));
                 
-                if (diff < 0.25 && !player.isInvulnerable) { // Margen aumentado para que pegue más fácil
+                if (diff < 0.15 && !player.isInvulnerable) { // Margen reducido para que sea más justo esquivar
                     hasHit = true;
                     player.takeDamage(45); // DAÑO AUMENTADO
                     this.scene.updateUI();
