@@ -113,23 +113,7 @@ export default class MenuScene extends Phaser.Scene {
         });
         upgradeBg.on('pointerdown', () => this.scene.start('UpgradeScene'));
 
-        // Selector de Personalidad del Boss
-        const personalities = ['poeta', 'logico', 'glitch'];
-        let currentPersonality = personalities.indexOf(window.gamePersonality || 'poeta');
-        if (currentPersonality === -1) currentPersonality = 0;
-        window.gamePersonality = personalities[currentPersonality];
 
-        const personalityText = this.add.text(this.scale.width / 2, this.scale.height * 0.80, `[ IA BOSS: ${personalities[currentPersonality].toUpperCase()} ]`, { 
-            fontSize: '20px', fill: '#00ffff', fontStyle: 'bold', backgroundColor: '#111'
-        }).setOrigin(0.5).setInteractive({ useHandCursor: true });
-        
-        personalityText.on('pointerdown', () => {
-            currentPersonality = (currentPersonality + 1) % personalities.length;
-            window.gamePersonality = personalities[currentPersonality];
-            personalityText.setText(`[ IA BOSS: ${personalities[currentPersonality].toUpperCase()} ]`);
-        });
-        personalityText.on('pointerover', () => personalityText.setFillStyle(0xffffff));
-        personalityText.on('pointerout', () => personalityText.setFillStyle(0x00ffff));
 
         // Selector de Personalidad del Boss
         const personalities = ['poeta', 'logico', 'glitch'];

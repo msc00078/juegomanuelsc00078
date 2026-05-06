@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Orbitron:wght@400;700;900&display=swap');
+
 :root {
   --primary: #00f2ff;
   --secondary: #ff00e1;
@@ -14,8 +16,6 @@
   color: #fff;
   overflow: hidden;
 }
-
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Orbitron:wght@400;700;900&display=swap');
 
 @media (prefers-color-scheme: dark) {
   :root {
@@ -39,6 +39,7 @@
 
 body {
   margin: 0;
+  color: var(--text-h);
 }
 
 #root {
