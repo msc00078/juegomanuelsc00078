@@ -10,56 +10,115 @@ export default class ShopScene extends Phaser.Scene {
         const H = this.scale.height;
         const cx = W / 2;
 
-        this.add.rectangle(cx, H / 2, W, H, 0x080c14);
-        this.add.grid(cx, H/2, W, H, 48, 48, 0x0d1020, 1, 0x111833, 1);
-        this.add.text(cx, H * 0.08, "DON BYTE", { fontSize: '46px', fill: '#ffd700', fontStyle: 'bold', stroke: '#000', strokeThickness: 4 }).setOrigin(0.5);
-        this.add.text(cx, H * 0.16, '"Siempre sonríe... demasiado."', { fontSize: '16px', fill: '#ffaa00', fontStyle: 'italic' }).setOrigin(0.5);
-        this.goldText = this.add.text(cx, H * 0.24, `Datos (Oro): ${this.registry.get('gold')}`, { fontSize: '22px', fill: '#aaffff' }).setOrigin(0.5);
+        // Fondo coordinado
+        const bg = this.add.graphics();
+        bg.fillGradientStyle(0x050505, 0x050505, 0x0a101a, 0x0a101a, 1);
+        bg.fillRect(0, 0, W, H);
+        this.add.grid(cx, H/2, W, H, 64, 64, 0x00f2ff, 0.02, 0x00f2ff, 0.05);
 
-        const row1Y = H * 0.42;
-        const row2Y = H * 0.60;
-        const spacing = W * 0.18;
+        this.add.text(cx, H * 0.10, "DON BYTE // MERCADO NEGRO", { 
+            fontFamily: 'Orbitron, sans-serif',
+            fontSize: '48px', fill: '#ffcc00', fontStyle: 'bold' 
+        }).setOrigin(0.5);
 
-        // Fila 1
-        this.createButton(cx - spacing, row1Y, `Nanito Curativo\n(Restaurar HP)\n${this.getPrice(25)} Oro`, 0x006622, () => this.buyHeal());
-        this.createButton(cx,           row1Y, `Afilar Byte\n(+Daño)\n${this.getPrice(50)} Oro`,          0x880000, () => this.buyDamage());
-        this.createButton(cx + spacing, row1Y, `Implante (+20 HP)\n${this.getPrice(60)} Oro`,              0x770077, () => this.buyMaxHp());
+        this.add.text(cx, H * 0.18, '"En el código nada es gratis, pero todo tiene un precio."', { 
+            fontFamily: 'Inter, sans-serif',
+            fontSize: '16px', fill: '#ffaa00', fontStyle: 'italic' 
+        }).setOrigin(0.5);
 
-        // Fila 2
-        let bowText = this.registry.get('hasBow') ? "Arco.exe\n(Instalado)" : `Arco.exe\n${this.getPrice(90)} Oro`;
-        this.createButton(cx - spacing * 0.6, row2Y, bowText, 0x886600, () => this.buyBow());
+        // Créditos UI
+        const goldPanel = this.add.graphics();
+        goldPanel.fillStyle(0x000000, 0.6);
+        goldPanel.fillRoundedRect(cx - 150, H * 0.23, 300, 50, 10);
+        goldPanel.lineStyle(1, 0x00f2ff, 0.5);
+        goldPanel.strokeRoundedRect(cx - 150, H * 0.23, 300, 50, 10);
 
-        let bombText = this.registry.get('hasBombs') ? "Bombas Glítch\n(Instaladas)" : `Bombas Glítch\n${this.getPrice(120)} Oro`;
-        this.createButton(cx + spacing * 0.6, row2Y, bombText, 0x006666, () => this.buyBombs());
+        this.goldText = this.add.text(cx, H * 0.265, `DATOS ORO: ${this.registry.get('gold')} 💎`, { 
+            fontFamily: 'Orbitron, sans-serif',
+            fontSize: '20px', fill: '#00f2ff', fontStyle: 'bold' 
+        }).setOrigin(0.5);
 
-        const continueBtn = this.add.rectangle(cx, H * 0.82, 240, 55, 0x221100).setInteractive();
-        continueBtn.setStrokeStyle(2, 0xffd700);
-        this.add.text(cx, H * 0.82, "Salir del mercado >", { fontSize: '20px', fill: '#ffd700' }).setOrigin(0.5);
+        const row1Y = H * 0.45;
+        const row2Y = H * 0.65;
+        const spacing = 220;
 
-        continueBtn.on('pointerover', () => continueBtn.setFillStyle(0x666666));
-        continueBtn.on('pointerout', () => continueBtn.setFillStyle(0x444444));
-        continueBtn.on('pointerdown', () => this.scene.start('MainScene'));
+        // Fila 1 - Mejoras
+        this.createShopItem(cx - spacing, row1Y, "NANITOS", "Restaurar HP", this.getPrice(25), 0x00ff88, () => this.buyHeal());
+        this.createShopItem(cx,           row1Y, "PROTOCOLOS", "+5 Daño", this.getPrice(40), 0xff0055, () => this.buyDamage());
+        this.createShopItem(cx + spacing, row1Y, "CHASIS", "+20 Max HP", this.getPrice(50), 0x00f2ff, () => this.buyMaxHp());
 
-        // Mostrar diálogo al entrar
-        this.showDialogue("DON BYTE", '"Bienvenido al mercado de datos, error. Aquí el código es ley y el oro es el lenguaje. Compra algo... o piérdete en el loop."');
+        // Fila 2 - Armas
+        let bowLabel = this.registry.get('hasBow') ? "INSTALADO" : `${this.getPrice(80)} 💎`;
+        this.createShopItem(cx - spacing * 0.5, row2Y, "ARCO.EXE", "Ataque Rango", bowLabel, 0xffcc00, () => this.buyBow());
+
+        let bombLabel = this.registry.get('hasBombs') ? "INSTALADO" : `${this.getPrice(100)} 💎`;
+        this.createShopItem(cx + spacing * 0.5, row2Y, "BOMBAS.GLITCH", "Explosivos", bombLabel, 0xff00e1, () => this.buyBombs());
+
+        // Botón Salir
+        const exitBtn = this.add.container(cx, H * 0.88);
+        const exitBg = this.add.rectangle(0, 0, 260, 50, 0x00f2ff, 0.1).setInteractive();
+        exitBg.setStrokeStyle(1, 0x00f2ff, 0.5);
+        const exitTxt = this.add.text(0, 0, "SALIR AL SECTOR >", { 
+            fontFamily: 'Orbitron, sans-serif', fontSize: '16px', fill: '#00f2ff', fontStyle: 'bold' 
+        }).setOrigin(0.5);
+        exitBtn.add([exitBg, exitTxt]);
+
+        exitBg.on('pointerover', () => { exitBg.setFillStyle(0x00f2ff, 0.3); this.tweens.add({ targets: exitBtn, scale: 1.05, duration: 200 }); });
+        exitBg.on('pointerout', () => { exitBg.setFillStyle(0x00f2ff, 0.1); this.tweens.add({ targets: exitBtn, scale: 1, duration: 200 }); });
+        exitBg.on('pointerdown', () => this.scene.start('MainScene'));
+
+        this.showDialogue("DON BYTE", '"Bienvenido al mercado de datos. Compra algo... o piérdete en el loop."');
+    }
+
+    createShopItem(x, y, title, desc, priceLabel, color, callback) {
+        const container = this.add.container(x, y);
+        const bg = this.add.rectangle(0, 0, 200, 140, 0x0a0a0a, 0.8).setInteractive();
+        bg.setStrokeStyle(1, color, 0.4);
+
+        const titleTxt = this.add.text(0, -40, title, { 
+            fontFamily: 'Orbitron, sans-serif', fontSize: '18px', fill: '#fff', fontStyle: 'bold' 
+        }).setOrigin(0.5);
+        const descTxt = this.add.text(0, -10, desc, { 
+            fontFamily: 'Inter, sans-serif', fontSize: '12px', fill: '#888' 
+        }).setOrigin(0.5);
+        const priceTxt = this.add.text(0, 35, typeof priceLabel === 'number' ? `${priceLabel} 💎` : priceLabel, { 
+            fontFamily: 'Orbitron, sans-serif', fontSize: '16px', fill: color, fontStyle: 'bold' 
+        }).setOrigin(0.5);
+
+        container.add([bg, titleTxt, descTxt, priceTxt]);
+
+        bg.on('pointerover', () => {
+            bg.setFillStyle(0x111111, 1);
+            bg.setStrokeStyle(2, color, 1);
+            this.tweens.add({ targets: container, scale: 1.05, duration: 200 });
+        });
+        bg.on('pointerout', () => {
+            bg.setFillStyle(0x0a0a0a, 0.8);
+            bg.setStrokeStyle(1, color, 0.4);
+            this.tweens.add({ targets: container, scale: 1, duration: 200 });
+        });
+        bg.on('pointerdown', () => {
+            callback();
+            this.tweens.add({ targets: container, scale: 0.95, duration: 50, yoyo: true });
+        });
     }
 
     showDialogue(character, message) {
         const cx = this.scale.width / 2;
-        const cy = this.scale.height / 2;
+        const panel = this.add.container(cx, this.scale.height - 80).setDepth(1000);
+        const bg = this.add.rectangle(0, 0, this.scale.width * 0.85, 100, 0x050505, 0.95);
+        bg.setStrokeStyle(2, 0x00f2ff, 0.6);
         
-        const box = this.add.rectangle(cx, this.scale.height - 100, this.scale.width * 0.8, 120, 0x000000, 0.9).setDepth(200).setStrokeStyle(2, 0x00ffff);
-        const nameTxt = this.add.text(cx - (this.scale.width * 0.38), this.scale.height - 150, character, { fontSize: '20px', fill: '#00ffff', fontStyle: 'bold' }).setDepth(201);
-        const msgTxt = this.add.text(cx, this.scale.height - 100, message, { fontSize: '18px', fill: '#fff', align: 'center', wordWrap: { width: this.scale.width * 0.7 } }).setOrigin(0.5).setDepth(201);
-        
-        // Auto-destruir tras unos segundos o al hacer click
-        this.input.once('pointerdown', () => {
-            box.destroy(); nameTxt.destroy(); msgTxt.destroy();
+        const charTxt = this.add.text(-this.scale.width * 0.4, -40, character, { 
+            fontFamily: 'Orbitron, sans-serif', fontSize: '18px', fill: '#00f2ff', fontStyle: 'bold' 
         });
+        const msgTxt = this.add.text(0, 5, message, { 
+            fontFamily: 'Inter, sans-serif', fontSize: '16px', fill: '#fff', align: 'center', wordWrap: { width: this.scale.width * 0.75 } 
+        }).setOrigin(0.5);
         
-        this.time.delayedCall(5000, () => {
-            if (box.active) { box.destroy(); nameTxt.destroy(); msgTxt.destroy(); }
-        });
+        panel.add([bg, charTxt, msgTxt]);
+        this.input.once('pointerdown', () => panel.destroy());
+        this.time.delayedCall(5000, () => { if (panel.active) panel.destroy(); });
     }
 
     getPrice(base) {
@@ -68,19 +127,8 @@ export default class ShopScene extends Phaser.Scene {
         return base;
     }
 
-    createButton(x, y, text, color, callback) {
-        const bg = this.add.rectangle(x, y, 180, 100, color).setInteractive();
-        const txt = this.add.text(x, y, text, { fontSize: '16px', fill: '#fff', align: 'center' }).setOrigin(0.5);
-        bg.on('pointerover', () => bg.setStrokeStyle(4, 0xffffff));
-        bg.on('pointerout', () => bg.setStrokeStyle(0));
-        bg.on('pointerdown', () => {
-            callback();
-            this.tweens.add({ targets: bg, scale: 0.9, duration: 50, yoyo: true });
-        });
-    }
-
     updateGoldUI() {
-        this.goldText.setText(`Oro disponible: ${this.registry.get('gold')}`);
+        this.goldText.setText(`DATOS ORO: ${this.registry.get('gold')} 💎`);
     }
 
     buyHeal() {
@@ -92,11 +140,11 @@ export default class ShopScene extends Phaser.Scene {
             this.registry.set('gold', gold - price);
             this.registry.set('playerHp', maxHp);
             this.updateGoldUI();
-            this.showFeedback("¡Curado!");
+            this.showFeedback("¡SISTEMAS REPARADOS!");
         } else if (hp >= maxHp) {
-            this.showFeedback("Vida llena", 0xff0000);
+            this.showFeedback("INTEGRIDAD AL MÁXIMO", 0xff0000);
         } else {
-            this.showFeedback("Falta Oro", 0xff0000);
+            this.showFeedback("CRÉDITOS INSUFICIENTES", 0xff0000);
         }
     }
 
@@ -108,9 +156,9 @@ export default class ShopScene extends Phaser.Scene {
             this.registry.set('gold', gold - price);
             this.registry.set('swordDamage', damage + 5);
             this.updateGoldUI();
-            this.showFeedback("¡+5 Daño!");
+            this.showFeedback("¡ATAQUE OPTIMIZADO!");
         } else {
-            this.showFeedback("Falta Oro", 0xff0000);
+            this.showFeedback("CRÉDITOS INSUFICIENTES", 0xff0000);
         }
     }
 
@@ -123,9 +171,9 @@ export default class ShopScene extends Phaser.Scene {
             this.registry.set('playerMaxHp', maxHp + 20);
             this.registry.set('playerHp', this.registry.get('playerHp') + 20);
             this.updateGoldUI();
-            this.showFeedback("¡+20 Max HP!");
+            this.showFeedback("¡CHASIS AMPLIADO!");
         } else {
-            this.showFeedback("Falta Oro", 0xff0000);
+            this.showFeedback("CRÉDITOS INSUFICIENTES", 0xff0000);
         }
     }
 
@@ -137,9 +185,10 @@ export default class ShopScene extends Phaser.Scene {
             this.registry.set('gold', gold - price);
             this.registry.set('hasBow', true);
             this.updateGoldUI();
-            this.showFeedback("¡Arco!");
+            this.showFeedback("¡ARCO.EXE INSTALADO!");
+            this.scene.restart();
         } else {
-            this.showFeedback("Falta Oro", 0xff0000);
+            this.showFeedback("CRÉDITOS INSUFICIENTES", 0xff0000);
         }
     }
 
@@ -151,14 +200,17 @@ export default class ShopScene extends Phaser.Scene {
             this.registry.set('gold', gold - price);
             this.registry.set('hasBombs', true);
             this.updateGoldUI();
-            this.showFeedback("¡Bombas!");
+            this.showFeedback("¡BOMBAS.GLITCH CARGADAS!");
+            this.scene.restart();
         } else {
-            this.showFeedback("Falta Oro", 0xff0000);
+            this.showFeedback("CRÉDITOS INSUFICIENTES", 0xff0000);
         }
     }
 
     showFeedback(msg, color = 0x00ff00) {
-        const text = this.add.text(this.scale.width / 2, this.scale.height * 0.52, msg, { fontSize: '20px', fill: Phaser.Display.Color.IntegerToColor(color).rgba }).setOrigin(0.5);
-        this.tweens.add({ targets: text, y: this.scale.height * 0.40, alpha: 0, duration: 1500, onComplete: () => text.destroy() });
+        const text = this.add.text(this.scale.width / 2, this.scale.height * 0.52, msg, { 
+            fontFamily: 'Orbitron, sans-serif', fontSize: '20px', fill: Phaser.Display.Color.IntegerToColor(color).rgba 
+        }).setOrigin(0.5).setDepth(2000);
+        this.tweens.add({ targets: text, y: this.scale.height * 0.35, alpha: 0, duration: 1500, onComplete: () => text.destroy() });
     }
 }

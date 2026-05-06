@@ -1317,7 +1317,7 @@ export default class MainScene extends Phaser.Scene {
             fontSize: '20px', fill: '#fff', align: 'center', lineSpacing: 10
         }).setOrigin(0.5);
 
-        const hint = this.add.text(0, 120, "PRESIONA R PARA REINICIAR", {
+        const hint = this.add.text(0, 120, "PULSA CUALQUIER TECLA O ESPERA 5s", {
             fontFamily: 'Orbitron, sans-serif',
             fontSize: '16px', fill: '#ff0000', fontStyle: 'bold'
         }).setOrigin(0.5);
@@ -1327,8 +1327,19 @@ export default class MainScene extends Phaser.Scene {
         // Guardar resultado
         saveRunResult(this.score, this.currentLevel, crystalsEarned).catch(err => console.error(err));
 
-        this.time.delayedCall(3000, () => {
-            this.input.keyboard.once('keydown-R', () => {
+        // Auto-reinicio tras 5 segundos
+        const restartTimer = this.time.delayedCall(5000, () => {
+            this.scene.start('MenuScene');
+        });
+
+        // Reinicio con cualquier tecla tras un breve cooldown de seguridad (1s)
+        this.time.delayedCall(1000, () => {
+            this.input.keyboard.once('keydown', () => {
+                restartTimer.destroy(); // Cancelar el auto-reinicio si se pulsa una tecla
+                this.scene.start('MenuScene');
+            });
+            this.input.once('pointerdown', () => {
+                restartTimer.destroy();
                 this.scene.start('MenuScene');
             });
         });

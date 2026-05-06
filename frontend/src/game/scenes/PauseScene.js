@@ -11,30 +11,63 @@ export default class PauseScene extends Phaser.Scene {
         const cx = W / 2;
         const cy = H / 2;
 
-        // Fondo semi-transparente
-        this.add.rectangle(cx, cy, W, H, 0x000000, 0.65);
+        // Fondo semi-transparente oscurecido
+        this.add.rectangle(cx, cy, W, H, 0x000000, 0.75);
 
-        this.add.rectangle(cx, cy, 320, 380, 0x222222).setStrokeStyle(4, 0xffffff);
-
-        this.add.text(cx, cy - 140, "PAUSA", {
-            fontSize: '44px', fill: '#fff', fontStyle: 'bold'
+        // Panel de Pausa (Glassmorphism)
+        const panel = this.add.container(cx, cy);
+        const bg = this.add.rectangle(0, 0, 360, 420, 0x050505, 0.9);
+        bg.setStrokeStyle(2, 0x00f2ff, 0.4);
+        
+        const title = this.add.text(0, -150, "SIMULACIÓN EN PAUSA", {
+            fontFamily: 'Orbitron, sans-serif',
+            fontSize: '24px', fill: '#00f2ff', fontStyle: 'bold'
         }).setOrigin(0.5);
 
-        this.createButton(cx, cy - 50,  "RESUMIR",        0x0077ff, () => this.resume());
-        this.createButton(cx, cy + 30,  "REINTENTAR",     0xaa0000, () => this.restart());
-        this.createButton(cx, cy + 110, "MENÚ PRINCIPAL", 0x555555, () => this.goToMenu());
+        panel.add([bg, title]);
+
+        this.createButton(panel, 0, -50,  "RESUMIR",        0x00f2ff, () => this.resume());
+        this.createButton(panel, 0, 40,   "REINTENTAR",     0xff00e1, () => this.restart());
+        this.createButton(panel, 0, 130,  "SALIR AL MENÚ", 0x333333, () => this.goToMenu());
+
+        // Scanline decorativa
+        const line = this.add.rectangle(0, -bg.height/2, bg.width, 2, 0x00f2ff, 0.2);
+        panel.add(line);
+        this.tweens.add({
+            targets: line,
+            y: bg.height/2,
+            duration: 3000,
+            repeat: -1
+        });
 
         this.input.keyboard.on('keydown-ESC', () => this.resume());
         this.input.keyboard.on('keydown-P',   () => this.resume());
     }
 
-    createButton(x, y, label, color, callback) {
-        const btn = this.add.rectangle(x, y, 240, 55, color).setInteractive();
-        this.add.text(x, y, label, { fontSize: '20px', fill: '#fff', fontStyle: 'bold' }).setOrigin(0.5);
-        btn.on('pointerover', () => btn.setStrokeStyle(3, 0xffffff));
-        btn.on('pointerout',  () => btn.setStrokeStyle(0));
-        btn.on('pointerdown', () => callback());
-        return btn;
+    createButton(container, x, y, label, color, callback) {
+        const btnBg = this.add.rectangle(x, y, 280, 60, color, 0.1).setInteractive();
+        btnBg.setStrokeStyle(1, color, 0.5);
+        
+        const btnTxt = this.add.text(x, y, label, { 
+            fontFamily: 'Orbitron, sans-serif',
+            fontSize: '18px', fill: '#fff', fontStyle: 'bold' 
+        }).setOrigin(0.5);
+        
+        container.add([btnBg, btnTxt]);
+
+        btnBg.on('pointerover', () => {
+            btnBg.setFillStyle(color, 0.3);
+            btnBg.setStrokeStyle(1, color, 1);
+            this.tweens.add({ targets: btnBg, scaleX: 1.05, duration: 100 });
+        });
+        
+        btnBg.on('pointerout', () => {
+            btnBg.setFillStyle(color, 0.1);
+            btnBg.setStrokeStyle(1, color, 0.5);
+            this.tweens.add({ targets: btnBg, scaleX: 1, duration: 100 });
+        });
+
+        btnBg.on('pointerdown', () => callback());
     }
 
     resume() {

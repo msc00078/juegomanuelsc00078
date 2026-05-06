@@ -1,21 +1,21 @@
 import * as Phaser from 'phaser';
 
 const ALL_RELICS = [
-    { id: 'hermes', name: "Botas de Hermes.exe", desc: "+20% Velocidad de procesamiento", color: 0x00ffff },
-    { id: 'titan', name: "Corazón de Kernel", desc: "+50 Max HP, -10% Velocidad. Late como una CPU", color: 0xff0000 },
-    { id: 'vampiro', name: "Protocolo Sanguijuela", desc: "5% de probabilidad de\ncurar 5 HP al borrar un Ente", color: 0xaa0022 },
-    { id: 'berserker', name: "Furia.dll", desc: "+50% Daño con integridad < 30%", color: 0xff5500 },
-    { id: 'iman', name: "Imán de Cripto", desc: "Atrae el oro (datos) desde lejos", color: 0xffff00 },
-    { id: 'espinas', name: "Manto de Firewall", desc: "Devuelve daño a los atacantes", color: 0x44ff44 },
-    { id: 'perforante', name: "Flechas Perforantes", desc: "Las flechas atraviesan el código enemigo", color: 0xaaaaaa },
-    { id: 'reloj', name: "Overclock", desc: "Cooldowns de armas -30%", color: 0x8888ff },
-    { id: 'hierro', name: "Carcasa de Titanio", desc: "Reduce el daño recibido en 2", color: 0x555555 },
-    { id: 'polvora', name: "Polvora Negativa", desc: "+50% Radio de explosión", color: 0x111111 },
-    { id: 'sniper', name: "Ojo del Debugger", desc: "Más daño de arco a distancia", color: 0x00aa00 },
-    { id: 'vip', name: "Acceso Root", desc: "Tienda 20% más barata", color: 0xffdd00 },
-    { id: 'sangrado', name: "Filo Corrupto", desc: "Espada aplica daño en el tiempo", color: 0x880000 },
-    { id: 'artemisa', name: "Matriz de Artemisa", desc: "Dispara 3 flechas en abanico", color: 0x00ffaa },
-    { id: 'pegajosa', name: "Glitch Adhesivo", desc: "Las bombas se pegan al objetivo", color: 0x005500 }
+    { id: 'hermes', name: "BOTAS DE HERMES.EXE", desc: "+20% Velocidad de procesamiento", color: 0x00f2ff },
+    { id: 'titan', name: "CORAZÓN DE KERNEL", desc: "+50 Max HP, -10% Velocidad. Late como una CPU", color: 0xff0055 },
+    { id: 'vampiro', name: "PROTOCOLO SANGUIJUELA", desc: "5% de probabilidad de curar 5 HP al borrar un Ente", color: 0xff00e1 },
+    { id: 'berserker', name: "FURIA.DLL", desc: "+50% Daño con integridad < 30%", color: 0xffcc00 },
+    { id: 'iman', name: "IMÁN DE CRIPTO", desc: "Atrae el oro (datos) desde lejos", color: 0xffff00 },
+    { id: 'espinas', name: "MANTO DE FIREWALL", desc: "Devuelve daño a los atacantes", color: 0x00ff88 },
+    { id: 'perforante', name: "FLECHAS PERFORANTES", desc: "Las flechas atraviesan el código enemigo", color: 0xaaaaaa },
+    { id: 'reloj', name: "OVERCLOCK", desc: "Cooldowns de armas -30%", color: 0x8888ff },
+    { id: 'hierro', name: "CARCASA DE TITANIO", desc: "Reduce el daño recibido en 2", color: 0x555555 },
+    { id: 'polvora', name: "POLVORA NEGATIVA", desc: "+50% Radio de explosión", color: 0x333333 },
+    { id: 'sniper', name: "OJO DEL DEBUGGER", desc: "Más daño de arco a distancia", color: 0x00aa00 },
+    { id: 'vip', name: "ACCESO ROOT", desc: "Tienda 20% más barata", color: 0xffdd00 },
+    { id: 'sangrado', name: "FILO CORRUPTO", desc: "Espada aplica daño en el tiempo", color: 0x880000 },
+    { id: 'artemisa', name: "MATRIZ DE ARTEMISA", desc: "Dispara 3 flechas en abanico", color: 0x00ffaa },
+    { id: 'pegajosa', name: "GLITCH ADHESIVO", desc: "Las bombas se pegan al objetivo", color: 0x005500 }
 ];
 
 export default class RelicScene extends Phaser.Scene {
@@ -30,92 +30,67 @@ export default class RelicScene extends Phaser.Scene {
         const cx = W / 2;
         const cy = H / 2;
 
-        this.add.rectangle(cx, cy, W, H, 0x221111);
+        // Fondo coordinado
+        const bg = this.add.graphics();
+        bg.fillGradientStyle(0x050505, 0x050505, 0x1a0a0a, 0x1a0a0a, 1);
+        bg.fillRect(0, 0, W, H);
+        this.add.grid(cx, H/2, W, H, 64, 64, 0x00f2ff, 0.02, 0x00f2ff, 0.05);
 
-        this.add.text(cx, H * 0.12, "¡RELIQUIA OBTENIDA!", {
-            fontSize: '40px', fill: '#ffcc00', fontStyle: 'bold'
+        this.add.text(cx, H * 0.12, "ANOMALÍA DETECTADA", {
+            fontFamily: 'Orbitron, sans-serif',
+            fontSize: '44px', fill: '#ffcc00', fontStyle: 'bold'
         }).setOrigin(0.5);
-        this.add.text(cx, H * 0.22, "Elige un poder para el resto de la partida", {
-            fontSize: '20px', fill: '#fff'
+
+        this.add.text(cx, H * 0.20, "SELECCIONA UN ARTEFACTO DE PERSISTENCIA", {
+            fontFamily: 'Inter, sans-serif',
+            fontSize: '16px', fill: '#888', letterSpacing: 4
         }).setOrigin(0.5);
 
         let ownedRelics = this.registry.get('relics') || [];
         let availableRelics = ALL_RELICS.filter(r => !ownedRelics.includes(r.id));
 
         if (availableRelics.length === 0) {
-            this.add.text(cx, cy, "Ya tienes todas las reliquias.\nObtienes 50 de Oro en su lugar.", {
-                fontSize: '24px', fill: '#aaa', align: 'center'
-            }).setOrigin(0.5);
-            this.registry.set('gold', this.registry.get('gold') + 50);
-            this.createContinueButton(W, H);
+            this.showEmptyState(cx, cy, W, H);
             return;
         }
 
-        // Seleccionar hasta 3 aleatorias
         Phaser.Utils.Array.Shuffle(availableRelics);
         this.choices = availableRelics.slice(0, Math.min(3, availableRelics.length));
         this.currentPage = 0;
 
-        // Contenedor de tarjetas para poder actualizarlas
         this.cardContainer = this.add.container(0, 0);
-
         this.renderCards(W, H);
 
-        // Flechas de navegación si hay más de una tarjeta que no cabe
-        const cardWidth = 200;
-        const totalCardsWidth = this.choices.length * cardWidth;
-
-        if (totalCardsWidth > W * 0.85 && this.choices.length > 1) {
-            // Navegación izquierda/derecha
-            const leftBtn = this.add.text(40, cy, '◀', {
-                fontSize: '48px', fill: '#fff'
-            }).setOrigin(0.5).setInteractive().setDepth(10);
-
-            const rightBtn = this.add.text(W - 40, cy, '▶', {
-                fontSize: '48px', fill: '#fff'
-            }).setOrigin(0.5).setInteractive().setDepth(10);
-
-            leftBtn.on('pointerdown', () => {
-                this.currentPage = (this.currentPage - 1 + this.choices.length) % this.choices.length;
-                this.renderCards(W, H);
-            });
-            rightBtn.on('pointerdown', () => {
-                this.currentPage = (this.currentPage + 1) % this.choices.length;
-                this.renderCards(W, H);
-            });
-
-            // Swipe táctil
-            this.input.on('pointerdown', (p) => { this._swipeStartX = p.x; });
-            this.input.on('pointerup', (p) => {
-                const dx = p.x - this._swipeStartX;
-                if (Math.abs(dx) > 60) {
-                    if (dx < 0) {
-                        this.currentPage = (this.currentPage + 1) % this.choices.length;
-                    } else {
-                        this.currentPage = (this.currentPage - 1 + this.choices.length) % this.choices.length;
-                    }
-                    this.renderCards(W, H);
-                }
-            });
+        if (this.choices.length > 1 && W < 750) {
+            this.createNavigation(W, cy);
         }
+    }
+
+    showEmptyState(cx, cy, W, H) {
+        this.add.text(cx, cy, "CÓDIGO FUENTE COMPLETO.\nOBTIENES 50 💎 DE COMPENSACIÓN.", {
+            fontFamily: 'Orbitron, sans-serif', fontSize: '24px', fill: '#aaa', align: 'center'
+        }).setOrigin(0.5);
+        this.registry.set('gold', this.registry.get('gold') + 50);
+        
+        const btn = this.add.container(cx, H * 0.85);
+        const bBg = this.add.rectangle(0, 0, 240, 50, 0x00f2ff, 0.1).setInteractive();
+        bBg.setStrokeStyle(1, 0x00f2ff, 0.5);
+        const bTxt = this.add.text(0, 0, "CONTINUAR >", { 
+            fontFamily: 'Orbitron, sans-serif', fontSize: '16px', fill: '#fff', fontStyle: 'bold' 
+        }).setOrigin(0.5);
+        btn.add([bBg, bTxt]);
+        bBg.on('pointerdown', () => this.scene.start('MainScene'));
     }
 
     renderCards(W, H) {
         this.cardContainer.removeAll(true);
 
-        const cy = H / 2 + 30;
-        const cardW = 190;
-        const cardH = 240;
+        const cy = H / 2 + 50;
+        const cardW = 210;
+        const cardH = 300;
 
-        // En pantallas anchas mostrar hasta 3, en estrechas solo 1
-        const maxVisible = W > 700 ? this.choices.length : 1;
-        const indices = [];
-
-        if (maxVisible === 1) {
-            indices.push(this.currentPage);
-        } else {
-            for (let i = 0; i < this.choices.length; i++) indices.push(i);
-        }
+        const maxVisible = W > 750 ? this.choices.length : 1;
+        const indices = (maxVisible === 1) ? [this.currentPage] : this.choices.map((_, i) => i);
 
         const totalWidth = indices.length * (cardW + 30) - 30;
         const startX = (W - totalWidth) / 2 + cardW / 2;
@@ -124,20 +99,35 @@ export default class RelicScene extends Phaser.Scene {
             const relic = this.choices[relicIdx];
             const x = startX + col * (cardW + 30);
 
-            const bg = this.add.rectangle(x, cy, cardW, cardH, 0x442222).setInteractive();
-            bg.setStrokeStyle(3, relic.color);
-            const icon = this.add.circle(x, cy - 80, 28, relic.color);
-            const nameT = this.add.text(x, cy - 20, relic.name, {
-                fontSize: '17px', fill: '#fff', fontStyle: 'bold', align: 'center',
-                wordWrap: { width: cardW - 20 }
+            const container = this.add.container(x, cy);
+            const bg = this.add.rectangle(0, 0, cardW, cardH, 0x0a0a0a, 0.9).setInteractive();
+            bg.setStrokeStyle(2, relic.color, 0.4);
+
+            const glow = this.add.circle(0, -90, 40, relic.color, 0.15);
+            const icon = this.add.circle(0, -90, 30, relic.color).setStrokeStyle(2, 0xffffff);
+            
+            const nameT = this.add.text(0, -10, relic.name, {
+                fontFamily: 'Orbitron, sans-serif', fontSize: '18px', fill: '#fff', fontStyle: 'bold', align: 'center',
+                wordWrap: { width: cardW - 30 }
             }).setOrigin(0.5);
-            const descT = this.add.text(x, cy + 55, relic.desc, {
-                fontSize: '13px', fill: '#aaa', align: 'center',
-                wordWrap: { width: cardW - 20 }
+            
+            const descT = this.add.text(0, 70, relic.desc, {
+                fontFamily: 'Inter, sans-serif', fontSize: '13px', fill: '#aaa', align: 'center',
+                wordWrap: { width: cardW - 40 }
             }).setOrigin(0.5);
 
-            bg.on('pointerover', () => bg.setFillStyle(0x663333));
-            bg.on('pointerout', () => bg.setFillStyle(0x442222));
+            container.add([bg, glow, icon, nameT, descT]);
+
+            bg.on('pointerover', () => {
+                bg.setFillStyle(0x111111, 1);
+                bg.setStrokeStyle(3, relic.color, 1);
+                this.tweens.add({ targets: container, scale: 1.05, duration: 200 });
+            });
+            bg.on('pointerout', () => {
+                bg.setFillStyle(0x0a0a0a, 0.9);
+                bg.setStrokeStyle(2, relic.color, 0.4);
+                this.tweens.add({ targets: container, scale: 1, duration: 200 });
+            });
             bg.on('pointerdown', () => {
                 let owned = this.registry.get('relics') || [];
                 owned.push(relic.id);
@@ -149,22 +139,20 @@ export default class RelicScene extends Phaser.Scene {
                 this.scene.start('MainScene');
             });
 
-            this.cardContainer.add([bg, icon, nameT, descT]);
+            this.cardContainer.add(container);
         });
 
-        // Indicador de página si modo 1-a-la-vez
-        if (W <= 700 && this.choices.length > 1) {
+        if (W <= 750 && this.choices.length > 1) {
             const dots = this.choices.map((_, i) => i === this.currentPage ? '●' : '○').join(' ');
-            const dotText = this.add.text(W / 2, H * 0.92, dots, {
-                fontSize: '20px', fill: '#fff'
-            }).setOrigin(0.5);
-            this.cardContainer.add(dotText);
+            this.add.text(W / 2, H * 0.90, dots, { fontFamily: 'Inter, sans-serif', fontSize: '20px', fill: '#00f2ff' }).setOrigin(0.5);
         }
     }
 
-    createContinueButton(W, H) {
-        const btn = this.add.rectangle(W / 2, H * 0.82, 220, 55, 0x444444).setInteractive();
-        this.add.text(W / 2, H * 0.82, "Continuar", { fontSize: '22px', fill: '#fff' }).setOrigin(0.5);
-        btn.on('pointerdown', () => this.scene.start('MainScene'));
+    createNavigation(W, cy) {
+        const left = this.add.text(40, cy, '◀', { fontSize: '48px', fill: '#00f2ff' }).setOrigin(0.5).setInteractive();
+        const right = this.add.text(W - 40, cy, '▶', { fontSize: '48px', fill: '#00f2ff' }).setOrigin(0.5).setInteractive();
+
+        left.on('pointerdown', () => { this.currentPage = (this.currentPage - 1 + this.choices.length) % this.choices.length; this.renderCards(this.scale.width, this.scale.height); });
+        right.on('pointerdown', () => { this.currentPage = (this.currentPage + 1) % this.choices.length; this.renderCards(this.scale.width, this.scale.height); });
     }
 }
