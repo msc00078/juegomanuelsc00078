@@ -45,13 +45,15 @@ export class Enemy {
         this.nextBleedTick = this.scene.time.now + 1000;
         
         // Efecto visual: Partículas rojas continuas
-        this.bleedParticles = this.scene.add.particles(0, 0, 'squareParticle', {
-            speed: { min: -20, max: 20 },
-            scale: { start: 0.5, end: 0 },
-            lifespan: 500,
-            tint: 0x880000,
-            follow: this.sprite
-        });
+        if (this.scene.add.particles) {
+            this.bleedParticles = this.scene.add.particles(0, 0, 'squareParticle', {
+                speed: { min: -20, max: 20 },
+                scale: { start: 0.5, end: 0 },
+                lifespan: 500,
+                tint: 0x880000,
+                follow: this.sprite
+            });
+        }
         
         this.scene.time.delayedCall(5000, () => {
             this.isBleeding = false;

@@ -24,25 +24,24 @@ export class Boss {
     }
 
     takeDamage(amount) {
-        if (this.isDead) return;  // Prevent damage if already dead
+        if (this.isDead) return;
         if (this.hp <= 0) return;
         
         this.hp -= amount;
-        this.scene.showDamageNumber(this.sprite.x, this.sprite.y, amount);
+        this.scene.showDamageNumber?.(this.sprite.x, this.sprite.y, amount);
         
-        // Ensure hp doesn't go below 0
         if (this.hp < 0) this.hp = 0;
         
-        this.sprite.setFillStyle(0xffffff);
+        this.sprite.setFillStyle?.(0xffffff);
         this.scene.time.delayedCall(150, () => {
             if (this.sprite.active) {
-                if (this.phase === 1) this.sprite.setFillStyle(0xff0000);
-                else if (this.phase === 2) this.sprite.setFillStyle(0xaa0000);
-                else this.sprite.setFillStyle(0x440000);
+                if (this.phase === 1) this.sprite.setFillStyle?.(0xff0000);
+                else if (this.phase === 2) this.sprite.setFillStyle?.(0xaa0000);
+                else this.sprite.setFillStyle?.(0x440000);
             }
         });
 
-        this.scene.createParticles(this.sprite.x, this.sprite.y, 0xffffff);
+        this.scene.createParticles?.(this.sprite.x, this.sprite.y, 0xffffff);
 
         // Cambio de Fases
         const hpPercent = this.hp / this.maxHp;
@@ -59,27 +58,27 @@ export class Boss {
     }
 
     die() {
-        if (this.isDead) return;  // Prevent multiple death calls
+        if (this.isDead) return;
         this.isDead = true;
         
-        this.sprite.setActive(false).setVisible(false);
-        this.aura.destroy();
-        
-        // Additional boss death logic can be added here
+        this.sprite.setActive?.(false);
+        this.sprite.setVisible?.(false);
+        this.aura.destroy?.();
     }
 
     enterPhase(newPhase) {
         this.phase = newPhase;
-        this.scene.cameras.main.shake(500, 0.02);
+        this.scene.cameras?.main?.shake(500, 0.02);
         
         if (newPhase === 2) {
-            this.aura.setVisible(true).setFillStyle(0xff0000, 0.3);
-            this.scene.tweens.add({ targets: this.aura, scale: 1.5, duration: 1000, yoyo: true, repeat: -1 });
-            this.scene.bossText.setText("¡ESTO NO HA TERMINADO!");
+            this.aura.setVisible?.(true);
+            this.aura.setFillStyle?.(0xff0000, 0.3);
+            this.scene.tweens?.add({ targets: this.aura, scale: 1.5, duration: 1000, yoyo: true, repeat: -1 });
+            this.scene.bossText?.setText("¡ESTO NO HA TERMINADO!");
         } else if (newPhase === 3) {
-            this.aura.setFillStyle(0xffffff, 0.5);
-            this.sprite.setStrokeStyle(5, 0xffffff);
-            this.scene.bossText.setText("¡MUERE, INSECTO!");
+            this.aura.setFillStyle?.(0xffffff, 0.5);
+            this.sprite.setStrokeStyle?.(5, 0xffffff);
+            this.scene.bossText?.setText("¡MUERE, INSECTO!");
         }
     }
 

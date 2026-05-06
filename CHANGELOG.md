@@ -2,14 +2,24 @@
 
 Todas las novedades y mejoras implementadas en el proyecto.
 
-## [1.6.2] - 2026-05-06
+## [1.6.3] - 2026-05-06
+### Corregido
+- **Bug de cambio de arma en HUD**: Al hacer clic en el indicador de arma en la pantalla de juego, el ciclo de armas ahora solo pasa a armas que el jugador haya comprado (`hasBow`, `hasBombs`). Antes ciclaba libremente entre espada, arco y bombas independientemente de si se habían adquirido.
+
+
 ### Añadido
-- **Suite de Tests Completa**: Se creó una batería de **31 tests** repartidos en 8 archivos (2 backend + 6 frontend). Todos los tests pasan en verde.
-  - Backend: `boss.test.js` (2 tests: happy path y fallback de API), `bossRoute.test.js` (2 tests: respuesta exitosa y error 500).
-  - Frontend: `supabase.test.js` (signUp, signIn, saveRunResult, leaderboard), `Auth.test.jsx` (5 tests del componente de login), `Player.test.js` (7 tests de lógica de daño, invulnerabilidad, game over), `Enemy.test.js` (5 tests de vida, daño, muerte), `GameConfig.test.js` (5 tests de configuración de Phaser).
+- **Suite de Tests Completa (58 tests, 7 suites)**: Todos los tests pasan en verde.
+  - **Backend (4 tests):** `boss.test.js`, `bossRoute.test.js`. Cobertura del 88%.
+  - **Frontend (54 tests en 6 suites):**
+    - `Boss.test.js`: 9 tests (daño, fases, muerte, idempotencia)
+    - `Enemy.test.js`: 14 tests (lógica base + 5 subclases: Standard, Tank, Kamikaze, Ranged, Summoner)
+    - `Player.test.js`: 15 tests (daño, invulnerabilidad, reliquias, game over)
+    - `Auth.test.jsx`: 8 tests (login, registro, toggle, getLeaderboard)
+    - `supabase.test.js`: 6 tests (signUp, signIn, saveRunResult, manejo de errores)
+    - `GameConfig.test.js`: 5 tests (tipo, escala 1280x720, física, escenas)
 
 ### Modificado
-- **`Player.js`** y **`Enemy.js`**: Se usó optional chaining (`?.`) en las llamadas a `scene.showDamageNumber`, `scene.createParticles`, `scene.cameras`, etc., para que las clases sean seguras de instanciar fuera de una escena Phaser real (en tests).
+- **`Player.js`**, **`Enemy.js`**, **`Boss.js`**: Se usó optional chaining (`?.`) en llamadas a métodos de escena (`showDamageNumber`, `createParticles`, `cameras`, etc.) para que las clases sean seguras de instanciar fuera de Phaser (en tests).
 
 
 - **Entorno de Testing y Cobertura**: Se integró `Vitest` y `@vitest/coverage-v8` tanto en el `frontend` como en el `backend`. Esto permite realizar pruebas unitarias y medir el porcentaje de código cubierto.

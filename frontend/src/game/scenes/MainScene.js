@@ -131,11 +131,22 @@ export default class MainScene extends Phaser.Scene {
         
         this.weaponText.setInteractive({ useHandCursor: true });
         this.weaponText.on('pointerdown', () => {
-            let w = this.registry.get('equippedWeapon') || 1;
-            w++;
-            if (w > 3) w = 1;
-            this.registry.set('equippedWeapon', w);
-            this.updateUI();
+            const hasBow   = this.registry.get('hasBow');
+            const hasBombs = this.registry.get('hasBombs');
+
+            // Construir la lista de armas disponibles
+            const available = [1];
+            if (hasBow)   available.push(2);
+            if (hasBombs) available.push(3);
+
+            // Si solo hay una arma, no hacer nada
+            if (available.length === 1) return;
+
+            const current = this.registry.get('equippedWeapon') || 1;
+            const currentIdx = available.indexOf(current);
+            const nextIdx = (currentIdx + 1) % available.length;
+
+            this.player.equipWeapon(available[nextIdx]);
         });
 
 

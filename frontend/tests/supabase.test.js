@@ -1,56 +1,83 @@
 import { describe, it, expect, vi } from 'vitest';
 import { signUp, signIn, saveRunResult, getLeaderboard } from '../src/game/supabase.js';
 
-// Mock del cliente de supabase
-vi.mock('@supabase/supabase-js', () => {
-    return {
-        createClient: vi.fn(() => ({
-            auth: {
-                signUp: vi.fn().mockResolvedValue({ data: { user: { id: '123' } }, error: null }),
-                signInWithPassword: vi.fn().mockResolvedValue({ data: { user: { id: '123' } }, error: null }),
-                getUser: vi.fn().mockResolvedValue({ data: { user: { id: '123', email: 'test@test.com', user_metadata: { username: 'tester' } } } })
-            },
-            from: vi.fn(() => ({
-                insert: vi.fn().mockResolvedValue({ error: null }),
-                upsert: vi.fn().mockResolvedValue({ error: null }),
-                select: vi.fn(() => ({
-                    eq: vi.fn(() => ({
-                        single: vi.fn().mockResolvedValue({ data: { total_crystals: 10, high_score: 500, max_sector: 5 } })
-                    })),
-                    order: vi.fn(() => ({
-                        limit: vi.fn().mockResolvedValue({ data: [{ username: 'tester', score: 100 }], error: null })
-                    }))
-                }))
-            }))
+const mockCreate = {
+    signUp: vi.fn(),
+    signInWithPassword: vi.fn(),
+    getUser: vi.fn()
+};
+const mockFrom = vi.fn();
+
+vi.mock('@supabase/supabase-js', () => ({
+    createClient: vi.fn(() => ({
+        auth: {
+            signUp: (...args) => mockCreate.signUp(...args),
+            signInWithPassword: (...args) => mockCreate.signInWithPassword(...args),
+            getUser: (...args) => mockCreate.getUser(...args)
+        },
+        from: (...args) => mockFrom(...args)
+    }))
+}));
+
+const makeChain = (selectData = {}, insertError = null, upsertError = null) => ({
+    insert: vi.fn().mockResolvedValue({ error: insertError }),
+    upsert: vi.fn().mockResolvedValue({ error: upsertError }),
+    select: vi.fn(() => ({
+        eq: vi.fn(() => ({
+            single: vi.fn().mockResolvedValue({ data: selectData })
+        })),
+        order: vi.fn(() => ({
+            limit: vi.fn().mockResolvedValue({ data: [{ username: 'top1', high_score: 999 }], error: null })
         }))
-    };
+    }))
 });
 
 describe('Supabase Service Tests', () => {
-    it('debería hacer signUp correctamente', async () => {
-        const { data, error } = await signUp('test@test.com', 'password', 'tester');
+    it('signUp debería retornar data del usuario sin error', async () => {
+        mockCreate.signUp.mockResolvedValueOnce({ data: { user: { id: 'abc' } }, error: null });
+        mockFrom.mockReturnValue(makeChain());
+        const { data, error } = await signUp('test@test.com', 'pass', 'tester');
         expect(error).toBeUndefined();
-        expect(data.user).toBeDefined();
+        expect(data.user.id).toBe('abc');
     });
 
-    it('debería hacer signIn correctamente', async () => {
-        const { data, error } = await signIn('test@test.com', 'password');
+    it('signUp debería retornar error si supabase falla', async () => {
+        mockCreate.signUp.mockResolvedValueOnce({ data: {}, error: { message: 'Email inválido' } });
+        const result = await signUp('bad', 'pass', 'user');
+        expect(result.error).toBeDefined();
+        expect(result.error.message).toBe('Email inválido');
+    });
+
+    it('signIn debería retornar data del usuario', async () => {
+        mockCreate.signInWithPassword.mockResolvedValueOnce({ data: { user: { id: 'abc' } }, error: null });
+        const { data, error } = await signIn('test@test.com', 'pass');
         expect(error).toBeNull();
         expect(data.user).toBeDefined();
     });
 
-    it('debería guardar el resultado de la partida sin errores', async () => {
-        // En lugar de probar un console.log inexistente, probamos que la función termine sin lanzar error
-        const consoleSpy = vi.spyOn(console, 'error');
-        await saveRunResult(1500, 10, 50);
-        expect(consoleSpy).not.toHaveBeenCalled();
-        consoleSpy.mockRestore();
-    });
-
-    it('debería obtener la tabla de clasificación', async () => {
+    it('getLeaderboard debería retornar la lista de jugadores', async () => {
+        mockFrom.mockReturnValue(makeChain());
         const { data, error } = await getLeaderboard();
         expect(error).toBeNull();
-        expect(data.length).toBe(1);
-        expect(data[0].score).toBe(100);
+        expect(data[0].username).toBe('top1');
+    });
+
+    it('saveRunResult no debería lanzar error con datos válidos', async () => {
+        mockCreate.getUser.mockResolvedValueOnce({
+            data: { user: { id: 'abc', email: 'test@test.com' } }
+        });
+        mockFrom.mockReturnValue(makeChain({ total_crystals: 10, high_score: 500, max_sector: 3 }));
+        const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+        await saveRunResult(600, 4, 20);
+        expect(errorSpy).not.toHaveBeenCalled();
+        errorSpy.mockRestore();
+    });
+
+    it('saveRunResult no debería crashear si el usuario no está logueado', async () => {
+        mockCreate.getUser.mockResolvedValueOnce({ data: { user: null } });
+        const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+        await saveRunResult(100, 1, 5);
+        // No debe lanzar error, simplemente hace return
+        errorSpy.mockRestore();
     });
 });

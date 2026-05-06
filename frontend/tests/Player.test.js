@@ -1,7 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { Player } from '../src/game/entities/Player.js';
 
-// Fábrica de mock de escena (se reinicia en cada test para evitar interferencias)
 const makeScene = (registryOverrides = {}) => {
     const defaults = {
         playerMaxHp: 100,
@@ -13,7 +12,7 @@ const makeScene = (registryOverrides = {}) => {
     };
     const registry = { ...defaults, ...registryOverrides };
 
-    const rectangleMock = () => ({
+    const rectMock = () => ({
         setStrokeStyle: vi.fn().mockReturnThis(),
         setFillStyle: vi.fn().mockReturnThis(),
         setTint: vi.fn().mockReturnThis(),
@@ -24,6 +23,7 @@ const makeScene = (registryOverrides = {}) => {
         setDepth: vi.fn().mockReturnThis(),
         setPosition: vi.fn().mockReturnThis(),
         setSize: vi.fn().mockReturnThis(),
+        setFillStyle: vi.fn().mockReturnThis(),
         body: {
             setCollideWorldBounds: vi.fn(),
             setBounce: vi.fn(),
@@ -34,49 +34,28 @@ const makeScene = (registryOverrides = {}) => {
             enable: true,
             reset: vi.fn()
         },
-        x: 100,
-        y: 100,
-        active: true,
-        alpha: 1,
-        width: 30
+        x: 100, y: 100, active: true, alpha: 1, width: 30
     });
 
     return {
-        physics: {
-            add: {
-                existing: vi.fn(),
-                sprite: vi.fn(() => rectangleMock())
-            }
-        },
+        physics: { add: { existing: vi.fn() } },
         input: {
             keyboard: {
                 createCursorKeys: vi.fn(() => ({
-                    up: { isDown: false },
-                    down: { isDown: false },
-                    left: { isDown: false },
-                    right: { isDown: false },
+                    up: { isDown: false }, down: { isDown: false },
+                    left: { isDown: false }, right: { isDown: false },
                     space: { isDown: false }
                 })),
                 addKeys: vi.fn(() => ({
-                    up: { isDown: false },
-                    down: { isDown: false },
-                    left: { isDown: false },
-                    right: { isDown: false },
-                    space: { isDown: false },
-                    shift: { isDown: false },
-                    one: { isDown: false },
-                    two: { isDown: false },
-                    three: { isDown: false }
+                    up: { isDown: false }, down: { isDown: false },
+                    left: { isDown: false }, right: { isDown: false },
+                    space: { isDown: false }, shift: { isDown: false },
+                    one: { isDown: false }, two: { isDown: false }, three: { isDown: false }
                 }))
             }
         },
-        time: {
-            addEvent: vi.fn(),
-            delayedCall: vi.fn()
-        },
-        add: {
-            rectangle: vi.fn(() => rectangleMock())
-        },
+        time: { addEvent: vi.fn(), delayedCall: vi.fn() },
+        add: { rectangle: vi.fn(() => rectMock()) },
         tweens: { add: vi.fn() },
         registry: {
             get: vi.fn((key) => registry[key] ?? null),
@@ -88,18 +67,40 @@ const makeScene = (registryOverrides = {}) => {
 };
 
 describe('Player Logic Tests', () => {
-    it('debería leer los valores del registry de la escena', () => {
+    it('debería leer maxHp y hp del registry', () => {
         const scene = makeScene();
         const player = new Player(scene, 100, 100);
         expect(player.maxHp).toBe(100);
         expect(player.hp).toBe(100);
-        expect(player.speed).toBe(200);
+    });
+
+    it('debería calcular la velocidad base correctamente', () => {
+        const scene = makeScene();
+        const player = new Player(scene, 100, 100);
+        expect(player.speed).toBe(200); // 200 * (1 + 0)
+    });
+
+    it('debería aumentar la velocidad con bonusSpeed', () => {
+        const scene = makeScene({ bonusSpeed: 0.5 });
+        const player = new Player(scene, 100, 100);
+        expect(player.speed).toBe(300); // 200 * 1.5
+    });
+
+    it('debería aplicar bonus de velocidad de la reliquia hermes', () => {
+        const scene = makeScene({ relics: ['hermes'] });
+        const player = new Player(scene, 100, 100);
+        expect(player.speed).toBeCloseTo(240); // 200 * 1.2
+    });
+
+    it('debería aplicar reducción de velocidad de la reliquia titan', () => {
+        const scene = makeScene({ relics: ['titan'] });
+        const player = new Player(scene, 100, 100);
+        expect(player.speed).toBe(180); // 200 * 0.9
     });
 
     it('debería perder vida al recibir daño', () => {
         const scene = makeScene();
         const player = new Player(scene, 100, 100);
-        
         player.takeDamage(40);
         expect(player.hp).toBe(60);
     });
@@ -107,33 +108,44 @@ describe('Player Logic Tests', () => {
     it('debería quedar invulnerable justo después de recibir daño', () => {
         const scene = makeScene();
         const player = new Player(scene, 100, 100);
-        
         player.takeDamage(10);
         expect(player.isInvulnerable).toBe(true);
     });
 
-    it('debería actualizar el registry y la UI al recibir daño', () => {
+    it('debería actualizar el registry con la nueva HP', () => {
         const scene = makeScene();
         const player = new Player(scene, 100, 100);
-        
         player.takeDamage(40);
         expect(scene.registry.set).toHaveBeenCalledWith('hp', 60);
+    });
+
+    it('debería llamar a updateHealthUI al recibir daño', () => {
+        const scene = makeScene();
+        const player = new Player(scene, 100, 100);
+        player.takeDamage(40);
         expect(scene.updateHealthUI).toHaveBeenCalled();
     });
 
-    it('debería ignorar daño si es invulnerable', () => {
+    it('debería ignorar daño si ya es invulnerable', () => {
         const scene = makeScene();
         const player = new Player(scene, 100, 100);
         player.isInvulnerable = true;
-        
         player.takeDamage(50);
-        expect(player.hp).toBe(100); // No baja
+        expect(player.hp).toBe(100);
     });
 
-    it('debería disparar el game over si la vida cae a 0', () => {
+    it('debería ignorar daño si ya tiene 0 HP', () => {
         const scene = makeScene();
         const player = new Player(scene, 100, 100);
-        
+        player.hp = 0;
+        player.takeDamage(10);
+        expect(player.hp).toBe(0);
+        expect(scene.gameOver).not.toHaveBeenCalled();
+    });
+
+    it('debería disparar gameOver cuando la vida llega a 0', () => {
+        const scene = makeScene();
+        const player = new Player(scene, 100, 100);
         player.takeDamage(100);
         expect(player.hp).toBe(0);
         expect(scene.gameOver).toHaveBeenCalled();
@@ -142,8 +154,21 @@ describe('Player Logic Tests', () => {
     it('la vida no debería bajar de 0', () => {
         const scene = makeScene();
         const player = new Player(scene, 100, 100);
-        
         player.takeDamage(9999);
         expect(player.hp).toBe(0);
+    });
+
+    it('debería reducir el daño con la reliquia hierro', () => {
+        const scene = makeScene({ relics: ['hierro'] });
+        const player = new Player(scene, 100, 100);
+        player.takeDamage(5); // 5 - 2 = 3
+        expect(player.hp).toBe(97);
+    });
+
+    it('la reliquia hierro nunca debería reducir el daño a menos de 1', () => {
+        const scene = makeScene({ relics: ['hierro'] });
+        const player = new Player(scene, 100, 100);
+        player.takeDamage(1); // Math.max(1, 1 - 2) = 1
+        expect(player.hp).toBe(99);
     });
 });
