@@ -251,8 +251,11 @@ export default class MainScene extends Phaser.Scene {
                 });
 
                 // NUEVO: Los bloques paran los proyectiles/ataques del boss
-                this.physics.add.collider(boss.attacks, this.crates, (attackObj) => {
-                    attackObj.destroy();
+                // Usamos overlap y comprobamos existencia para evitar crashes en dispositivos móviles
+                this.physics.add.overlap(boss.attacks, this.crates, (attackObj) => {
+                    if (attackObj && attackObj.active) {
+                        attackObj.destroy();
+                    }
                 });
 
                 this.physics.add.overlap(this.arrows, boss.sprite, (bossSprite, arrow) => {
@@ -270,6 +273,11 @@ export default class MainScene extends Phaser.Scene {
             this.showElitePrompt();
         } else if (this.nodeType === 'treasure') {
             this.spawnTreasureRoom();
+        } else if (this.nodeType === 'shop') {
+            // Si venimos de la tienda, mostramos una sala de suministros segura y el portal de salida
+            this.add.text(this.scale.width / 2, 180, "ZONA DE SUMINISTROS", { fontSize: '32px', fill: '#00f2ff', fontStyle: 'bold' }).setOrigin(0.5);
+            this.add.text(this.scale.width / 2, 230, "Módulos de datos adquiridos. Continúa al siguiente sector.", { fontSize: '16px', fill: '#aaa' }).setOrigin(0.5);
+            // No spawneamos enemigos, solo el portal
         } else {
             this.spawnNormalEnemies();
         }
