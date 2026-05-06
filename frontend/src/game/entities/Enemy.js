@@ -811,7 +811,7 @@ export class LaserEliteEnemy extends Enemy {
                 
                 if (diff < 0.25 && !player.isInvulnerable) { // Margen aumentado para que pegue más fácil
                     hasHit = true;
-                    player.takeDamage(15);
+                    player.takeDamage(45); // DAÑO AUMENTADO
                     this.scene.updateUI();
                 }
             };

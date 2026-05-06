@@ -128,6 +128,7 @@ export class Player {
     }
 
     dash(time) {
+        if (!time) time = this.scene.time.now;
         this.isDashing = true;
         this.isInvulnerable = true;
         this.dashCooldownTime = time + 1500; // 1.5s cooldown
@@ -198,6 +199,7 @@ export class Player {
     }
 
     attack(time) {
+        if (!time) time = this.scene.time.now;
         const weapon = this.scene.registry.get('equippedWeapon') || 1;
         const relics = this.scene.registry.get('relics') || [];
         

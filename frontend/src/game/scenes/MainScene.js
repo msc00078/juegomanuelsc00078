@@ -250,6 +250,11 @@ export default class MainScene extends Phaser.Scene {
                     }
                 });
 
+                // NUEVO: Los bloques paran los proyectiles/ataques del boss
+                this.physics.add.collider(boss.attacks, this.crates, (attackObj) => {
+                    attackObj.destroy();
+                });
+
                 this.physics.add.overlap(this.arrows, boss.sprite, (bossSprite, arrow) => {
                     if (boss.hp > 0) {
                         const relics = this.registry.get('relics') || [];
@@ -397,13 +402,13 @@ export default class MainScene extends Phaser.Scene {
         
         this.mobileJoystick = { vx: 0, vy: 0, active: false };
 
-        const joyY = this.scale.height - 120;
-        const base = this.add.circle(130, joyY, 70, 0xffffff, 0.2).setDepth(1000).setScrollFactor(0);
-        const stick = this.add.circle(130, joyY, 35, 0x00ffff, 0.5).setDepth(1001).setScrollFactor(0);
+        const joyY = this.scale.height - 180;
+        const base = this.add.circle(130, joyY, 85, 0xffffff, 0.2).setDepth(1000).setScrollFactor(0);
+        const stick = this.add.circle(130, joyY, 40, 0x00ffff, 0.5).setDepth(1001).setScrollFactor(0);
         
-        const atkY = this.scale.height - 130;
-        const attackBtn = this.add.circle(this.scale.width - 110, atkY, 55, 0xff0000, 0.5).setDepth(1000).setScrollFactor(0).setInteractive();
-        const attackTxt = this.add.text(this.scale.width - 110, atkY, "ATK", { fontSize: '22px', fill: '#fff', fontStyle: 'bold' }).setOrigin(0.5).setDepth(1001).setScrollFactor(0);
+        const atkY = this.scale.height - 200;
+        const attackBtn = this.add.circle(this.scale.width - 120, atkY, 75, 0xff0000, 0.5).setDepth(1000).setScrollFactor(0).setInteractive();
+        const attackTxt = this.add.text(this.scale.width - 120, atkY, "ATK", { fontSize: '28px', fill: '#fff', fontStyle: 'bold' }).setOrigin(0.5).setDepth(1001).setScrollFactor(0);
         
         attackBtn.on('pointerdown', () => { 
             attackBtn.setAlpha(0.8);
@@ -412,9 +417,9 @@ export default class MainScene extends Phaser.Scene {
         attackBtn.on('pointerup', () => attackBtn.setAlpha(0.5));
         attackBtn.on('pointerout', () => attackBtn.setAlpha(0.5));
         
-        const dashY = this.scale.height - 60;
-        const dashBtn = this.add.circle(this.scale.width - 230, dashY, 42, 0x00ff00, 0.5).setDepth(1000).setScrollFactor(0).setInteractive();
-        const dashTxt = this.add.text(this.scale.width - 230, dashY, "DASH", { fontSize: '18px', fill: '#fff', fontStyle: 'bold' }).setOrigin(0.5).setDepth(1001).setScrollFactor(0);
+        const dashY = this.scale.height - 90;
+        const dashBtn = this.add.circle(this.scale.width - 250, dashY, 55, 0x00ff00, 0.5).setDepth(1000).setScrollFactor(0).setInteractive();
+        const dashTxt = this.add.text(this.scale.width - 250, dashY, "DASH", { fontSize: '22px', fill: '#fff', fontStyle: 'bold' }).setOrigin(0.5).setDepth(1001).setScrollFactor(0);
         
         dashBtn.on('pointerdown', () => { 
             dashBtn.setAlpha(0.8);
