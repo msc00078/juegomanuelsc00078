@@ -140,7 +140,7 @@ describe('Player Logic Tests', () => {
         player.hp = 0;
         player.takeDamage(10);
         expect(player.hp).toBe(0);
-        expect(scene.gameOver).not.toHaveBeenCalled();
+        expect(scene.endGame).not.toHaveBeenCalled();
     });
 
     it('debería disparar endGame cuando la vida llega a 0', () => {

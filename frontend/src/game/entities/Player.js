@@ -11,6 +11,7 @@ export class Player {
         const relics = scene.registry.get('relics') || [];
         if (relics.includes('hermes')) this.speed *= 1.2;
         if (relics.includes('titan')) this.speed *= 0.9;
+        this._baseSpeed = this.speed; // velocidad de referencia para restaurar tras slow
         
         this.isAttacking = false;
         

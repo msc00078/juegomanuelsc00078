@@ -1,7 +1,9 @@
 import * as Phaser from 'phaser';
 import { Player } from '../entities/Player';
 import { Boss } from '../entities/Boss';
-import { StandardEnemy, TankEnemy, RangedEnemy, KamikazeEnemy, SummonerEnemy } from '../entities/Enemy';
+import { StandardEnemy, TankEnemy, RangedEnemy, KamikazeEnemy, SummonerEnemy,
+         TeleporterEnemy, HealerEnemy, GuardianEnemy, TrapperEnemy,
+         applyEnemyScaling } from '../entities/Enemy';
 import { saveRunResult } from '../supabase';
 import axios from 'axios';
 
@@ -72,6 +74,7 @@ export default class MainScene extends Phaser.Scene {
         this.enemyArrows = this.physics.add.group();
         this.xpOrbs = this.physics.add.group();
         this.enemySprites = this.physics.add.group();
+        this.trapZones = this.physics.add.staticGroup(); // zonas de ralentización del Trampero
         this.portal = null;
 
         this.nodeType = this.registry.get('nextNodeType') || 'combat';
@@ -197,7 +200,7 @@ export default class MainScene extends Phaser.Scene {
             });
 
             this.physics.add.collider(this.player.sprite, this.boss.sprite, () => {
-                if (!this.gameOver) {
+                if (!this.gameOver && this.boss.hp > 0) {
                     this.player.takeDamage(10);
                     this.updateUI();
                     this.pushBack(this.player.sprite, this.boss.sprite, 300);
@@ -205,7 +208,7 @@ export default class MainScene extends Phaser.Scene {
             });
 
             this.physics.add.overlap(this.player.sprite, this.boss.attacks, (playerSprite, attackObj) => {
-                if (!this.gameOver) {
+                if (!this.gameOver && this.boss.hp > 0) {
                     this.player.takeDamage(15);
                     this.updateUI();
                     attackObj.destroy();
@@ -470,74 +473,109 @@ export default class MainScene extends Phaser.Scene {
     }
 
     spawnNormalEnemies() {
-        const numEnemies = 2 + this.currentLevel;
+        const level = this.currentLevel;
+        const numEnemies = 2 + level;
+
         for (let i = 0; i < numEnemies; i++) {
-            let rx = Phaser.Math.Between(100, this.scale.width - 100);
-            let ry = Phaser.Math.Between(100, this.scale.height - 200);
-            let rand = Math.random();
+            const rx = Phaser.Math.Between(100, this.scale.width  - 100);
+            const ry = Phaser.Math.Between(100, this.scale.height - 200);
+            const rand = Math.random();
             let enemy;
-            if (this.currentLevel < 3) {
+
+            if (level < 3) {
+                // Solo estándar en los primeros niveles
                 enemy = new StandardEnemy(this, rx, ry);
-            } else {
-                if (rand < 0.4) enemy = new StandardEnemy(this, rx, ry);
+            } else if (level < 6) {
+                // Pool básico
+                if (rand < 0.4)      enemy = new StandardEnemy(this, rx, ry);
                 else if (rand < 0.6) enemy = new TankEnemy(this, rx, ry);
                 else if (rand < 0.8) enemy = new RangedEnemy(this, rx, ry);
                 else if (rand < 0.9) enemy = new SummonerEnemy(this, rx, ry);
-                else enemy = new KamikazeEnemy(this, rx, ry);
+                else                 enemy = new KamikazeEnemy(this, rx, ry);
+            } else if (level < 10) {
+                // Pool ampliado con Teletransportador y Trampero
+                if (rand < 0.25)     enemy = new StandardEnemy(this, rx, ry);
+                else if (rand < 0.4) enemy = new TankEnemy(this, rx, ry);
+                else if (rand < 0.55)enemy = new RangedEnemy(this, rx, ry);
+                else if (rand < 0.65)enemy = new SummonerEnemy(this, rx, ry);
+                else if (rand < 0.75)enemy = new KamikazeEnemy(this, rx, ry);
+                else if (rand < 0.87)enemy = new TeleporterEnemy(this, rx, ry);
+                else                 enemy = new TrapperEnemy(this, rx, ry);
+            } else {
+                // Pool completo con Sanador y Guardián
+                if (rand < 0.2)      enemy = new StandardEnemy(this, rx, ry);
+                else if (rand < 0.33)enemy = new TankEnemy(this, rx, ry);
+                else if (rand < 0.46)enemy = new RangedEnemy(this, rx, ry);
+                else if (rand < 0.55)enemy = new SummonerEnemy(this, rx, ry);
+                else if (rand < 0.63)enemy = new KamikazeEnemy(this, rx, ry);
+                else if (rand < 0.73)enemy = new TeleporterEnemy(this, rx, ry);
+                else if (rand < 0.82)enemy = new TrapperEnemy(this, rx, ry);
+                else if (rand < 0.91)enemy = new HealerEnemy(this, rx, ry);
+                else                 enemy = new GuardianEnemy(this, rx, ry);
             }
+
+            // Aplicar variante (normal / mejorado / elite) y posible Alpha
+            applyEnemyScaling(enemy, level);
+
             this.enemies.push(enemy);
             this.setupEnemyCollisions(enemy);
         }
     }
 
     setupEnemyCollisions(enemy) {
+        if (!enemy.sprite) return;
         this.enemySprites.add(enemy.sprite);
         const relics = this.registry.get('relics') || [];
+
+        // Colisión espada → enemigo
         this.physics.add.overlap(this.player.sword, enemy.sprite, () => {
-            if (this.player.isAttacking && enemy.hp > 0) {
-                this.pushBack(enemy.sprite, this.player.sprite, 200);
+            if (!this.player.isAttacking || enemy.hp <= 0) return;
 
-                let damage = this.getPlayerDamage();
-                let isCrit = Math.random() < 0.15; // 15% crit chance
-                if (isCrit) {
-                    damage *= 2;
-                    this.showCritEffect(enemy.sprite.x, enemy.sprite.y);
-                }
-
-                enemy.takeDamage(damage);
-                if (relics.includes('sangrado')) {
-                    enemy.startBleed();
+            // Guardián: bloquea el daño frontal
+            if (enemy.isShielded && enemy.isHitFromBehind) {
+                const fromBehind = enemy.isHitFromBehind(
+                    this.player.sprite.x, this.player.sprite.y,
+                    this.player.sprite.x, this.player.sprite.y
+                );
+                if (!fromBehind) {
+                    this.showDamageNumber(enemy.sprite.x, enemy.sprite.y - 10, '🛡');
+                    return; // daño bloqueado
                 }
             }
+
+            this.pushBack(enemy.sprite, this.player.sprite, 200);
+            let damage = this.getPlayerDamage();
+            const isCrit = Math.random() < 0.15;
+            if (isCrit) {
+                damage *= 2;
+                this.showCritEffect(enemy.sprite.x, enemy.sprite.y);
+            }
+            enemy.takeDamage(damage);
+            if (relics.includes('sangrado')) enemy.startBleed();
         });
 
+        // Colisión cuerpo → jugador (usa contactDamage del enemigo)
         this.physics.add.collider(this.player.sprite, enemy.sprite, () => {
-            if (!this.gameOver && enemy.hp > 0) {
-                if (relics.includes('espinas')) {
-                    enemy.takeDamage(10);
-                }
-                this.player.takeDamage(5);
-                this.updateUI();
-                this.pushBack(this.player.sprite, enemy.sprite, 300);
-            }
+            if (this.gameOver || enemy.hp <= 0) return;
+            if (relics.includes('espinas')) enemy.takeDamage(10);
+            this.player.takeDamage(enemy.contactDamage ?? 5);
+            this.updateUI();
+            this.pushBack(this.player.sprite, enemy.sprite, 300);
         });
 
+        // Colisión flecha → enemigo
         this.physics.add.overlap(this.arrows, enemy.sprite, (enemySprite, arrow) => {
-            if (enemy.hp > 0) {
-                let dmg = 10;
-                if (relics.includes('sniper')) {
-                    const dist = Phaser.Math.Distance.Between(this.player.sprite.x, this.player.sprite.y, enemySprite.x, enemySprite.y);
-                    if (dist > 300) dmg += 10;
-                }
-                if (!relics.includes('perforante')) {
-                    arrow.destroy();
-                }
-                enemy.takeDamage(dmg);
-                // Remove enemy if it died from this arrow hit
-                if (enemy.hp <= 0) {
-                    this.enemies = this.enemies.filter(e => e !== enemy);
-                }
+            if (enemy.hp <= 0) return;
+            let dmg = 10;
+            if (relics.includes('sniper')) {
+                const dist = Phaser.Math.Distance.Between(
+                    this.player.sprite.x, this.player.sprite.y,
+                    enemySprite.x, enemySprite.y
+                );
+                if (dist > 300) dmg += 10;
             }
+            if (!relics.includes('perforante')) arrow.destroy();
+            enemy.takeDamage(dmg);
         });
     }
 
@@ -955,6 +993,24 @@ export default class MainScene extends Phaser.Scene {
                 }
             });
         }
+        // Zonas de trampa del Trampero: ralentizan al jugador
+        let inTrap = false;
+        this.trapZones.getChildren().forEach(trap => {
+            if (!trap.active) return;
+            const d = Phaser.Math.Distance.Between(
+                this.player.sprite.x, this.player.sprite.y, trap.x, trap.y
+            );
+            if (d < 35) inTrap = true;
+        });
+        if (inTrap && !this._inTrap) {
+            this._inTrap = true;
+            this.player.speed = Math.round(this.player.speed * 0.45);
+        } else if (!inTrap && this._inTrap) {
+            this._inTrap = false;
+            // Restaurar velocidad original
+            this.player.speed = this.player._baseSpeed ?? 200;
+        }
+
         this.checkLevelClear();
     }
 

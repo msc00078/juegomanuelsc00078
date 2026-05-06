@@ -5,7 +5,7 @@ const makeScene = () => ({
     physics: {
         add: {
             existing: vi.fn(),
-            group: vi.fn(() => ({ add: vi.fn() }))
+            group: vi.fn(() => ({ add: vi.fn(), clear: vi.fn() }))
         },
         moveToObject: vi.fn()
     },
@@ -24,6 +24,7 @@ const makeScene = () => ({
                 setCollideWorldBounds: vi.fn(),
                 setImmovable: vi.fn(),
                 setVelocity: vi.fn(),
+                enable: true,
                 velocity: { x: 0, y: 0 }
             },
             x: 300, y: 300,
@@ -33,16 +34,23 @@ const makeScene = () => ({
         circle: vi.fn(() => ({
             setVisible: vi.fn().mockReturnThis(),
             setFillStyle: vi.fn().mockReturnThis(),
+            setPosition: vi.fn().mockReturnThis(),
             destroy: vi.fn(),
+            active: true,
             body: { setCircle: vi.fn(), setImmovable: vi.fn() }
         }))
     },
+    scale: { width: 1280, height: 720 },
+    player: { sprite: { x: 640, y: 360, active: true, body: { velocity: { x: 0, y: 0 } } } },
     showDamageNumber: vi.fn(),
     createParticles: vi.fn(),
     cameras: { main: { shake: vi.fn() } },
     tweens: { add: vi.fn() },
-    bossText: { setText: vi.fn() }
+    bossText: { setText: vi.fn() },
+    apiCallInterval: 3000,
+    spawnKamikazeFromBoss: vi.fn()
 });
+
 
 describe('Boss Logic Tests', () => {
     it('debería inicializarse con HP correcto y fase 1', () => {
