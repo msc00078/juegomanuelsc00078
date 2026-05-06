@@ -78,6 +78,7 @@ export default class MainScene extends Phaser.Scene {
         this.xpOrbs = this.physics.add.group();
         this.enemySprites = this.physics.add.group();
         this.trapZones = this.physics.add.staticGroup(); // zonas de ralentización del Trampero
+        this.crates = this.physics.add.staticGroup(); // Obstáculos
         this.portal = null;
 
         this.nodeType = this.registry.get('nextNodeType') || 'combat';
@@ -317,7 +318,6 @@ export default class MainScene extends Phaser.Scene {
             this.gainXp(10);
         });
 
-        this.crates = this.physics.add.staticGroup();
         this.physics.add.collider(this.player.sprite, this.crates);
 
         // Usar group en lugar de map para que afecte a futuros enemigos
