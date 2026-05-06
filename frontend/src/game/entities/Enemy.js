@@ -780,7 +780,7 @@ export class LaserEliteEnemy extends Enemy {
         if (!this.sprite?.active || this.isDead) return;
         
         this.isFiringLaser = true;
-        this.sprite.setTint(0xffffff);
+        this.sprite.setFillStyle(0xffffff);
         
         // Indicador de carga (línea de aviso)
         const line = this.scene.add.line(0, 0, this.sprite.x, this.sprite.y, playerSprite.x, playerSprite.y, 0xff00ff, 0.3).setOrigin(0).setDepth(50);
@@ -815,7 +815,7 @@ export class LaserEliteEnemy extends Enemy {
                 onComplete: () => {
                     beam.destroy();
                     this.isFiringLaser = false;
-                    if (this.sprite?.active) this.sprite.clearTint();
+                    if (this.sprite?.active) this.sprite.setFillStyle(this.color);
                 }
             });
         });
