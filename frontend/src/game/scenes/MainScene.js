@@ -79,17 +79,17 @@ export default class MainScene extends Phaser.Scene {
 
         this.nodeType = this.registry.get('nextNodeType') || 'combat';
 
-        // HUD Dinámico
+        // HUD Dinámico (Glassmorphism)
         this.vignette = this.add.graphics();
         this.drawVignette();
 
-        this.topPanel = this.add.rectangle(this.scale.width / 2, 30, this.scale.width, 60, 0x000000, 0.6).setDepth(100).setScrollFactor(0);
+        // Panel Superior Glass
+        this.topPanel = this.add.graphics().setDepth(100).setScrollFactor(0);
+        this.topPanel.fillStyle(0x050505, 0.75);
+        this.topPanel.fillRoundedRect(10, 10, this.scale.width - 20, 70, 12);
+        this.topPanel.lineStyle(2, 0x00f2ff, 0.3);
+        this.topPanel.strokeRoundedRect(10, 10, this.scale.width - 20, 70, 12);
         
-        // Efecto CRT / Scanlines para la inmersión Neón Sagrado
-        for (let i = 0; i < this.scale.height; i += 4) {
-            this.add.rectangle(this.scale.width/2, i, this.scale.width, 1, 0x000000, 0.1).setScrollFactor(0).setDepth(200);
-        }
-
         let nodeLabel = this.nodeType.toUpperCase();
         if (nodeLabel === 'COMBAT') nodeLabel = 'FRAGMENTO DE COMBATE';
         if (nodeLabel === 'ELITE') nodeLabel = 'ANOMALÍA CRÍTICA';
@@ -98,39 +98,53 @@ export default class MainScene extends Phaser.Scene {
         if (nodeLabel === 'EVENT') nodeLabel = 'GLITCH EN LA REALIDAD';
         if (this.isBossLevel) nodeLabel = 'CONCIENCIA ROTA (JEFE)';
 
-        this.levelText = this.add.text(this.scale.width / 2, 20, `SECTOR 0${this.currentLevel} • ${nodeLabel}`, {
-            fontSize: '18px', fill: '#00ffff', fontStyle: 'bold', stroke: '#000', strokeThickness: 3
+        this.levelText = this.add.text(this.scale.width / 2, 35, `SECTOR 0${this.currentLevel} // ${nodeLabel}`, {
+            fontFamily: 'Orbitron, sans-serif',
+            fontSize: '18px', 
+            fill: '#00f2ff', 
+            fontStyle: 'bold'
         }).setOrigin(0.5).setDepth(101).setScrollFactor(0);
 
-        // Barra de vida gráfica
-        this.hpBarBg = this.add.rectangle(120, 45, 150, 15, 0x333333).setDepth(101).setScrollFactor(0);
-        this.hpBar = this.add.rectangle(120, 45, 150, 15, 0x00ff00).setDepth(102).setScrollFactor(0);
-        this.playerHpText = this.add.text(120, 25, `HP: ${this.player.hp}/${this.player.maxHp}`, {
+        // Barra de vida Estilo Premium
+        this.hpBarBg = this.add.rectangle(135, 45, 180, 12, 0x111111).setDepth(101).setScrollFactor(0).setOrigin(0, 0.5);
+        this.hpBar = this.add.rectangle(135, 45, 180, 12, 0x00ff00).setDepth(102).setScrollFactor(0).setOrigin(0, 0.5);
+        this.playerHpText = this.add.text(135, 28, `HP: ${this.player.hp}/${this.player.maxHp}`, {
+            fontFamily: 'Inter, sans-serif',
+            fontSize: '11px', fill: '#888', fontWeight: 'bold'
+        }).setOrigin(0, 0.5).setDepth(103).setScrollFactor(0);
+
+        // Barra de XP Estilo Premium
+        this.xpBarBg = this.add.rectangle(135, 58, 180, 6, 0x111111).setDepth(101).setScrollFactor(0).setOrigin(0, 0.5);
+        this.xpBar = this.add.rectangle(135, 58, 180, 6, 0x00f2ff).setDepth(102).setScrollFactor(0).setOrigin(0, 0.5);
+        this.runLevelText = this.add.text(135, 72, `PROGRESO LVL.${this.registry.get('runLevel')}`, {
+            fontFamily: 'Inter, sans-serif',
+            fontSize: '10px', fill: '#00f2ff', fontWeight: 'bold'
+        }).setOrigin(0, 0.5).setDepth(103).setScrollFactor(0);
+
+        this.goldText = this.add.text(this.scale.width - 40, 35, `${this.gold} 💎`, {
+            fontFamily: 'Orbitron, sans-serif',
+            fontSize: '20px', fill: '#ffd700', fontStyle: 'bold'
+        }).setOrigin(1, 0.5).setDepth(101).setScrollFactor(0);
+
+        this.scoreText = this.add.text(this.scale.width - 40, 58, `SCORE: ${this.score}`, {
+            fontFamily: 'Inter, sans-serif',
+            fontSize: '12px', fill: '#00f2ff', fontWeight: 'bold'
+        }).setOrigin(1, 0.5).setDepth(101).setScrollFactor(0);
+
+        this.comboText = this.add.text(this.scale.width - 200, 45, `x${this.registry.get('combo') || 0}`, {
+            fontFamily: 'Orbitron, sans-serif',
+            fontSize: '24px', fill: '#ff00e1', fontStyle: 'bold'
+        }).setOrigin(1, 0.5).setDepth(101).setScrollFactor(0);
+
+        // Arma HUD
+        this.weaponContainer = this.add.container(this.scale.width / 2, this.scale.height - 40).setDepth(101).setScrollFactor(0);
+        this.weaponBg = this.add.rectangle(0, 0, 200, 40, 0x00f2ff, 0.1);
+        this.weaponBg.setStrokeStyle(1, 0x00f2ff, 0.5);
+        this.weaponText = this.add.text(0, 0, "1 - ESPADA", {
+            fontFamily: 'Orbitron, sans-serif',
             fontSize: '14px', fill: '#fff', fontStyle: 'bold'
-        }).setOrigin(0.5).setDepth(103).setScrollFactor(0);
-
-        // Barra de XP gráfica
-        this.xpBarBg = this.add.rectangle(120, 62, 150, 8, 0x333333).setDepth(101).setScrollFactor(0);
-        this.xpBar = this.add.rectangle(120, 62, 150, 8, 0x00ffff).setDepth(102).setScrollFactor(0);
-        this.runLevelText = this.add.text(120, 75, `LVL: ${this.registry.get('runLevel')}`, {
-            fontSize: '12px', fill: '#00ffff', fontStyle: 'bold'
-        }).setOrigin(0.5).setDepth(103).setScrollFactor(0);
-
-        this.goldText = this.add.text(this.scale.width - 200, 25, `ORO: ${this.gold} 💎`, {
-            fontSize: '18px', fill: '#ffd700', fontStyle: 'bold'
-        }).setOrigin(1, 0.5).setDepth(101).setScrollFactor(0);
-
-        this.scoreText = this.add.text(this.scale.width - 200, 45, `SCORE: ${this.score}`, {
-            fontSize: '14px', fill: '#00ffff', fontStyle: 'bold'
-        }).setOrigin(1, 0.5).setDepth(101).setScrollFactor(0);
-
-        this.comboText = this.add.text(this.scale.width - 50, 35, `x${this.registry.get('combo') || 0}`, {
-            fontSize: '18px', fill: '#ff00ff', fontStyle: 'bold'
-        }).setOrigin(1, 0.5).setDepth(101).setScrollFactor(0);
-
-        this.weaponText = this.add.text(this.scale.width / 2, this.scale.height - 30, "1 - ESPADA", {
-            fontSize: '18px', fill: '#fff', backgroundColor: '#0077ff', padding: { x: 15, y: 5 }
-        }).setOrigin(0.5).setDepth(101).setScrollFactor(0);
+        }).setOrigin(0.5);
+        this.weaponContainer.add([this.weaponBg, this.weaponText]);
         
         this.weaponText.setInteractive({ useHandCursor: true });
         this.weaponText.on('pointerdown', () => {
@@ -1279,26 +1293,46 @@ export default class MainScene extends Phaser.Scene {
 
     endGame(message) {
         this.gameOver = true;
+        this.scene.pause(); // Pausar lógica física
 
-        // Los cristales son escasos en el mundo del Núcleo.
-        // Solo 1 cristal por cada 3 niveles completados. Los NPCs raros son la fuente principal.
-        let crystalsEarned = Math.floor(this.currentLevel / 3);
-        if (crystalsEarned > 0) {
-            message += `\n+${crystalsEarned} 💎 recuperados del caos`;
-        }
-        message += `\nSCORE FINAL: ${this.score}`;
+        // Oscurecer fondo
+        const overlay = this.add.rectangle(this.scale.width / 2, this.scale.height / 2, this.scale.width, this.scale.height, 0x000000, 0.8).setDepth(1000);
+        
+        // Contenedor Game Over
+        const goContainer = this.add.container(this.scale.width / 2, this.scale.height / 2).setDepth(1001);
+        
+        const box = this.add.rectangle(0, 0, 500, 350, 0x050505, 0.9);
+        box.setStrokeStyle(2, 0xff0000, 1);
+        
+        const title = this.add.text(0, -120, "SYSTEM FAILURE", {
+            fontFamily: 'Orbitron, sans-serif',
+            fontSize: '42px', fill: '#ff0000', fontStyle: 'bold'
+        }).setOrigin(0.5);
 
-        // GUARDAR EN SUPABASE EL RESULTADO FINAL
+        const crystalsEarned = Math.floor(this.currentLevel / 3);
+        const stats = `SECTOR ALCANZADO: ${this.currentLevel}\nRECURSOS RECUPERADOS: ${crystalsEarned} 💎\nSCORE TOTAL: ${this.score}`;
+        
+        const statsText = this.add.text(0, 0, stats, {
+            fontFamily: 'Inter, sans-serif',
+            fontSize: '20px', fill: '#fff', align: 'center', lineSpacing: 10
+        }).setOrigin(0.5);
+
+        const hint = this.add.text(0, 120, "PRESIONA R PARA REINICIAR", {
+            fontFamily: 'Orbitron, sans-serif',
+            fontSize: '16px', fill: '#ff0000', fontStyle: 'bold'
+        }).setOrigin(0.5);
+
+        goContainer.add([box, title, statsText, hint]);
+
+        // Guardar resultado
         saveRunResult(this.score, this.currentLevel, crystalsEarned).catch(err => console.error(err));
 
-        if (this.player.sprite.body) this.player.sprite.body.setVelocity(0);
-        if (this.boss && this.boss.sprite.body) this.boss.sprite.body.setVelocity(0);
-        if (this.gameOverText.active) {
-            this.gameOverText.setText(message);
-            this.gameOverText.setVisible(true);
-        }
-        if (this.bossText && this.bossText.active) this.bossText.setVisible(false);
         this.time.delayedCall(3000, () => {
+            this.input.keyboard.once('keydown-R', () => {
+                this.scene.start('MenuScene');
+            });
+        });
+    }
             this.scene.start('MenuScene');
         });
     }

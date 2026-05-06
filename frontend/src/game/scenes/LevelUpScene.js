@@ -10,58 +10,66 @@ export default class LevelUpScene extends Phaser.Scene {
         const H = this.scale.height;
         const cx = W / 2;
 
-        this.add.rectangle(cx, H / 2, W, H, 0x000000, 0.75);
+        // Fondo Oscurecido
+        this.add.rectangle(cx, H / 2, W, H, 0x000000, 0.85);
 
-        this.add.text(cx, H * 0.14, "¡NIVEL ALCANZADO!", {
-            fontSize: '40px', fill: '#00ffff', fontStyle: 'bold', stroke: '#000', strokeThickness: 6
+        this.add.text(cx, H * 0.15, "NÚCLEO OPTIMIZADO", {
+            fontFamily: 'Orbitron, sans-serif',
+            fontSize: '48px', fill: '#00f2ff', fontStyle: 'bold'
         }).setOrigin(0.5);
 
-        this.add.text(cx, H * 0.24, "Elige una mejora para esta partida", {
-            fontSize: '20px', fill: '#fff'
+        this.add.text(cx, H * 0.22, "SELECCIONA UNA MEJORA DE HARDWARE", {
+            fontFamily: 'Inter, sans-serif',
+            fontSize: '16px', fill: '#888', letterSpacing: 4
         }).setOrigin(0.5);
 
         const options = [
-            { id: 'hp',    title: "VITALIDAD", desc: "+20 HP Máximo",    icon: "❤️",  color: 0xff0000 },
-            { id: 'dmg',   title: "FUERZA",    desc: "+3 Daño Base",     icon: "⚔️",  color: 0xaaaaaa },
-            { id: 'speed', title: "AGILIDAD",  desc: "+10% Velocidad",   icon: "💨",  color: 0x00ffff }
+            { id: 'hp',    title: "VITALIDAD", desc: "Aumenta la integridad del chasis (+20 HP)", icon: "❤️", color: 0xff0055 },
+            { id: 'dmg',   title: "POTENCIA",  desc: "Sobrecarga los sistemas de ataque (+3 Daño)", icon: "⚔️", color: 0xffcc00 },
+            { id: 'speed', title: "AGILIDAD",  desc: "Optimiza los servomotores (+10% Vel.)", icon: "⚡", color: 0x00f2ff }
         ];
 
-        const cardW = 200;
-        const totalW = options.length * (cardW + 30) - 30;
+        const cardW = 220;
+        const spacing = 30;
+        const totalW = options.length * (cardW + spacing) - spacing;
         const startX = (W - totalW) / 2 + cardW / 2;
 
         options.forEach((opt, i) => {
-            this.createOptionCard(startX + i * (cardW + 30), H * 0.54, opt);
+            this.createOptionCard(startX + i * (cardW + spacing), H * 0.55, opt);
         });
-
-        // Partículas de celebración
-        this.add.particles(cx, H * 0.14, 'squareParticle', {
-            speed: 120, scale: { start: 1, end: 0 },
-            lifespan: 900, quantity: 20, emitting: false
-        }).explode(20);
     }
 
     createOptionCard(x, y, opt) {
-        const bg = this.add.rectangle(x, y, 190, 260, 0x222222).setInteractive();
-        bg.setStrokeStyle(4, opt.color);
+        const container = this.add.container(x, y);
+        
+        const bg = this.add.rectangle(0, 0, 210, 280, 0x0a0a0a, 0.8).setInteractive();
+        bg.setStrokeStyle(2, opt.color, 0.4);
 
-        this.add.text(x, y - 90, opt.icon, { fontSize: '50px' }).setOrigin(0.5);
-        this.add.text(x, y - 30, opt.title, {
-            fontSize: '22px', fill: Phaser.Display.Color.IntegerToRGB(opt.color) ? '#' + opt.color.toString(16).padStart(6,'0') : '#fff',
-            fontStyle: 'bold'
+        const icon = this.add.text(0, -80, opt.icon, { fontSize: '60px' }).setOrigin(0.5);
+        const title = this.add.text(0, -10, opt.title, {
+            fontFamily: 'Orbitron, sans-serif',
+            fontSize: '22px', fill: '#fff', fontStyle: 'bold'
         }).setOrigin(0.5);
-        this.add.text(x, y + 35, opt.desc, {
-            fontSize: '16px', fill: '#fff', align: 'center', wordWrap: { width: 160 }
+        
+        const desc = this.add.text(0, 60, opt.desc, {
+            fontFamily: 'Inter, sans-serif',
+            fontSize: '14px', fill: '#aaa', align: 'center', wordWrap: { width: 180 }
         }).setOrigin(0.5);
+
+        container.add([bg, icon, title, desc]);
 
         bg.on('pointerover', () => {
-            bg.setFillStyle(0x333333);
-            this.tweens.add({ targets: bg, scale: 1.06, duration: 100 });
+            bg.setFillStyle(0x111111, 1);
+            bg.setStrokeStyle(3, opt.color, 1);
+            this.tweens.add({ targets: container, scale: 1.05, duration: 200 });
         });
+        
         bg.on('pointerout', () => {
-            bg.setFillStyle(0x222222);
-            this.tweens.add({ targets: bg, scale: 1, duration: 100 });
+            bg.setFillStyle(0x0a0a0a, 0.8);
+            bg.setStrokeStyle(2, opt.color, 0.4);
+            this.tweens.add({ targets: container, scale: 1, duration: 200 });
         });
+
         bg.on('pointerdown', () => {
             this.applyUpgrade(opt.id);
             this.scene.stop();

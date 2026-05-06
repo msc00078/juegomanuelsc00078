@@ -11,13 +11,21 @@ export default class UpgradeScene extends Phaser.Scene {
         const H = this.scale.height;
         const cx = W / 2;
 
-        this.add.rectangle(cx, H / 2, W, H, 0x080818);
-        this.add.grid(cx, H/2, W, H, 64, 64, 0x111133, 1, 0x0a0a22, 1);
-        this.add.text(cx, H * 0.08, "EL REFUGIO NEÓN", {
-            fontSize: '36px', fill: '#00ffff', fontStyle: 'bold', stroke: '#000022', strokeThickness: 4
+        // Fondo coordinado con MenuScene
+        const bg = this.add.graphics();
+        bg.fillGradientStyle(0x050505, 0x050505, 0x0a0a1a, 0x0a0a1a, 1);
+        bg.fillRect(0, 0, W, H);
+
+        this.add.grid(cx, H/2, W, H, 64, 64, 0x00f2ff, 0.03, 0x00f2ff, 0.05);
+
+        this.add.text(cx, H * 0.10, "EL REFUGIO NEÓN", {
+            fontFamily: 'Orbitron, sans-serif',
+            fontSize: '48px', fill: '#00f2ff', fontStyle: 'bold'
         }).setOrigin(0.5);
-        this.add.text(cx, H * 0.16, "\"Madre Víscera opera sin anestesia.\nEl dolor es evolución.\"", {
-            fontSize: '14px', fill: '#ff6688', align: 'center'
+
+        this.add.text(cx, H * 0.18, "\"Madre Víscera opera sin anestesia. El dolor es evolución.\"", {
+            fontFamily: 'Inter, sans-serif',
+            fontSize: '14px', fill: '#ff00e1', fontStyle: 'italic'
         }).setOrigin(0.5);
 
         let stats = JSON.parse(localStorage.getItem('metaStats')) || {
@@ -25,56 +33,80 @@ export default class UpgradeScene extends Phaser.Scene {
         };
 
         this.stats = stats;
-        this.crystalsText = this.add.text(cx, H * 0.26, `Fragmentos de Núcleo: ${stats.crystals} 💎`, {
-            fontSize: '22px', fill: '#ff00ff'
-        }).setOrigin(0.5);
-        this.add.text(cx, H * 0.32, "Los cristales son escasos. Explóralos en Eventos o con NPCs raros.", {
-            fontSize: '12px', fill: '#888', align: 'center'
-        }).setOrigin(0.5);
-
-        // Coste elevado: la mejora meta es un privilegio, no un derecho
-        this.createUpgradeRow(stats, H * 0.44, "Integridad Base (+10 HP)",  'hpLevel',    25, cx, W);
-        this.createUpgradeRow(stats, H * 0.59, "Protocolo de Daño (+2)",   'dmgLevel',   35, cx, W);
-        this.createUpgradeRow(stats, H * 0.74, "Overclock de Movimiento (+5%)",  'speedLevel', 50, cx, W);
-
-        const backBtn = this.add.rectangle(cx, H * 0.89, 260, 50, 0x220033).setInteractive();
-        backBtn.setStrokeStyle(2, 0x7700ff);
-        this.add.text(cx, H * 0.89, "< Volver al Hangar", { fontSize: '20px', fill: '#aaaaff' }).setOrigin(0.5);
-        backBtn.on('pointerover', () => backBtn.setStrokeStyle(2, 0xffffff));
-        backBtn.on('pointerout',  () => backBtn.setStrokeStyle(0));
-        backBtn.on('pointerdown', () => this.scene.start('MenuScene'));
-
-        // Mostrar Leaderboard (Top 5) en la pantalla de mejoras
-        this.add.text(50, 50, "TOP 5 GLOBAL", { fontSize: '20px', fill: '#ff00ff', fontStyle: 'bold' });
         
-        getLeaderboard().then(({ data, error }) => {
-            if (!error && data) {
-                let yPos = 80;
-                data.slice(0, 5).forEach((player, index) => {
-                    let color = index === 0 ? '#ffcc00' : '#00ffff';
-                    this.add.text(50, yPos, `#${index + 1} ${player.username} - ${player.high_score} pts`, { fontSize: '14px', fill: color });
-                    yPos += 25;
-                });
-            }
+        // Contador de Cristales Estilo HUD
+        const crystalPanel = this.add.graphics();
+        crystalPanel.fillStyle(0x000000, 0.6);
+        crystalPanel.fillRoundedRect(cx - 200, H * 0.23, 400, 50, 10);
+        crystalPanel.lineStyle(1, 0xffcc00, 0.5);
+        crystalPanel.strokeRoundedRect(cx - 200, H * 0.23, 400, 50, 10);
+
+        this.crystalsText = this.add.text(cx, H * 0.265, `FRAGMENTOS DE NÚCLEO: ${stats.crystals} 💎`, {
+            fontFamily: 'Orbitron, sans-serif',
+            fontSize: '20px', fill: '#ffcc00', fontStyle: 'bold'
+        }).setOrigin(0.5);
+
+        // Filas de mejora con diseño de tarjetas
+        this.createUpgradeRow(stats, H * 0.44, "INTEGRIDAD BASE", "+10 HP", 'hpLevel', 25, cx, W);
+        this.createUpgradeRow(stats, H * 0.59, "PROTOCOLOS DE ATAQUE", "+2 DAÑO", 'dmgLevel', 35, cx, W);
+        this.createUpgradeRow(stats, H * 0.74, "OVERCLOCK MOTOR", "+5% VELOCIDAD", 'speedLevel', 50, cx, W);
+
+        // Botón Volver
+        const backBtnContainer = this.add.container(cx, H * 0.90);
+        const backBg = this.add.rectangle(0, 0, 280, 50, 0x00f2ff, 0.1).setInteractive();
+        backBg.setStrokeStyle(1, 0x00f2ff, 0.5);
+        const backText = this.add.text(0, 0, "< VOLVER AL HANGAR", { 
+            fontFamily: 'Orbitron, sans-serif',
+            fontSize: '16px', fill: '#00f2ff', fontStyle: 'bold' 
+        }).setOrigin(0.5);
+        backBtnContainer.add([backBg, backText]);
+
+        backBg.on('pointerover', () => {
+            backBg.setFillStyle(0x00f2ff, 0.2);
+            this.tweens.add({ targets: backBtnContainer, scale: 1.05, duration: 200 });
         });
+        backBg.on('pointerout', () => {
+            backBg.setFillStyle(0x00f2ff, 0.1);
+            this.tweens.add({ targets: backBtnContainer, scale: 1, duration: 200 });
+        });
+        backBg.on('pointerdown', () => this.scene.start('MenuScene'));
     }
 
-    createUpgradeRow(stats, y, label, key, costPerLevel, cx, W) {
+    createUpgradeRow(stats, y, label, effect, key, costPerLevel, cx, W) {
         let level = stats[key] || 0;
         let cost  = (level + 1) * costPerLevel;
 
-        this.add.text(cx - W * 0.25, y, `${label}\n(Nivel ${level})`, {
-            fontSize: '20px', fill: '#fff'
-        }).setOrigin(0, 0.5);
+        const rowBg = this.add.graphics();
+        rowBg.fillStyle(0x000000, 0.4);
+        rowBg.fillRoundedRect(cx - 350, y - 35, 700, 70, 8);
+        rowBg.lineStyle(1, 0x333333, 1);
+        rowBg.strokeRoundedRect(cx - 350, y - 35, 700, 70, 8);
 
-        const btn = this.add.rectangle(cx + W * 0.18, y, 260, 64, 0x333333).setInteractive();
-        const btnTxt = this.add.text(cx + W * 0.18, y, `Mejorar (${cost} 💎)`, {
-            fontSize: '18px', fill: '#fff'
+        this.add.text(cx - 330, y - 10, label, {
+            fontFamily: 'Orbitron, sans-serif', fontSize: '18px', fill: '#fff', fontStyle: 'bold'
+        });
+        this.add.text(cx - 330, y + 12, `${effect} // NIVEL ${level}`, {
+            fontFamily: 'Inter, sans-serif', fontSize: '12px', fill: '#888'
+        });
+
+        const btn = this.add.container(cx + 200, y);
+        const btnBg = this.add.rectangle(0, 0, 240, 44, 0x00f2ff, 0.15).setInteractive();
+        btnBg.setStrokeStyle(1, 0x00f2ff, 0.4);
+        const btnTxt = this.add.text(0, 0, `MEJORAR (${cost} 💎)`, {
+            fontFamily: 'Orbitron, sans-serif', fontSize: '14px', fill: '#fff', fontStyle: 'bold'
         }).setOrigin(0.5);
+        btn.add([btnBg, btnTxt]);
 
-        btn.on('pointerover', () => btn.setStrokeStyle(2, 0xffffff));
-        btn.on('pointerout',  () => btn.setStrokeStyle(0));
-        btn.on('pointerdown', () => {
+        btnBg.on('pointerover', () => {
+            btnBg.setFillStyle(0x00f2ff, 0.3);
+            btnBg.setStrokeStyle(1, 0x00f2ff, 1);
+        });
+        btnBg.on('pointerout', () => {
+            btnBg.setFillStyle(0x00f2ff, 0.15);
+            btnBg.setStrokeStyle(1, 0x00f2ff, 0.4);
+        });
+
+        btnBg.on('pointerdown', () => {
             if (stats.crystals >= cost) {
                 stats.crystals -= cost;
                 stats[key]++;
@@ -82,6 +114,10 @@ export default class UpgradeScene extends Phaser.Scene {
                 this.scene.restart();
             } else {
                 this.cameras.main.shake(200, 0.01);
+                const errTxt = this.add.text(cx + 200, y - 40, "RECURSOS INSUFICIENTES", {
+                    fontFamily: 'Inter, sans-serif', fontSize: '10px', fill: '#ff0000'
+                }).setOrigin(0.5);
+                this.time.delayedCall(2000, () => errTxt.destroy());
             }
         });
     }

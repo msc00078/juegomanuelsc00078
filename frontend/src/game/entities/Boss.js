@@ -5,18 +5,19 @@ export class Boss {
         this.scene    = scene;
         this.level    = level;
         
-        // Escalado de vida por nivel: 600 base + 150 por cada 5 niveles
-        const hpMultiplier = 1 + (Math.floor(level / 5) * 0.25);
-        this.hp       = Math.round(600 * hpMultiplier);
+        // Escalado de vida por nivel: 450 base + 180 por cada 5 niveles (más progresivo)
+        const hpMultiplier = 1 + (Math.floor(level / 5) * 0.20);
+        this.hp       = Math.round(450 * hpMultiplier);
         this.maxHp    = this.hp;
         
         this.bossType = type;
         this.phase    = 1;
         this.isDead   = false;
 
-        // Daño de contacto y ataques escala con nivel
-        this.contactDamage = Math.round(15 * (1 + (level / 20))); 
-        this.attackDamage  = Math.round(20 * (1 + (level / 20)));
+        // Daño de contacto y ataques escala con nivel (más suave al inicio)
+        const damageMult = 0.8 + (level / 40);
+        this.contactDamage = Math.round(12 * damageMult); 
+        this.attackDamage  = Math.round(16 * damageMult);
 
         // Posición del jugador predicha
         this._predictedPlayerX = scene.scale.width  / 2;
@@ -80,10 +81,10 @@ export class Boss {
 
         this.scene.createParticles?.(this.sprite.x, this.sprite.y, 0xffffff);
 
-        // Cambio de fases
+        // Cambio de fases (Ahora más tarde para dar respiro)
         const pct = this.hp / this.maxHp;
-        if (this.phase === 1 && pct < 0.6) this.enterPhase(2);
-        else if (this.phase === 2 && pct < 0.3) this.enterPhase(3);
+        if (this.phase === 1 && pct < 0.5) this.enterPhase(2);
+        else if (this.phase === 2 && pct < 0.2) this.enterPhase(3);
 
         if (this.hp <= 0) { this.hp = 0; this.die(); }
     }

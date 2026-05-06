@@ -7,29 +7,111 @@ export default class MenuScene extends Phaser.Scene {
     }
 
     create() {
-        this.add.rectangle(this.scale.width / 2, this.scale.height / 2, this.scale.width, this.scale.height, 0x1a1a1a);
-        this.add.grid(this.scale.width / 2, this.scale.height / 2, this.scale.width, this.scale.height, 64, 64, 0x222222, 1, 0x333333, 1);
+        // Fondo Profundo con Gradiente
+        const bg = this.add.graphics();
+        bg.fillGradientStyle(0x050505, 0x050505, 0x111111, 0x111111, 1);
+        bg.fillRect(0, 0, this.scale.width, this.scale.height);
 
-        this.add.text(this.scale.width / 2, this.scale.height * 0.22, "NEÓN SAGRADO", { fontSize: '72px', fill: '#ffcc00', fontStyle: 'bold', stroke: '#000', strokeThickness: 5 }).setOrigin(0.5);
-        this.add.text(this.scale.width / 2, this.scale.height * 0.36, "Un error en el sistema. Tú no deberías existir.", { fontSize: '22px', fill: '#aaffff' }).setOrigin(0.5);
+        // Rejilla Dinámica (Grid)
+        const grid = this.add.grid(this.scale.width / 2, this.scale.height / 2, this.scale.width * 1.5, this.scale.height * 1.5, 64, 64, 0x00f2ff, 0.03, 0x00f2ff, 0.05);
+        this.tweens.add({
+            targets: grid,
+            alpha: { from: 0.02, to: 0.06 },
+            duration: 2000,
+            yoyo: true,
+            repeat: -1
+        });
 
-        const playBtn = this.add.rectangle(this.scale.width / 2, this.scale.height * 0.52, 300, 70, 0x0077ff).setInteractive();
-        playBtn.setStrokeStyle(4, 0xffffff);
-        this.add.text(this.scale.width / 2, this.scale.height * 0.52, "JUGAR", { fontSize: '34px', fill: '#fff', fontStyle: 'bold' }).setOrigin(0.5);
+        // Efecto de Scanline
+        const scanline = this.add.rectangle(this.scale.width / 2, -100, this.scale.width, 100, 0x00f2ff, 0.05);
+        this.tweens.add({
+            targets: scanline,
+            y: this.scale.height + 100,
+            duration: 4000,
+            repeat: -1
+        });
 
-        const upgradeBtn = this.add.rectangle(this.scale.width / 2, this.scale.height * 0.67, 300, 70, 0x7700ff).setInteractive();
-        upgradeBtn.setStrokeStyle(4, 0xffffff);
-        this.add.text(this.scale.width / 2, this.scale.height * 0.67, "EL REFUGIO NEÓN", { fontSize: '28px', fill: '#fff', fontStyle: 'bold' }).setOrigin(0.5);
-
-        // Parpadeo botón
-        this.tweens.add({ targets: playBtn, alpha: 0.7, duration: 800, yoyo: true, repeat: -1 });
-
-        playBtn.on('pointerover', () => playBtn.setFillStyle(0x0055cc));
-        playBtn.on('pointerout', () => playBtn.setFillStyle(0x0077ff));
+        // TÍTULO CON GLITCH
+        const title = this.add.text(this.scale.width / 2, this.scale.height * 0.22, "NEÓN SAGRADO", { 
+            fontFamily: 'Orbitron, sans-serif',
+            fontSize: '84px', 
+            fill: '#fff', 
+            fontStyle: 'bold', 
+            stroke: '#ff00e1', 
+            strokeThickness: 2 
+        }).setOrigin(0.5);
         
-        upgradeBtn.on('pointerover', () => upgradeBtn.setFillStyle(0x5500aa));
-        upgradeBtn.on('pointerout', () => upgradeBtn.setFillStyle(0x7700ff));
-        upgradeBtn.on('pointerdown', () => this.scene.start('UpgradeScene'));
+        // Sombra de glitch
+        const titleShadow = this.add.text(this.scale.width / 2 + 3, this.scale.height * 0.22 + 2, "NEÓN SAGRADO", { 
+            fontFamily: 'Orbitron, sans-serif',
+            fontSize: '84px', 
+            fill: '#00f2ff', 
+            fontStyle: 'bold'
+        }).setOrigin(0.5).setAlpha(0.5).setDepth(-1);
+
+        this.tweens.add({
+            targets: titleShadow,
+            x: '+=2',
+            y: '+=1',
+            duration: 50,
+            yoyo: true,
+            repeat: -1
+        });
+
+        this.add.text(this.scale.width / 2, this.scale.height * 0.35, "Simulación Crítica v2.3.0 // Tú no deberías existir.", { 
+            fontFamily: 'Inter, sans-serif',
+            fontSize: '20px', 
+            fill: '#00f2ff',
+            letterSpacing: 2
+        }).setOrigin(0.5);
+
+        // BOTÓN JUGAR (Glassmorphism)
+        const playBtnContainer = this.add.container(this.scale.width / 2, this.scale.height * 0.52);
+        const playBg = this.add.rectangle(0, 0, 320, 80, 0x00f2ff, 0.1).setInteractive();
+        playBg.setStrokeStyle(2, 0x00f2ff, 0.5);
+        const playText = this.add.text(0, 0, "INICIAR PURGA", { 
+            fontFamily: 'Orbitron, sans-serif',
+            fontSize: '32px', 
+            fill: '#fff', 
+            fontStyle: 'bold' 
+        }).setOrigin(0.5);
+        playBtnContainer.add([playBg, playText]);
+
+        // BOTÓN UPGRADES
+        const upgradeBtnContainer = this.add.container(this.scale.width / 2, this.scale.height * 0.68);
+        const upgradeBg = this.add.rectangle(0, 0, 320, 80, 0xff00e1, 0.1).setInteractive();
+        upgradeBg.setStrokeStyle(2, 0xff00e1, 0.5);
+        const upgradeText = this.add.text(0, 0, "EL REFUGIO", { 
+            fontFamily: 'Orbitron, sans-serif',
+            fontSize: '28px', 
+            fill: '#fff', 
+            fontStyle: 'bold' 
+        }).setOrigin(0.5);
+        upgradeBtnContainer.add([upgradeBg, upgradeText]);
+
+        // Interacciones
+        playBg.on('pointerover', () => {
+            playBg.setFillStyle(0x00f2ff, 0.3);
+            playBg.setStrokeStyle(2, 0x00f2ff, 1);
+            this.tweens.add({ targets: playBtnContainer, scale: 1.05, duration: 200 });
+        });
+        playBg.on('pointerout', () => {
+            playBg.setFillStyle(0x00f2ff, 0.1);
+            playBg.setStrokeStyle(2, 0x00f2ff, 0.5);
+            this.tweens.add({ targets: playBtnContainer, scale: 1, duration: 200 });
+        });
+        
+        upgradeBg.on('pointerover', () => {
+            upgradeBg.setFillStyle(0xff00e1, 0.3);
+            upgradeBg.setStrokeStyle(2, 0xff00e1, 1);
+            this.tweens.add({ targets: upgradeBtnContainer, scale: 1.05, duration: 200 });
+        });
+        upgradeBg.on('pointerout', () => {
+            upgradeBg.setFillStyle(0xff00e1, 0.1);
+            upgradeBg.setStrokeStyle(2, 0xff00e1, 0.5);
+            this.tweens.add({ targets: upgradeBtnContainer, scale: 1, duration: 200 });
+        });
+        upgradeBg.on('pointerdown', () => this.scene.start('UpgradeScene'));
 
         // Selector de Personalidad del Boss
         const personalities = ['poeta', 'logico', 'glitch'];
@@ -49,7 +131,30 @@ export default class MenuScene extends Phaser.Scene {
         personalityText.on('pointerover', () => personalityText.setFillStyle(0xffffff));
         personalityText.on('pointerout', () => personalityText.setFillStyle(0x00ffff));
 
-        playBtn.on('pointerdown', () => {
+        // Selector de Personalidad del Boss
+        const personalities = ['poeta', 'logico', 'glitch'];
+        let currentPersonality = personalities.indexOf(window.gamePersonality || 'poeta');
+        if (currentPersonality === -1) currentPersonality = 0;
+        window.gamePersonality = personalities[currentPersonality];
+
+        const personalityText = this.add.text(this.scale.width / 2, this.scale.height * 0.85, `[ ENTE IA: ${personalities[currentPersonality].toUpperCase()} ]`, { 
+            fontFamily: 'Inter, sans-serif',
+            fontSize: '18px', 
+            fill: '#ffcc00', 
+            fontStyle: 'bold',
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            padding: { x: 10, y: 5 }
+        }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+        
+        personalityText.on('pointerdown', () => {
+            currentPersonality = (currentPersonality + 1) % personalities.length;
+            window.gamePersonality = personalities[currentPersonality];
+            personalityText.setText(`[ ENTE IA: ${personalities[currentPersonality].toUpperCase()} ]`);
+        });
+        personalityText.on('pointerover', () => personalityText.setFill('#ffffff'));
+        personalityText.on('pointerout', () => personalityText.setFill('#ffcc00'));
+
+        playBg.on('pointerdown', () => {
             let savedMeta = JSON.parse(localStorage.getItem('metaStats')) || {};
             let meta = {
                 hpLevel: savedMeta.hpLevel || 0,
@@ -81,39 +186,79 @@ export default class MenuScene extends Phaser.Scene {
             this.scene.start('MainScene');
         });
 
-        // Mostrar Leaderboard (Top 5) en la pantalla de inicio
-        this.add.text(50, 50, "TOP 5 GLOBAL", { fontSize: '24px', fill: '#ff00ff', fontStyle: 'bold' });
+        // Mostrar Leaderboard (Izquierda)
+        const leaderPanel = this.add.graphics();
+        leaderPanel.fillStyle(0x000000, 0.4);
+        leaderPanel.fillRoundedRect(30, 40, 260, 240, 12);
+        leaderPanel.lineStyle(1, 0xff00e1, 0.3);
+        leaderPanel.strokeRoundedRect(30, 40, 260, 240, 12);
+
+        this.add.text(45, 55, "LEADERBOARD", { 
+            fontFamily: 'Orbitron, sans-serif',
+            fontSize: '20px', 
+            fill: '#ff00e1', 
+            fontStyle: 'bold' 
+        });
         
         getLeaderboard().then(({ data, error }) => {
             if (!error && data) {
-                let yPos = 90;
+                let yPos = 95;
                 data.slice(0, 5).forEach((player, index) => {
-                    let color = index === 0 ? '#ffcc00' : '#00ffff';
-                    this.add.text(50, yPos, `#${index + 1} ${player.username} - ${player.high_score} pts`, { fontSize: '18px', fill: color });
-                    yPos += 30;
+                    let color = index === 0 ? '#ffcc00' : '#ffffff';
+                    this.add.text(45, yPos, `${index + 1}. ${player.username || 'Anon'}`, { 
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '15px', 
+                        fill: color 
+                    });
+                    this.add.text(280, yPos, `${player.high_score}`, { 
+                        fontFamily: 'Inter, sans-serif',
+                        fontSize: '15px', 
+                        fill: '#00f2ff' 
+                    }).setOrigin(1, 0);
+                    yPos += 32;
                 });
             }
         });
 
-        // Mostrar Controles (Derecha) en la pantalla de inicio
-        const rightX = this.scale.width - 50;
-        this.add.text(rightX, 50, "CÓDIGOS DE ACCESO", { fontSize: '24px', fill: '#00ffcc', fontStyle: 'bold' }).setOrigin(1, 0);
+        // Mostrar Controles (Derecha)
+        const rightX = this.scale.width - 30;
+        const controlPanel = this.add.graphics();
+        controlPanel.fillStyle(0x000000, 0.4);
+        controlPanel.fillRoundedRect(this.scale.width - 290, 40, 260, 240, 12);
+        controlPanel.lineStyle(1, 0x00f2ff, 0.3);
+        controlPanel.strokeRoundedRect(this.scale.width - 290, 40, 260, 240, 12);
+
+        this.add.text(rightX - 10, 55, "COMANDOS", { 
+            fontFamily: 'Orbitron, sans-serif',
+            fontSize: '20px', 
+            fill: '#00f2ff', 
+            fontStyle: 'bold' 
+        }).setOrigin(1, 0);
         
         const controls = [
-            "WASD / Flechas : Mover el Avatar",
-            "ESPACIO : Atacar con el Arma",
-            "SHIFT : Dash de Evasión",
-            "1, 2, 3 : Cambiar de Arma",
-            "Tecla I / TAB : Abrir Inventario",
-            "ESC / P : Pausar Simulación"
+            "WASD / 🕹️ : Moverse",
+            "SPACE / ⚔️ : Atacar",
+            "SHIFT / ⚡ : Dash",
+            "1, 2, 3 / 🎒 : Armas",
+            "I - TAB / 📜 : Inv.",
+            "ESC - P / ⏸️ : Pausa"
         ];
         
-        let cy = 90;
+        let cy = 95;
         controls.forEach(ctrl => {
-            this.add.text(rightX, cy, ctrl, { fontSize: '16px', fill: '#cccccc' }).setOrigin(1, 0);
-            cy += 30;
+            this.add.text(rightX - 10, cy, ctrl, { 
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '14px', 
+                fill: '#888' 
+            }).setOrigin(1, 0);
+            cy += 28;
         });
 
-        this.add.text(this.scale.width / 2, this.scale.height * 0.92, "Los dioses murieron... y ahora venden upgrades.", { fontSize: '14px', fill: '#555', align: 'center' }).setOrigin(0.5);
+        this.add.text(this.scale.width / 2, this.scale.height * 0.94, "NÉMESIS SAGRADA // CONECTADO AL NÚCLEO", { 
+            fontFamily: 'Inter, sans-serif',
+            fontSize: '12px', 
+            fill: '#444', 
+            letterSpacing: 4 
+        }).setOrigin(0.5);
     }
 }
