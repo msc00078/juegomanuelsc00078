@@ -547,8 +547,8 @@ export class TeleporterEnemy extends Enemy {
                 const angle = Phaser.Math.Angle.Between(
                     playerSprite.x, playerSprite.y, this.sprite.x, this.sprite.y
                 );
-                const offsetX = Math.cos(angle + Math.PI) * 45;
-                const offsetY = Math.sin(angle + Math.PI) * 45;
+                const offsetX = Math.cos(angle + Math.PI) * 15;
+                const offsetY = Math.sin(angle + Math.PI) * 15;
                 this.sprite.setPosition(
                     Phaser.Math.Clamp(playerSprite.x + offsetX, 20, this.scene.scale.width  - 20),
                     Phaser.Math.Clamp(playerSprite.y + offsetY, 90, this.scene.scale.height - 20)
@@ -732,8 +732,9 @@ export class TrapperEnemy extends Enemy {
         const angle = Phaser.Math.Angle.Between(
             this.sprite.x, this.sprite.y, targetX, targetY
         );
-        const tx = this.sprite.x + Math.cos(angle) * 80;
-        const ty = this.sprite.y + Math.sin(angle) * 80;
+        // Ahora apunta directamente al jugador o muy cerca
+        const tx = targetX + (Math.random() - 0.5) * 15;
+        const ty = targetY + (Math.random() - 0.5) * 15;
 
         const trap = this.scene.add.circle(tx, ty, 30, 0xffcc00, 0.35);
         trap.setStrokeStyle(2, 0xff8800);
@@ -794,7 +795,7 @@ export class LaserEliteEnemy extends Enemy {
 
             // Disparo del rayo (un rectángulo largo)
             const angle = Phaser.Math.Angle.Between(this.sprite.x, this.sprite.y, playerSprite.x, playerSprite.y);
-            const beam = this.scene.add.rectangle(this.sprite.x, this.sprite.y, 1000, 20, 0xff00ff, 0.6).setOrigin(0, 0.5).setDepth(51);
+            const beam = this.scene.add.rectangle(this.sprite.x, this.sprite.y, 1200, 40, 0xff00ff, 0.7).setOrigin(0, 0.5).setDepth(51);
             beam.setRotation(angle);
             
             // Detección de colisión manual (Arcade Physics no soporta rotación para cuerpos)
@@ -803,12 +804,12 @@ export class LaserEliteEnemy extends Enemy {
                 if (hasHit || !beam.active || !this.scene.player) return;
                 const player = this.scene.player;
                 const dist = Phaser.Math.Distance.Between(this.sprite.x, this.sprite.y, player.sprite.x, player.sprite.y);
-                if (dist > 1000) return; // Fuera de rango
+                if (dist > 1200) return; // Fuera de rango
                 
                 const angToPlayer = Phaser.Math.Angle.Between(this.sprite.x, this.sprite.y, player.sprite.x, player.sprite.y);
                 const diff = Math.abs(Phaser.Math.Angle.Wrap(angToPlayer - angle));
                 
-                if (diff < 0.12 && !player.isInvulnerable) { // Margen de 0.12 radianes para el ancho del rayo
+                if (diff < 0.25 && !player.isInvulnerable) { // Margen aumentado para que pegue más fácil
                     hasHit = true;
                     player.takeDamage(15);
                     this.scene.updateUI();
