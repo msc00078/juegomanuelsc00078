@@ -2,7 +2,32 @@
 
 Todas las novedades y mejoras implementadas en el proyecto.
 
-## [1.6.3] - 2026-05-06
+## [2.0.0] - 2026-05-06
+> **Versión mayor** — Sistema de enemigos completamente renovado, Boss con IA mejorada y nuevo ecosistema de escalado de dificultad.
+### Añadido
+- **Sistema de Variantes de Enemigos**: Los enemigos escalan visualmente y en estadísticas según el nivel actual.
+  - Niveles 1-5: variante **Normal**.
+  - Niveles 6-10: variante **Mejorado** (+40% HP, +10% velocidad, borde naranja).
+  - Nivel 11+: variante **Élite** (+100% HP, +25% velocidad, borde rojo + aura).
+- **Enemigos Alpha** (5% de probabilidad): 3× vida, 2× daño de contacto, aura dorada pulsante, sueltan 3 orbes de XP al morir.
+- **4 Nuevos tipos de enemigos**:
+  - **Fase Corrupta (Teletransportador)**: Se teletransporta detrás del jugador cada ~4.5s. Alto daño de contacto (18). Disponible desde nivel 6.
+  - **Parche de Sistema (Sanador)**: Cura 8 HP a los aliados en radio 160 cada 3.5s. Siempre huye del jugador. Disponible desde nivel 10.
+  - **Centinela Blindado (Guardián)**: Escudo frontal que bloquea el daño de la espada. Completamente vulnerable por la espalda. Se mueve lentamente hacia el jugador. Disponible desde nivel 10.
+  - **Glitch Trampa (Trampero)**: Coloca zonas de ralentización que reducen la velocidad del jugador al 45% durante 5 segundos. Mantiene distancia media. Disponible desde nivel 6.
+- **Mejoras del Boss (IA + Dificultad)**:
+  - Movimiento autónomo entre llamadas a la API (ya no es estático).
+  - Targeting predictivo: los proyectiles apuntan a donde estará el jugador.
+  - En fase 2 el intervalo de llamadas a la API baja a 2s (más ataques).
+  - En fase 3 el intervalo baja a 1.2s, los proyectiles son rafágas de 4 y el boss invoca 2 kamikazes al entrar en la fase.
+  - Las ondas de área en fase 3 son dobles y concéntricas.
+
+### Modificado
+- **Pool de spawn de enemigos**: Ahora se expande progresivamente según el nivel (3 rangos: niveles <3, 3-5, 6-9, 10+).
+- **`contactDamage` por tipo**: El daño de colisión ya no es fijo (5 para todos) sino que depende del tipo de enemigo.
+- **`Player._baseSpeed`**: Se guarda la velocidad inicial del jugador para poder restaurarla después de efectos de ralentización.
+
+
 ### Añadido
 - **Optimización de IA (Boss Warmup)**: Se implementó un sistema de precalentamiento para la API del Boss.
   - Nuevo endpoint `/api/boss-warmup` en el backend para despertar el modelo de Groq/Render.
@@ -19,6 +44,10 @@ Todas las novedades y mejoras implementadas en el proyecto.
     - `GameConfig.test.js`: 5 tests (tipo, escala 1280x720, física, escenas)
 
 ### Corregido
+- **Daño Fantasma del Boss**: Se corrigió un problema donde el jefe seguía haciendo daño al jugador después de morir si este caminaba sobre su posición o sobre ataques de área residuales. Ahora, al morir el jefe:
+  - Se desactiva su cuerpo físico inmediatamente.
+  - Se limpian todos sus ataques activos (`attacks.clear()`).
+  - Se añadieron comprobaciones de vida (`hp > 0`) en los handlers de colisión de la escena.
 - **Bug de cambio de arma en HUD**: Al hacer clic en el indicador de arma en la pantalla de juego, el ciclo de armas ahora solo pasa a armas que el jugador haya comprado (`hasBow`, `hasBombs`). Antes ciclaba libremente entre espada, arco y bombas independientemente de si se habían adquirido.
 - **Robustez de Entidades**: Se aplicó optional chaining (`?.`) en `Player.js`, `Enemy.js` y `Boss.js` para permitir instanciación segura en tests sin una escena Phaser real.
 - **Dependencias de Backend**: Instalada `axios` en el backend para permitir la ejecución de tests de diagnóstico de API.
