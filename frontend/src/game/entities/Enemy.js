@@ -21,52 +21,117 @@ export class Enemy {
         this.sprite.body.setBounce(0.3);
     }
 
-    /** Aplica la variante de escala según el nivel actual */
+    /** Aplica escalado gradual y asigna uno de los 20 Rangos Visuales */
     applyVariant(level) {
-        let tier = 'normal';
-        if (level >= 6  && level < 11) tier = 'mejorado';
-        if (level >= 11) tier = 'elite';
+        // 1. Escalado base de estadísticas (Sigue siendo gradual por nivel individual)
+        const statMultiplier = 1 + (level - 1) * 0.12; 
+        this.hp = Math.round(this.hp * statMultiplier);
+        this.maxHp = this.hp;
+        this.contactDamage = Math.round(this.contactDamage * statMultiplier);
+        this.speed = Math.round(this.speed * (1 + (level - 1) * 0.02));
 
-        if (tier === 'mejorado') {
-            this.hp     = Math.round(this.hp * 1.4);
-            this.maxHp  = this.hp;
-            this.speed  = Math.round(this.speed * 1.1);
-            this.contactDamage = Math.round(this.contactDamage * 1.3);
-            this.sprite.setStrokeStyle(3, 0xffaa00);
-        } else if (tier === 'elite') {
-            this.hp     = Math.round(this.hp * 2);
-            this.maxHp  = this.hp;
-            this.speed  = Math.round(this.speed * 1.25);
-            this.contactDamage = Math.round(this.contactDamage * 1.6);
-            this.sprite.setStrokeStyle(4, 0xff0000);
-            // Pequeño aura roja
+        const sizeScale = 1 + (level - 1) * 0.006;
+        this.sprite.setScale(sizeScale);
+        this.currentScale = sizeScale;
+
+        // 2. Definición de los 20 Rangos (Cada 5 niveles cambia el rango visual)
+        const tierIndex = Math.min(Math.floor((level - 1) / 5), 19); 
+        this.tier = tierIndex + 1;
+
+        // Tabla de colores Sagrado-Neon para los 20 rangos
+        const tierColors = [
+            0x004400, 0x008800, 0x00cc00, 0x00ff44, // 1-4 (Verdes)
+            0x008888, 0x00cccc, 0x00ffff, 0x0088ff, // 5-8 (Cyans/Azules)
+            0x0000ff, 0x4400ff, 0x8800ff, 0xcc00ff, // 9-12 (Azules/Púrpuras)
+            0xff00ff, 0xff0088, 0xff0044, 0xff0000, // 13-16 (Magents/Rojos)
+            0xff4400, 0xff8800, 0xffcc00, 0xffff00  // 17-20 (Naranjas/Oro)
+        ];
+
+        const tierColor = tierColors[tierIndex];
+        const strokeThickness = 2 + Math.floor(tierIndex / 4); // El borde crece cada 4 rangos
+        
+        this.sprite.setStrokeStyle(strokeThickness, tierColor);
+
+        // 3. Efectos según el rango
+        if (tierIndex >= 4) { // Rango 5+ (Nivel 21+)
+            // Aura del color del rango
             this._eliteAura = this.scene.add.circle(
-                this.sprite.x, this.sprite.y, this.size * 0.8, 0xff0000, 0.18
+                this.sprite.x, this.sprite.y, 
+                this.size * sizeScale * 0.6, 
+                tierColor, 0.15
             );
         }
-        this.tier = tier;
+
+        if (tierIndex >= 11) { // Rango 12+ (Nivel 56+)
+            // Partículas sutiles constantes del color del tier
+            if (this.scene.createParticles) {
+                this._tierParticleTimer = this.scene.time.addEvent({
+                    delay: 1500 - (tierIndex * 50), // Más partículas en niveles más altos
+                    callback: () => {
+                        if (this.sprite && this.sprite.active && !this.isDead) {
+                            this.scene.createParticles(this.sprite.x, this.sprite.y, tierColor);
+                        }
+                    },
+                    loop: true
+                });
+            }
+        }
+        
+        if (tierIndex === 19) { // Rango 20 (Nivel 96+)
+            // Efecto especial para el rango máximo: Brillo blanco extra
+            this.sprite.setStrokeStyle(6, 0xffffff);
+            this.scene.tweens.add({
+                targets: this.sprite,
+                alpha: 0.7,
+                duration: 500,
+                yoyo: true,
+                repeat: -1
+            });
+        }
     }
 
-    /** Convierte este enemigo en Alpha (5% probabilidad) */
+    /** Convierte este enemigo en Alpha (Diferenciación visual máxima) */
     applyAlpha() {
         this.isAlpha = true;
-        this.hp     = Math.round(this.hp * 3);
+        // El Alpha multiplica lo que ya tenga por variante
+        this.hp     = Math.round(this.hp * 2.5);
         this.maxHp  = this.hp;
-        this.contactDamage = Math.round(this.contactDamage * 2);
-        this.speed  = Math.round(this.speed * 1.15);
-        this.xpBonus = 30;
+        this.contactDamage = Math.round(this.contactDamage * 1.8);
+        this.speed  = Math.round(this.speed * 1.1);
+        this.xpBonus = 50;
 
-        // Visual: contorno dorado y escala mayor
-        this.sprite.setScale(1.35);
-        this.sprite.setStrokeStyle(4, 0xffd700);
+        // Visual: Mucho más grande y con efectos dorados
+        const currentScale = this.sprite.scale;
+        this.sprite.setScale(currentScale * 1.3);
+        this.sprite.setStrokeStyle(5, 0xffd700);
 
+        // Aura dual (interna fija, externa pulsante)
         this._alphaAura = this.scene.add.circle(
-            this.sprite.x, this.sprite.y, this.size * 1.1, 0xffd700, 0.25
+            this.sprite.x, this.sprite.y, this.size * this.sprite.scale * 0.8, 0xffd700, 0.3
         );
+        this._alphaAuraOuter = this.scene.add.circle(
+            this.sprite.x, this.sprite.y, this.size * this.sprite.scale * 1.1, 0xffd700, 0.1
+        );
+        
         this.scene.tweens.add({
-            targets: this._alphaAura,
-            scale: 1.3, alpha: 0.1,
-            duration: 700, yoyo: true, repeat: -1
+            targets: this._alphaAuraOuter,
+            scale: 1.4,
+            alpha: 0,
+            duration: 1000,
+            repeat: -1
+        });
+
+        // "Corona" o indicador visual extra (un pequeño rombo encima)
+        this._alphaCrown = this.scene.add.rectangle(this.sprite.x, this.sprite.y - 40 * this.sprite.scale, 15, 15, 0xffd700);
+        this._alphaCrown.setAngle(45);
+        this._alphaCrown.setStrokeStyle(2, 0xffffff);
+        this.scene.tweens.add({
+            targets: this._alphaCrown,
+            y: "-=10",
+            duration: 800,
+            yoyo: true,
+            repeat: -1,
+            ease: 'Sine.easeInOut'
         });
     }
 
@@ -90,11 +155,11 @@ export class Enemy {
     }
 
     _updateAuras() {
-        if (this._alphaAura && this.sprite.active) {
-            this._alphaAura.setPosition(this.sprite.x, this.sprite.y);
-        }
-        if (this._eliteAura && this.sprite.active) {
-            this._eliteAura.setPosition(this.sprite.x, this.sprite.y);
+        if (this.sprite && this.sprite.active) {
+            if (this._alphaAura) this._alphaAura.setPosition(this.sprite.x, this.sprite.y);
+            if (this._alphaAuraOuter) this._alphaAuraOuter.setPosition(this.sprite.x, this.sprite.y);
+            if (this._alphaCrown) this._alphaCrown.setPosition(this.sprite.x, this.sprite.y - 40 * this.sprite.scale);
+            if (this._eliteAura) this._eliteAura.setPosition(this.sprite.x, this.sprite.y);
         }
     }
 
@@ -136,7 +201,10 @@ export class Enemy {
 
         // Destruir visuales
         this._alphaAura?.destroy();
+        this._alphaAuraOuter?.destroy();
+        this._alphaCrown?.destroy();
         this._eliteAura?.destroy();
+        this._tierParticleTimer?.remove();
         this.hpBarGfx?.destroy();
         this.bleedParticles?.destroy();
         this.sprite?.destroy();
@@ -176,7 +244,15 @@ export class Enemy {
 // ─── HELPER: aplicar variante + alpha a cualquier enemigo ────────────────────
 export function applyEnemyScaling(enemy, level) {
     enemy.applyVariant(level);
-    if (Math.random() < 0.05) enemy.applyAlpha();
+    
+    // Probabilidad de Alpha escala con el nivel: 
+    // Nivel 1: 1% | Nivel 50: 10% | Nivel 100: 20% (Tope)
+    let alphaChance = 0.01 + (level * 0.002);
+    if (alphaChance > 0.20) alphaChance = 0.20;
+
+    if (Math.random() < alphaChance) {
+        enemy.applyAlpha();
+    }
     return enemy;
 }
 

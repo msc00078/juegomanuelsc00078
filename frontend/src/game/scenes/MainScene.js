@@ -474,7 +474,8 @@ export default class MainScene extends Phaser.Scene {
 
     spawnNormalEnemies() {
         const level = this.currentLevel;
-        const numEnemies = 2 + level;
+        // Escalar cantidad de enemigos suavemente: 2 base + 1 cada 2 niveles aprox
+        const numEnemies = Math.floor(2 + (level / 2)); 
 
         for (let i = 0; i < numEnemies; i++) {
             const rx = Phaser.Math.Between(100, this.scale.width  - 100);
@@ -482,35 +483,47 @@ export default class MainScene extends Phaser.Scene {
             const rand = Math.random();
             let enemy;
 
-            if (level < 3) {
-                // Solo estándar en los primeros niveles
-                enemy = new StandardEnemy(this, rx, ry);
-            } else if (level < 6) {
-                // Pool básico
-                if (rand < 0.4)      enemy = new StandardEnemy(this, rx, ry);
-                else if (rand < 0.6) enemy = new TankEnemy(this, rx, ry);
-                else if (rand < 0.8) enemy = new RangedEnemy(this, rx, ry);
-                else if (rand < 0.9) enemy = new SummonerEnemy(this, rx, ry);
+            if (level < 5) {
+                // NIVEL 1-4: Solo Glitchers y algún Tanque desde el 3
+                if (level >= 3 && rand < 0.2) enemy = new TankEnemy(this, rx, ry);
+                else enemy = new StandardEnemy(this, rx, ry);
+            } 
+            else if (level < 12) {
+                // NIVEL 5-11: Introducimos Arqueros y Kamikazes
+                if (rand < 0.5)      enemy = new StandardEnemy(this, rx, ry);
+                else if (rand < 0.7) enemy = new TankEnemy(this, rx, ry);
+                else if (rand < 0.85)enemy = new RangedEnemy(this, rx, ry);
                 else                 enemy = new KamikazeEnemy(this, rx, ry);
-            } else if (level < 10) {
-                // Pool ampliado con Teletransportador y Trampero
-                if (rand < 0.25)     enemy = new StandardEnemy(this, rx, ry);
-                else if (rand < 0.4) enemy = new TankEnemy(this, rx, ry);
-                else if (rand < 0.55)enemy = new RangedEnemy(this, rx, ry);
-                else if (rand < 0.65)enemy = new SummonerEnemy(this, rx, ry);
+            } 
+            else if (level < 25) {
+                // NIVEL 12-24: Introducimos Invocadores y Trampas
+                if (rand < 0.3)      enemy = new StandardEnemy(this, rx, ry);
+                else if (rand < 0.5) enemy = new TankEnemy(this, rx, ry);
+                else if (rand < 0.65)enemy = new RangedEnemy(this, rx, ry);
                 else if (rand < 0.75)enemy = new KamikazeEnemy(this, rx, ry);
-                else if (rand < 0.87)enemy = new TeleporterEnemy(this, rx, ry);
+                else if (rand < 0.88)enemy = new SummonerEnemy(this, rx, ry);
                 else                 enemy = new TrapperEnemy(this, rx, ry);
-            } else {
-                // Pool completo con Sanador y Guardián
-                if (rand < 0.2)      enemy = new StandardEnemy(this, rx, ry);
-                else if (rand < 0.33)enemy = new TankEnemy(this, rx, ry);
-                else if (rand < 0.46)enemy = new RangedEnemy(this, rx, ry);
-                else if (rand < 0.55)enemy = new SummonerEnemy(this, rx, ry);
-                else if (rand < 0.63)enemy = new KamikazeEnemy(this, rx, ry);
-                else if (rand < 0.73)enemy = new TeleporterEnemy(this, rx, ry);
-                else if (rand < 0.82)enemy = new TrapperEnemy(this, rx, ry);
-                else if (rand < 0.91)enemy = new HealerEnemy(this, rx, ry);
+            } 
+            else if (level < 45) {
+                // NIVEL 25-44: El Teletransportador entra en juego
+                if (rand < 0.25)     enemy = new StandardEnemy(this, rx, ry);
+                else if (rand < 0.45)enemy = new TankEnemy(this, rx, ry);
+                else if (rand < 0.6) enemy = new RangedEnemy(this, rx, ry);
+                else if (rand < 0.7) enemy = new KamikazeEnemy(this, rx, ry);
+                else if (rand < 0.8) enemy = new SummonerEnemy(this, rx, ry);
+                else if (rand < 0.9) enemy = new TrapperEnemy(this, rx, ry);
+                else                 enemy = new TeleporterEnemy(this, rx, ry);
+            } 
+            else {
+                // NIVEL 45+: Pool completo con Sanadores y Guardianes
+                if (rand < 0.15)     enemy = new StandardEnemy(this, rx, ry);
+                else if (rand < 0.3) enemy = new TankEnemy(this, rx, ry);
+                else if (rand < 0.4) enemy = new RangedEnemy(this, rx, ry);
+                else if (rand < 0.5) enemy = new KamikazeEnemy(this, rx, ry);
+                else if (rand < 0.6) enemy = new SummonerEnemy(this, rx, ry);
+                else if (rand < 0.7) enemy = new TrapperEnemy(this, rx, ry);
+                else if (rand < 0.8) enemy = new TeleporterEnemy(this, rx, ry);
+                else if (rand < 0.9) enemy = new HealerEnemy(this, rx, ry);
                 else                 enemy = new GuardianEnemy(this, rx, ry);
             }
 
