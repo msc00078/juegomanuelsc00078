@@ -1006,7 +1006,7 @@ export default class MainScene extends Phaser.Scene {
         };
         
         try {
-            const response = await axios.post('https://juegomanuelsc00078.onrender.com/api/boss-decision', gameState, { timeout: 2500 });
+            const response = await axios.post('https://juegomanuelsc00078.onrender.com/api/boss-decision', gameState, { timeout: 8000 });
             const { action, intensity, dialogue } = response.data;
             if (!this.gameOver && this.boss && this.boss.hp > 0) {
                 if (this.bossText && this.bossText.active) this.bossText.setText(dialogue);

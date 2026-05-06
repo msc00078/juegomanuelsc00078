@@ -1,4 +1,14 @@
 import * as Phaser from 'phaser';
+import axios from 'axios';
+
+const API_BASE = 'https://juegomanuelsc00078.onrender.com/api';
+
+function triggerBossWarmup(bossType = 'poeta') {
+    // Fire-and-forget: el backend responde de inmediato y procesa en background
+    axios.post(`${API_BASE}/boss-warmup`, { boss_type: bossType })
+        .then(() => console.log('[MapScene] Warmup de boss enviado.'))
+        .catch(() => console.warn('[MapScene] Warmup ignorado (servidor dormido o sin conexión).'));
+}
 
 export default class MapScene extends Phaser.Scene {
     constructor() {
@@ -14,6 +24,9 @@ export default class MapScene extends Phaser.Scene {
 
         // Si es nivel 5, 10, 15... obligar a ir al Boss
         if (level % 5 === 0) {
+            // Precalentar la IA con antelación
+            const bossType = window.gamePersonality || 'poeta';
+            triggerBossWarmup(bossType);
             this.createNode(400, 300, "SALA DEL BOSS", 0xff0000, 'boss');
             return;
         }
@@ -62,6 +75,13 @@ export default class MapScene extends Phaser.Scene {
         
         bg.on('pointerdown', () => {
             this.registry.set('nextNodeType', type);
+
+            // Si el jugador selecciona un nodo de boss manualmente (edge case),
+            // también disparar el warmup
+            if (type === 'boss') {
+                const bossType = window.gamePersonality || 'poeta';
+                triggerBossWarmup(bossType);
+            }
             
             // Efecto flash
             this.cameras.main.flash(500, 255, 255, 255);

@@ -3,11 +3,11 @@
 Todas las novedades y mejoras implementadas en el proyecto.
 
 ## [1.6.3] - 2026-05-06
-### Corregido
-- **Bug de cambio de arma en HUD**: Al hacer clic en el indicador de arma en la pantalla de juego, el ciclo de armas ahora solo pasa a armas que el jugador haya comprado (`hasBow`, `hasBombs`). Antes ciclaba libremente entre espada, arco y bombas independientemente de si se habían adquirido.
-
-
 ### Añadido
+- **Optimización de IA (Boss Warmup)**: Se implementó un sistema de precalentamiento para la API del Boss.
+  - Nuevo endpoint `/api/boss-warmup` en el backend para despertar el modelo de Groq/Render.
+  - Llamadas anticipadas desde `MapScene.js` al seleccionar el nodo de jefe para evitar latencias de "cold start".
+- **Test de Diagnóstico de API Real**: Se creó `backend/tests/bossApiDiagnostic.test.js` para monitorizar tiempos de respuesta y coherencia de la IA en producción.
 - **Suite de Tests Completa (58 tests, 7 suites)**: Todos los tests pasan en verde.
   - **Backend (4 tests):** `boss.test.js`, `bossRoute.test.js`. Cobertura del 88%.
   - **Frontend (54 tests en 6 suites):**
@@ -18,8 +18,13 @@ Todas las novedades y mejoras implementadas en el proyecto.
     - `supabase.test.js`: 6 tests (signUp, signIn, saveRunResult, manejo de errores)
     - `GameConfig.test.js`: 5 tests (tipo, escala 1280x720, física, escenas)
 
+### Corregido
+- **Bug de cambio de arma en HUD**: Al hacer clic en el indicador de arma en la pantalla de juego, el ciclo de armas ahora solo pasa a armas que el jugador haya comprado (`hasBow`, `hasBombs`). Antes ciclaba libremente entre espada, arco y bombas independientemente de si se habían adquirido.
+- **Robustez de Entidades**: Se aplicó optional chaining (`?.`) en `Player.js`, `Enemy.js` y `Boss.js` para permitir instanciación segura en tests sin una escena Phaser real.
+- **Dependencias de Backend**: Instalada `axios` en el backend para permitir la ejecución de tests de diagnóstico de API.
+
 ### Modificado
-- **`Player.js`**, **`Enemy.js`**, **`Boss.js`**: Se usó optional chaining (`?.`) en llamadas a métodos de escena (`showDamageNumber`, `createParticles`, `cameras`, etc.) para que las clases sean seguras de instanciar fuera de Phaser (en tests).
+- **Timeout de API del Boss**: Aumentado de 2500ms a 8000ms en `MainScene.js` para dar margen de respuesta durante el primer contacto tras el warmup.
 
 
 - **Entorno de Testing y Cobertura**: Se integró `Vitest` y `@vitest/coverage-v8` tanto en el `frontend` como en el `backend`. Esto permite realizar pruebas unitarias y medir el porcentaje de código cubierto.

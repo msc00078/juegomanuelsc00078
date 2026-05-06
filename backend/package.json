@@ -4,14 +4,16 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "vitest",
-    "coverage": "vitest run --coverage"
+    "test": "vitest --exclude tests/bossApiDiagnostic.test.js",
+    "coverage": "vitest run --coverage --exclude tests/bossApiDiagnostic.test.js",
+    "test:api": "vitest run tests/bossApiDiagnostic.test.js --reporter=verbose"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "axios": "^1.16.0",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
