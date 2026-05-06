@@ -275,7 +275,7 @@ export class Player {
             this.sprite.setActive?.(false);
             this.sprite.setVisible?.(false);
             if (this.sword) this.sword.destroy?.();
-            this.scene.gameOver?.();
+            this.scene.endGame?.("¡HAS SIDO BORRADO DEL SISTEMA!");
         }
     }
 }

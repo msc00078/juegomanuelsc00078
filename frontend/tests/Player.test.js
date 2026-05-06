@@ -62,7 +62,7 @@ const makeScene = (registryOverrides = {}) => {
             set: vi.fn((key, val) => { registry[key] = val; })
         },
         updateHealthUI: vi.fn(),
-        gameOver: vi.fn()
+        endGame: vi.fn()
     };
 };
 
@@ -143,12 +143,12 @@ describe('Player Logic Tests', () => {
         expect(scene.gameOver).not.toHaveBeenCalled();
     });
 
-    it('debería disparar gameOver cuando la vida llega a 0', () => {
+    it('debería disparar endGame cuando la vida llega a 0', () => {
         const scene = makeScene();
         const player = new Player(scene, 100, 100);
         player.takeDamage(100);
         expect(player.hp).toBe(0);
-        expect(scene.gameOver).toHaveBeenCalled();
+        expect(scene.endGame).toHaveBeenCalled();
     });
 
     it('la vida no debería bajar de 0', () => {
