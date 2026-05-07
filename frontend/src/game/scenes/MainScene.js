@@ -1,9 +1,12 @@
 import * as Phaser from 'phaser';
-import { Player } from '../entities/Player';
-import { Boss } from '../entities/Boss';
-import { StandardEnemy, TankEnemy, RangedEnemy, KamikazeEnemy, SummonerEnemy,
+import { Player, Boss, 
+         StandardEnemy, TankEnemy, RangedEnemy, KamikazeEnemy, SummonerEnemy,
          TeleporterEnemy, HealerEnemy, GuardianEnemy, TrapperEnemy, LaserEliteEnemy,
-         applyEnemyScaling } from '../entities/Enemy';
+         applyEnemyScaling } from '../entities';
+import { InputManager } from '../managers/InputManager';
+import { HUDManager } from '../managers/HUDManager';
+import { SpawnManager } from '../managers/SpawnManager';
+import { MobileControls } from '../ui/MobileControls';
 import { saveRunResult } from '../supabase';
 import axios from 'axios';
 
@@ -14,7 +17,11 @@ export default class MainScene extends Phaser.Scene {
         this.gameOver = false;
         this.isCountdown = true;
         this.apiCallInterval = 3000;
-        this.mobileJoystick = null; // {vx, vy, active}
+        
+        // Managers
+        this.inputManager = null;
+        this.hudManager = null;
+        this.spawnManager = null;
     }
 
     init() {
@@ -72,6 +79,8 @@ export default class MainScene extends Phaser.Scene {
 
         this.add.grid(this.scale.width / 2, this.scale.height / 2, this.scale.width, this.scale.height, 32, 32, 0x35682d, 1, 0x22441d, 1);
 
+        // Inicializar Managers de entrada antes que el jugador
+        this.inputManager = new InputManager(this);
         this.player = new Player(this, this.scale.width / 2, this.scale.height - 100);
 
         this.enemies = [];
@@ -88,95 +97,9 @@ export default class MainScene extends Phaser.Scene {
 
         this.nodeType = this.registry.get('nextNodeType') || 'combat';
 
-        // HUD Dinámico (Glassmorphism)
-        this.vignette = this.add.graphics();
-        this.drawVignette();
-
-        // Panel Superior Glass
-        this.topPanel = this.add.graphics().setDepth(100).setScrollFactor(0);
-        this.topPanel.fillStyle(0x050505, 0.75);
-        this.topPanel.fillRoundedRect(10, 10, this.scale.width - 20, 70, 12);
-        this.topPanel.lineStyle(2, 0x00f2ff, 0.3);
-        this.topPanel.strokeRoundedRect(10, 10, this.scale.width - 20, 70, 12);
-        
-        let nodeLabel = this.nodeType.toUpperCase();
-        if (nodeLabel === 'COMBAT') nodeLabel = 'FRAGMENTO DE COMBATE';
-        if (nodeLabel === 'ELITE') nodeLabel = 'ANOMALÍA CRÍTICA';
-        if (nodeLabel === 'TREASURE') nodeLabel = 'NÚCLEO DE DATOS';
-        if (nodeLabel === 'SHOP') nodeLabel = 'MERCADO NEGRO';
-        if (nodeLabel === 'EVENT') nodeLabel = 'GLITCH EN LA REALIDAD';
-        if (this.isBossLevel) nodeLabel = 'CONCIENCIA ROTA (JEFE)';
-
-        this.levelText = this.add.text(this.scale.width / 2, 35, `SECTOR 0${this.currentLevel} // ${nodeLabel}`, {
-            fontFamily: 'Orbitron, sans-serif',
-            fontSize: '18px', 
-            fill: '#00f2ff', 
-            fontStyle: 'bold'
-        }).setOrigin(0.5).setDepth(101).setScrollFactor(0);
-
-        // Barra de vida Estilo Premium
-        this.hpBarBg = this.add.rectangle(135, 45, 180, 12, 0x111111).setDepth(101).setScrollFactor(0).setOrigin(0, 0.5);
-        this.hpBar = this.add.rectangle(135, 45, 180, 12, 0x00ff00).setDepth(102).setScrollFactor(0).setOrigin(0, 0.5);
-        this.playerHpText = this.add.text(135, 28, `HP: ${this.player.hp}/${this.player.maxHp}`, {
-            fontFamily: 'Inter, sans-serif',
-            fontSize: '11px', fill: '#888', fontWeight: 'bold'
-        }).setOrigin(0, 0.5).setDepth(103).setScrollFactor(0);
-
-        // Barra de XP Estilo Premium
-        this.xpBarBg = this.add.rectangle(135, 58, 180, 6, 0x111111).setDepth(101).setScrollFactor(0).setOrigin(0, 0.5);
-        this.xpBar = this.add.rectangle(135, 58, 180, 6, 0x00f2ff).setDepth(102).setScrollFactor(0).setOrigin(0, 0.5);
-        this.runLevelText = this.add.text(135, 72, `PROGRESO LVL.${this.registry.get('runLevel')}`, {
-            fontFamily: 'Inter, sans-serif',
-            fontSize: '10px', fill: '#00f2ff', fontWeight: 'bold'
-        }).setOrigin(0, 0.5).setDepth(103).setScrollFactor(0);
-
-        this.goldText = this.add.text(this.scale.width - 40, 35, `${this.gold} 💎`, {
-            fontFamily: 'Orbitron, sans-serif',
-            fontSize: '20px', fill: '#ffd700', fontStyle: 'bold'
-        }).setOrigin(1, 0.5).setDepth(101).setScrollFactor(0);
-
-        this.scoreText = this.add.text(this.scale.width - 40, 58, `SCORE: ${this.score}`, {
-            fontFamily: 'Inter, sans-serif',
-            fontSize: '12px', fill: '#00f2ff', fontWeight: 'bold'
-        }).setOrigin(1, 0.5).setDepth(101).setScrollFactor(0);
-
-        this.comboText = this.add.text(this.scale.width - 200, 45, `x${this.registry.get('combo') || 0}`, {
-            fontFamily: 'Orbitron, sans-serif',
-            fontSize: '24px', fill: '#ff00e1', fontStyle: 'bold'
-        }).setOrigin(1, 0.5).setDepth(101).setScrollFactor(0);
-
-        // --- GESTIÓN DE MÚSICA IN-GAME ---
-        this.handleMusic();
-
-        // Arma HUD
-        this.weaponContainer = this.add.container(this.scale.width / 2, this.scale.height - 40).setDepth(101).setScrollFactor(0);
-        this.weaponBg = this.add.rectangle(0, 0, 200, 40, 0x00f2ff, 0.1);
-        this.weaponBg.setStrokeStyle(1, 0x00f2ff, 0.5);
-        this.weaponText = this.add.text(0, 0, "1 - ESPADA", {
-            fontFamily: 'Orbitron, sans-serif',
-            fontSize: '14px', fill: '#fff', fontStyle: 'bold'
-        }).setOrigin(0.5);
-        this.weaponContainer.add([this.weaponBg, this.weaponText]);
-        
-        this.weaponText.setInteractive({ useHandCursor: true });
-        this.weaponText.on('pointerdown', () => {
-            const hasBow   = this.registry.get('hasBow');
-            const hasBombs = this.registry.get('hasBombs');
-
-            // Construir la lista de armas disponibles
-            const available = [1];
-            if (hasBow)   available.push(2);
-            if (hasBombs) available.push(3);
-
-            // Si solo hay una arma, no hacer nada
-            if (available.length === 1) return;
-
-            const current = this.registry.get('equippedWeapon') || 1;
-            const currentIdx = available.indexOf(current);
-            const nextIdx = (currentIdx + 1) % available.length;
-
-            this.player.equipWeapon(available[nextIdx]);
-        });
+        // Inicializar Gestores de UI y Spawning
+        this.hudManager = new HUDManager(this);
+        this.spawnManager = new SpawnManager(this);
 
 
 
@@ -377,103 +300,7 @@ export default class MainScene extends Phaser.Scene {
 
         this.spawnCrates();
         this.updateUI();
-        
-        // Mobile Controls
-        if (!this.sys.game.device.os.desktop || navigator.maxTouchPoints > 0) {
-            this.createMobileControls();
-        }
-
-        // Countdown Logic
-        this.startLevelCountdown();
-    }
-
-    startLevelCountdown() {
-        this.isCountdown = true;
-        const cx = this.scale.width / 2;
-        const cy = this.scale.height / 2;
-
-        const countText = this.add.text(cx, cy, "3", {
-            fontSize: '80px', fill: '#ffff00', fontStyle: 'bold', stroke: '#000', strokeThickness: 8
-        }).setOrigin(0.5).setDepth(200);
-
-        this.time.delayedCall(1000, () => {
-            countText.setText("2");
-            this.time.delayedCall(1000, () => {
-                countText.setText("1");
-                this.time.delayedCall(1000, () => {
-                    countText.setText("¡ACCIÓN!");
-                    countText.setFill('#00ff00');
-                    this.isCountdown = false;
-                    this.time.delayedCall(500, () => countText.destroy());
-                });
-            });
-        });
-    }
-
-    createMobileControls() {
-        this.input.addPointer(2); // Permitir multi-touch
-        
-        this.mobileJoystick = { vx: 0, vy: 0, active: false };
-
-        const joyY = this.scale.height - 180;
-        const base = this.add.circle(130, joyY, 85, 0xffffff, 0.2).setDepth(1000).setScrollFactor(0);
-        const stick = this.add.circle(130, joyY, 40, 0x00ffff, 0.5).setDepth(1001).setScrollFactor(0);
-        
-        const atkY = this.scale.height - 200;
-        const attackBtn = this.add.circle(this.scale.width - 120, atkY, 75, 0xff0000, 0.5).setDepth(1000).setScrollFactor(0).setInteractive();
-        const attackTxt = this.add.text(this.scale.width - 120, atkY, "ATK", { fontSize: '28px', fill: '#fff', fontStyle: 'bold' }).setOrigin(0.5).setDepth(1001).setScrollFactor(0);
-        
-        attackBtn.on('pointerdown', () => { 
-            attackBtn.setAlpha(0.8);
-            this.player.attack(); 
-        });
-        attackBtn.on('pointerup', () => attackBtn.setAlpha(0.5));
-        attackBtn.on('pointerout', () => attackBtn.setAlpha(0.5));
-        
-        const dashY = this.scale.height - 90;
-        const dashBtn = this.add.circle(this.scale.width - 250, dashY, 55, 0x00ff00, 0.5).setDepth(1000).setScrollFactor(0).setInteractive();
-        const dashTxt = this.add.text(this.scale.width - 250, dashY, "DASH", { fontSize: '22px', fill: '#fff', fontStyle: 'bold' }).setOrigin(0.5).setDepth(1001).setScrollFactor(0);
-        
-        dashBtn.on('pointerdown', () => { 
-            dashBtn.setAlpha(0.8);
-            this.player.dash(); 
-        });
-        dashBtn.on('pointerup', () => dashBtn.setAlpha(0.5));
-        dashBtn.on('pointerout', () => dashBtn.setAlpha(0.5));
-
-        this.input.on('pointerdown', (pointer) => {
-            // Ignorar clics en la mitad derecha para no interferir con los botones
-            if (pointer.x < this.scale.width / 2 && pointer.y > 100) {
-                this.mobileJoystick.active = true;
-                this.mobileJoystick.pointerId = pointer.id;
-                base.setPosition(pointer.x, pointer.y);
-                stick.setPosition(pointer.x, pointer.y);
             }
-        });
-
-        this.input.on('pointermove', (pointer) => {
-            if (this.mobileJoystick.active && pointer.id === this.mobileJoystick.pointerId) {
-                const angle = Phaser.Math.Angle.Between(base.x, base.y, pointer.x, pointer.y);
-                let dist = Phaser.Math.Distance.Between(base.x, base.y, pointer.x, pointer.y);
-                if (dist > 60) dist = 60;
-                
-                stick.setPosition(base.x + Math.cos(angle) * dist, base.y + Math.sin(angle) * dist);
-                
-                this.mobileJoystick.vx = (Math.cos(angle) * dist) / 60;
-                this.mobileJoystick.vy = (Math.sin(angle) * dist) / 60;
-            }
-        });
-
-        this.input.on('pointerup', (pointer) => {
-            if (this.mobileJoystick.pointerId === pointer.id) {
-                this.mobileJoystick.active = false;
-                this.mobileJoystick.vx = 0;
-                this.mobileJoystick.vy = 0;
-                base.setPosition(130, joyY);
-                stick.setPosition(130, joyY);
-            }
-        });
-    }
 
     getPlayerDamage() {
         let dmg = Number(this.registry.get('swordDamage'));
@@ -586,93 +413,11 @@ export default class MainScene extends Phaser.Scene {
     }
 
     spawnNormalEnemies() {
-        const level = this.currentLevel;
-        // Escalar cantidad de enemigos suavemente: 2 base + 1 cada 2 niveles aprox
-        const numEnemies = Math.floor(2 + (level / 2)); 
-
-        for (let i = 0; i < numEnemies; i++) {
-            const rx = Phaser.Math.Between(100, this.scale.width  - 100);
-            const ry = Phaser.Math.Between(100, this.scale.height - 200);
-            const rand = Math.random();
-            let enemy;
-
-            if (level < 5) {
-                // NIVEL 1-4: Mayormente Glitchers, pero con raros avistamientos
-                if (rand < 0.01)      enemy = new RangedEnemy(this, rx, ry);
-                else if (rand < 0.02) enemy = new KamikazeEnemy(this, rx, ry);
-                else if (rand < 0.03) enemy = new SummonerEnemy(this, rx, ry);
-                else if (level >= 3 && rand < 0.2) enemy = new TankEnemy(this, rx, ry);
-                else                  enemy = new StandardEnemy(this, rx, ry);
-            } 
-            else if (level < 12) {
-                // NIVEL 5-11: Introducimos Arqueros y Kamikazes, con raros Summoners/Trappers
-                if (rand < 0.02)      enemy = new SummonerEnemy(this, rx, ry);
-                else if (rand < 0.04) enemy = new TrapperEnemy(this, rx, ry);
-                else if (rand < 0.05) enemy = new TeleporterEnemy(this, rx, ry);
-                else if (rand < 0.5)  enemy = new StandardEnemy(this, rx, ry);
-                else if (rand < 0.7)  enemy = new TankEnemy(this, rx, ry);
-                else if (rand < 0.85) enemy = new RangedEnemy(this, rx, ry);
-                else                  enemy = new KamikazeEnemy(this, rx, ry);
-            } 
-            else if (level < 25) {
-                // NIVEL 12-24: Introducimos Invocadores y Trampas, con raros Healers/Guardians
-                if (rand < 0.02)      enemy = new HealerEnemy(this, rx, ry);
-                else if (rand < 0.04) enemy = new GuardianEnemy(this, rx, ry);
-                else if (rand < 0.06) enemy = new TeleporterEnemy(this, rx, ry);
-                else if (rand < 0.3)  enemy = new StandardEnemy(this, rx, ry);
-                else if (rand < 0.5)  enemy = new TankEnemy(this, rx, ry);
-                else if (rand < 0.65) enemy = new RangedEnemy(this, rx, ry);
-                else if (rand < 0.75) enemy = new KamikazeEnemy(this, rx, ry);
-                else if (rand < 0.88) enemy = new SummonerEnemy(this, rx, ry);
-                else                  enemy = new TrapperEnemy(this, rx, ry);
-            } 
-            else if (level < 45) {
-                // NIVEL 25-44: El Teletransportador entra en juego, Healer/Guardian raros
-                if (rand < 0.03)      enemy = new HealerEnemy(this, rx, ry);
-                else if (rand < 0.06) enemy = new GuardianEnemy(this, rx, ry);
-                else if (rand < 0.25) enemy = new StandardEnemy(this, rx, ry);
-                else if (rand < 0.45) enemy = new TankEnemy(this, rx, ry);
-                else if (rand < 0.6)  enemy = new RangedEnemy(this, rx, ry);
-                else if (rand < 0.7)  enemy = new KamikazeEnemy(this, rx, ry);
-                else if (rand < 0.8)  enemy = new SummonerEnemy(this, rx, ry);
-                else if (rand < 0.9)  enemy = new TrapperEnemy(this, rx, ry);
-                else                  enemy = new TeleporterEnemy(this, rx, ry);
-            } 
-            else {
-                // NIVEL 45+: Pool completo con Sanadores y Guardianes
-                if (rand < 0.15)     enemy = new StandardEnemy(this, rx, ry);
-                else if (rand < 0.3) enemy = new TankEnemy(this, rx, ry);
-                else if (rand < 0.4) enemy = new RangedEnemy(this, rx, ry);
-                else if (rand < 0.5) enemy = new KamikazeEnemy(this, rx, ry);
-                else if (rand < 0.6) enemy = new SummonerEnemy(this, rx, ry);
-                else if (rand < 0.7) enemy = new TrapperEnemy(this, rx, ry);
-                else if (rand < 0.8) enemy = new TeleporterEnemy(this, rx, ry);
-                else if (rand < 0.9) enemy = new HealerEnemy(this, rx, ry);
-                else                 enemy = new GuardianEnemy(this, rx, ry);
-            }
-
-            // Aplicar variante (normal / mejorado / elite) y posible Alpha
-            applyEnemyScaling(enemy, level);
-
-            this.enemies.push(enemy);
-            this.setupEnemyCollisions(enemy);
-        }
+        this.spawnManager.spawnNormalEnemies();
     }
 
     spawnKamikazeFromBoss() {
-        if (this.gameOver) return;
-        // Spawnea un kamikaze cerca de un boss aleatorio
-        const activeBosses = this.bosses.filter(b => b.hp > 0);
-        if (activeBosses.length === 0) return;
-        
-        const b = activeBosses[Math.floor(Math.random() * activeBosses.length)];
-        const rx = b.sprite.x + Phaser.Math.Between(-100, 100);
-        const ry = b.sprite.y + Phaser.Math.Between(-100, 100);
-        
-        const k = new KamikazeEnemy(this, rx, ry);
-        applyEnemyScaling(k, this.currentLevel);
-        this.enemies.push(k);
-        this.setupEnemyCollisions(k);
+        this.spawnManager.spawnKamikazeFromBoss();
     }
 
     setupEnemyCollisions(enemy) {
@@ -1077,55 +822,7 @@ export default class MainScene extends Phaser.Scene {
     }
 
     updateUI() {
-        if (this.playerHpText && this.playerHpText.active) {
-            this.playerHpText.setText(`HP: ${Math.floor(this.player.hp)}/${this.player.maxHp}`);
-            this.hpBar.width = Math.max(0, 150 * (this.player.hp / this.player.maxHp));
-            const percent = this.player.hp / this.player.maxHp;
-            if (percent < 0.3) this.hpBar.setFillStyle(0xff0000);
-            else if (percent < 0.6) this.hpBar.setFillStyle(0xffff00);
-            else this.hpBar.setFillStyle(0x00ff00);
-        }
-
-        // Actualizar XP Bar
-        if (this.xpBar.active) {
-            const xp = this.registry.get('runXp');
-            const next = this.registry.get('xpToNext');
-            const percentXp = xp / next;
-            this.xpBar.width = 150 * percentXp;
-            this.runLevelText.setText(`LVL: ${this.registry.get('runLevel')}`);
-        }
-
-        if (this.goldText && this.goldText.active) this.goldText.setText(`ORO: ${this.gold} 💎`);
-        if (this.scoreText && this.scoreText.active) this.scoreText.setText(`SCORE: ${this.score}`);
-
-        // Combo
-        const combo = this.registry.get('combo');
-        if (combo > 0) {
-            this.comboText.setText(`COMBO x${combo}`);
-            this.comboText.setScale(1 + (combo * 0.05));
-        } else {
-            this.comboText.setText("");
-        }
-
-        const w = this.registry.get('equippedWeapon') || 1;
-        if (this.weaponText.active) {
-            if (w === 1) this.weaponText.setText("1 - ESPADA").setBackgroundColor('#0077ff');
-            if (w === 2) this.weaponText.setText("2 - ARCO").setBackgroundColor('#aa7700');
-            if (w === 3) this.weaponText.setText("3 - BOMBAS").setBackgroundColor('#555555');
-        }
-
-        if (this.isBossLevel && this.bosses && this.bosses.length > 0) {
-            const totalHp = this.bosses.reduce((acc, b) => acc + Math.max(0, b.hp), 0);
-            const totalMaxHp = this.bosses.reduce((acc, b) => acc + b.maxHp, 0);
-            const percent = totalMaxHp > 0 ? totalHp / totalMaxHp : 0;
-            
-            this.bossHpBar.width = 400 * percent;
-            if (totalHp <= 0) {
-                this.bossHpContainer.setVisible(false);
-            } else {
-                this.bossHpContainer.setVisible(true);
-            }
-        }
+        this.hudManager.update();
 
         if (this.player.hp <= 0 && !this.gameOver) {
             this.cameras.main.shake(500, 0.05);

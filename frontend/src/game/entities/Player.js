@@ -27,105 +27,73 @@ export class Player {
         this.sword.setVisible(false);
         this.sword.body.enable = false;
 
-        // Controles
-        this.cursors = scene.input.keyboard.createCursorKeys();
-        this.wasd = scene.input.keyboard.addKeys({
-            up: Phaser.Input.Keyboard.KeyCodes.W,
-            down: Phaser.Input.Keyboard.KeyCodes.S,
-            left: Phaser.Input.Keyboard.KeyCodes.A,
-            right: Phaser.Input.Keyboard.KeyCodes.D,
-            space: Phaser.Input.Keyboard.KeyCodes.SPACE,
-            shift: Phaser.Input.Keyboard.KeyCodes.SHIFT,
-            one: Phaser.Input.Keyboard.KeyCodes.ONE,
-            two: Phaser.Input.Keyboard.KeyCodes.TWO,
-            three: Phaser.Input.Keyboard.KeyCodes.THREE
-        });
+    // Controles unificados
+    this.inputManager = scene.inputManager;
 
-        // Dirección de mirada
-        this.facing = 1; 
-        
-        // Cooldowns y Estados
-        this.lastShotTime = 0;
-        this.lastBombTime = 0;
-        this.isDashing = false;
-        this.isInvulnerable = false;
-        this.dashCooldownTime = 0;
-        this.dashDuration = 1500; // milisegundos de cooldown total
+    // Dirección de mirada
+    this.facing = 1; 
+    
+    // Cooldowns y Estados
+    this.lastShotTime = 0;
+    this.lastBombTime = 0;
+    this.isDashing = false;
+    this.isInvulnerable = false;
+    this.dashCooldownTime = 0;
+    this.dashDuration = 1500; // milisegundos de cooldown total
 
-        // UI de Dash
-        this.dashBar = scene.add.rectangle(x, y + 40, 30, 4, 0x00ffff).setDepth(50);
+    // UI de Dash
+    this.dashBar = scene.add.rectangle(x, y + 40, 30, 4, 0x00ffff).setDepth(50);
+  }
+
+  update(time) {
+    if (this.hp <= 0) {
+      if (this.dashBar) this.dashBar.setVisible(false);
+      return;
     }
 
-    update(time) {
-        if (this.hp <= 0) {
-            if(this.dashBar) this.dashBar.setVisible(false);
-            return;
-        }
+    // Actualizar barra de Dash
+    this.dashBar.setPosition(this.sprite.x, this.sprite.y + 25);
+    const dashElapsed = time - (this.dashCooldownTime - 1500);
+    const dashPercent = Math.min(1, dashElapsed / 1500);
+    this.dashBar.width = 30 * dashPercent;
+    if (dashPercent < 1) this.dashBar.setFillStyle(0x555555);
+    else this.dashBar.setFillStyle(0x00ffff);
 
-        // Actualizar barra de Dash
-        this.dashBar.setPosition(this.sprite.x, this.sprite.y + 25);
-        const dashElapsed = time - (this.dashCooldownTime - 1500); 
-        const dashPercent = Math.min(1, dashElapsed / 1500);
-        this.dashBar.width = 30 * dashPercent;
-        if (dashPercent < 1) this.dashBar.setFillStyle(0x555555);
-        else this.dashBar.setFillStyle(0x00ffff);
+    if (this.isAttacking) {
+      this.sprite.body.velocity.x *= 0.5;
+      this.sprite.body.velocity.y *= 0.5;
+      this.updateSwordPosition();
+    } else if (this.isDashing) {
+      // Mantener velocidad de dash sin cambiar dirección
+    } else {
+      const move = this.inputManager.getMovement();
 
-        if (this.isAttacking) {
-            this.sprite.body.velocity.x *= 0.5;
-            this.sprite.body.velocity.y *= 0.5;
-            this.updateSwordPosition();
-        } else if (this.isDashing) {
-            // Mantener velocidad de dash sin cambiar dirección
+      if (move.x !== 0 || move.y !== 0) {
+        if (Math.abs(move.x) > Math.abs(move.y)) {
+          this.facing = move.x > 0 ? 1 : -1;
         } else {
-            let moveX = 0;
-            let moveY = 0;
-
-            if (this.cursors.left.isDown || this.wasd.left.isDown) moveX = -1;
-            else if (this.cursors.right.isDown || this.wasd.right.isDown) moveX = 1;
-
-            if (this.cursors.up.isDown || this.wasd.up.isDown) moveY = -1;
-            else if (this.cursors.down.isDown || this.wasd.down.isDown) moveY = 1;
-            
-            // Sobrescribir con input móvil si está activo
-            if (this.scene.mobileJoystick && this.scene.mobileJoystick.active) {
-                moveX = this.scene.mobileJoystick.vx;
-                moveY = this.scene.mobileJoystick.vy;
-            }
-
-            if (moveX !== 0 && moveY !== 0 && (!this.scene.mobileJoystick || !this.scene.mobileJoystick.active)) {
-                moveX *= 0.7071;
-                moveY *= 0.7071;
-            }
-
-            if (moveX !== 0 || moveY !== 0) {
-                if (Math.abs(moveX) > Math.abs(moveY)) {
-                    this.facing = moveX > 0 ? 1 : -1;
-                } else {
-                    this.facing = moveY > 0 ? -2 : 2; 
-                }
-            }
-
-            let vx = moveX * this.speed;
-            let vy = moveY * this.speed;
-
-            this.sprite.body.setVelocity(vx, vy);
-
-            // Dash
-            if (Phaser.Input.Keyboard.JustDown(this.wasd.shift) && time > this.dashCooldownTime) {
-                this.dash(time);
-            }
+          this.facing = move.y > 0 ? -2 : 2;
         }
+      }
 
-        // Cambiar Arma
-        if (Phaser.Input.Keyboard.JustDown(this.wasd.one)) this.equipWeapon(1);
-        if (Phaser.Input.Keyboard.JustDown(this.wasd.two) && this.scene.registry.get('hasBow')) this.equipWeapon(2);
-        if (Phaser.Input.Keyboard.JustDown(this.wasd.three) && this.scene.registry.get('hasBombs')) this.equipWeapon(3);
+      this.sprite.body.setVelocity(move.x * this.speed, move.y * this.speed);
 
-        // Atacar
-        if ((Phaser.Input.Keyboard.JustDown(this.cursors.space) || Phaser.Input.Keyboard.JustDown(this.wasd.space)) && !this.isDashing) {
-            if(!this.isAttacking) this.attack(time);
-        }
+      // Dash
+      if (this.inputManager.isActionJustDown('dash') && time > this.dashCooldownTime) {
+        this.dash(time);
+      }
     }
+
+    // Cambiar Arma
+    if (this.inputManager.isActionJustDown('weapon1')) this.equipWeapon(1);
+    if (this.inputManager.isActionJustDown('weapon2') && this.scene.registry.get('hasBow')) this.equipWeapon(2);
+    if (this.inputManager.isActionJustDown('weapon3') && this.scene.registry.get('hasBombs')) this.equipWeapon(3);
+
+    // Atacar
+    if (this.inputManager.isActionJustDown('attack') && !this.isDashing) {
+      if (!this.isAttacking) this.attack(time);
+    }
+  }
 
     dash(time) {
         if (!time) time = this.scene.time.now;
