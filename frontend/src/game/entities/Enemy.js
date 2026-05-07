@@ -783,22 +783,28 @@ export class LaserEliteEnemy extends Enemy {
         this.isFiringLaser = true;
         this.sprite.setFillStyle(0xffffff);
         
-        // Indicador de carga (línea de aviso)
-        const line = this.scene.add.line(0, 0, this.sprite.x, this.sprite.y, playerSprite.x, playerSprite.y, 0xff00ff, 0.3).setOrigin(0).setDepth(50);
+        // 1. BLOQUEAR EL ÁNGULO AL INICIO (Donde apunta el haz de luz)
+        const lockedAngle = Phaser.Math.Angle.Between(this.sprite.x, this.sprite.y, playerSprite.x, playerSprite.y);
         
-        this.scene.time.delayedCall(800, () => {
+        // Indicador de carga (haz de luz estático)
+        const line = this.scene.add.line(0, 0, this.sprite.x, this.sprite.y, 
+            this.sprite.x + Math.cos(lockedAngle) * 1200, 
+            this.sprite.y + Math.sin(lockedAngle) * 1200, 
+            0xff00ff, 0.3).setOrigin(0).setDepth(50);
+        
+        // Reducido tiempo de carga de 800 a 500ms
+        this.scene.time.delayedCall(500, () => {
             line.destroy();
             if (!this.sprite?.active || this.isDead) {
                 this.isFiringLaser = false;
                 return;
             }
 
-            // Disparo del rayo (un rectángulo largo)
-            const angle = Phaser.Math.Angle.Between(this.sprite.x, this.sprite.y, playerSprite.x, playerSprite.y);
+            // Disparo del rayo (usa el ángulo bloqueado)
             const beam = this.scene.add.rectangle(this.sprite.x, this.sprite.y, 1200, 25, 0xff00ff, 0.7).setOrigin(0, 0.5).setDepth(51);
-            beam.setRotation(angle);
+            beam.setRotation(lockedAngle);
             
-            // Detección de colisión manual (Arcade Physics no soporta rotación para cuerpos)
+            // Detección de colisión manual
             let hasHit = false;
             const checkCollision = () => {
                 if (hasHit || !beam.active || !this.scene.player) return;
@@ -807,7 +813,7 @@ export class LaserEliteEnemy extends Enemy {
                 if (dist > 1200) return; // Fuera de rango
                 
                 const angToPlayer = Phaser.Math.Angle.Between(this.sprite.x, this.sprite.y, player.sprite.x, player.sprite.y);
-                const diff = Math.abs(Phaser.Math.Angle.Wrap(angToPlayer - angle));
+                const diff = Math.abs(Phaser.Math.Angle.Wrap(angToPlayer - lockedAngle));
                 
                 if (diff < 0.15 && !player.isInvulnerable) { // Margen reducido para que sea más justo esquivar
                     hasHit = true;
