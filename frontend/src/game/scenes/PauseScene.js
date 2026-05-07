@@ -30,6 +30,32 @@ export default class PauseScene extends Phaser.Scene {
         this.createButton(panel, 0, 40,   "REINTENTAR",     0xff00e1, () => this.restart());
         this.createButton(panel, 0, 130,  "SALIR AL MENÚ", 0x333333, () => this.goToMenu());
 
+        // Botón Silenciar (debajo de los otros)
+        const muteLabelInicial = window.isMuted ? '🔇  ACTIVAR SONIDO' : '🔊  SILENCIAR';
+        const muteColor = 0xffaa00;
+        const muteBtnBg = this.add.rectangle(0, 215, 280, 60, muteColor, 0.1).setInteractive();
+        muteBtnBg.setStrokeStyle(1, muteColor, 0.5);
+        const muteBtnTxt = this.add.text(0, 215, muteLabelInicial, {
+            fontFamily: 'Orbitron, sans-serif',
+            fontSize: '16px', fill: '#fff', fontStyle: 'bold'
+        }).setOrigin(0.5);
+        panel.add([muteBtnBg, muteBtnTxt]);
+
+        muteBtnBg.on('pointerover', () => { muteBtnBg.setFillStyle(muteColor, 0.3); muteBtnBg.setStrokeStyle(1, muteColor, 1); });
+        muteBtnBg.on('pointerout',  () => { muteBtnBg.setFillStyle(muteColor, 0.1); muteBtnBg.setStrokeStyle(1, muteColor, 0.5); });
+        muteBtnBg.on('pointerdown', () => {
+            const muted = window.toggleMute ? window.toggleMute() : false;
+            muteBtnTxt.setText(muted ? '🔇  ACTIVAR SONIDO' : '🔊  SILENCIAR');
+            // Silenciar también la música in-game de Phaser
+            const mainScene = this.scene.get('MainScene');
+            if (mainScene && mainScene.sound) {
+                mainScene.sound.setMute(muted);
+            }
+        });
+
+        // Aumentar tamaño del panel para que quepa el nuevo botón
+        bg.height = 530;
+
         // Scanline decorativa
         const line = this.add.rectangle(0, -bg.height/2, bg.width, 2, 0x00f2ff, 0.2);
         panel.add(line);

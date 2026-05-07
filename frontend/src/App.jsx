@@ -18,10 +18,12 @@ function App() {
     }
   };
 
-  // Exponer función para que Phaser detenga la música
+  // Exponer funciones globales de audio para que Phaser pueda controlar la música
   useEffect(() => {
+    window.isMuted = false;
+
     window.playMenuMusic = () => {
-      if (audioRef.current && audioRef.current.paused) {
+      if (audioRef.current && audioRef.current.paused && !window.isMuted) {
         audioRef.current.volume = 0.5;
         audioRef.current.play().catch(e => console.log(e));
       }
@@ -29,17 +31,32 @@ function App() {
 
     window.stopMenuMusic = () => {
       if (audioRef.current) {
-        // Fade out suave
         const fadeOut = setInterval(() => {
-          if (audioRef.current.volume > 0.05) {
+          if (audioRef.current && audioRef.current.volume > 0.05) {
             audioRef.current.volume -= 0.05;
           } else {
-            audioRef.current.pause();
-            audioRef.current.volume = 0.5; // Reset para la próxima vez
+            if (audioRef.current) {
+              audioRef.current.pause();
+              audioRef.current.volume = 0.5;
+            }
             clearInterval(fadeOut);
           }
         }, 50);
       }
+    };
+
+    // Silenciar / Activar toda la música
+    window.toggleMute = () => {
+      window.isMuted = !window.isMuted;
+      if (audioRef.current) {
+        if (window.isMuted) {
+          audioRef.current.volume = 0;
+        } else {
+          audioRef.current.volume = 0.5;
+          audioRef.current.play().catch(e => console.log(e));
+        }
+      }
+      return window.isMuted;
     };
   }, []);
 
