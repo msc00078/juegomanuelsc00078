@@ -573,13 +573,8 @@ export default class MainScene extends Phaser.Scene {
         // Bonus de estadísticas reducidos significativamente a petición del usuario
         elite.hp = Math.round(elite.hp * 1.2);
         elite.maxHp = elite.hp;
-<<<<<<< HEAD
-        elite.contactDamage = Math.round(elite.contactDamage * 1.5);
-        elite.sprite.setScale(elite.sprite.scaleX * 1.3);
-=======
         elite.contactDamage = Math.round(elite.contactDamage * 1.1);
-        elite.sprite.setScale(elite.sprite.scale * 1.2);
->>>>>>> a4fa19942644ce4309c957386e3bc9e997cd86c1
+        elite.sprite.setScale(elite.sprite.scaleX * 1.2);
 
         this.enemies.push(elite);
         this.setupEnemyCollisions(elite);
@@ -1045,11 +1040,10 @@ export default class MainScene extends Phaser.Scene {
         // Probabilidades de sala aumentadas para tienda y eventos
         const r = Math.random();
         let nextNode = 'combat';
-        if (r < 0.55) nextNode = 'combat'; // 55% combate normal
-        else if (r < 0.625) nextNode = 'elite'; // 7.5% elite
-        else if (r < 0.70) nextNode = 'treasure'; // 7.5% tesoro
-        else if (r < 0.85) nextNode = 'shop'; // 15% tienda
-        else nextNode = 'event'; // 15% evento
+        if (r < 0.02) nextNode = 'combat'; // 2% combate normal
+        else if (r < 0.97) nextNode = 'elite'; // 95% elite (PARA TESTEO)
+        else if (r < 0.985) nextNode = 'treasure'; // 1.5% tesoro
+        else nextNode = 'shop'; // 1% tienda (event removido para testeo)
 
         this.registry.set('nextNodeType', nextNode);
 
