@@ -401,7 +401,7 @@ export default class MainScene extends Phaser.Scene {
         elite.hp = Math.round(elite.hp * 1.2);
         elite.maxHp = elite.hp;
         elite.contactDamage = Math.round(elite.contactDamage * 1.1);
-        elite.sprite.setScale(elite.sprite.scale * 1.2);
+        elite.sprite.setScale(elite.sprite.scaleX * 1.2);
 
         this.enemies.push(elite);
         this.setupEnemyCollisions(elite);

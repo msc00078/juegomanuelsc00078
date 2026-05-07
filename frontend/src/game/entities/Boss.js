@@ -109,7 +109,7 @@ export class Boss {
             this.aura.setVisible?.(true);
             this.aura.setFillStyle?.(0xff0000, 0.3);
             this.scene.tweens?.add({
-                targets: this.aura, scale: 1.6,
+                targets: this.aura, scaleX: 1.6, scaleY: 1.6,
                 duration: 800, yoyo: true, repeat: -1
             });
             this.scene.bossText?.setText('¡ESTO NO HA TERMINADO!');

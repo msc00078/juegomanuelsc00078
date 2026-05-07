@@ -96,23 +96,23 @@ export default class MenuScene extends Phaser.Scene {
         playBg.on('pointerover', () => {
             playBg.setFillStyle(0x00f2ff, 0.3);
             playBg.setStrokeStyle(2, 0x00f2ff, 1);
-            this.tweens.add({ targets: playBtnContainer, scale: 1.05, duration: 200 });
+            this.tweens.add({ targets: playBtnContainer, scaleX: 1.05, scaleY: 1.05, duration: 200 });
         });
         playBg.on('pointerout', () => {
             playBg.setFillStyle(0x00f2ff, 0.1);
             playBg.setStrokeStyle(2, 0x00f2ff, 0.5);
-            this.tweens.add({ targets: playBtnContainer, scale: 1, duration: 200 });
+            this.tweens.add({ targets: playBtnContainer, scaleX: 1, scaleY: 1, duration: 200 });
         });
         
         upgradeBg.on('pointerover', () => {
             upgradeBg.setFillStyle(0xff00e1, 0.3);
             upgradeBg.setStrokeStyle(2, 0xff00e1, 1);
-            this.tweens.add({ targets: upgradeBtnContainer, scale: 1.05, duration: 200 });
+            this.tweens.add({ targets: upgradeBtnContainer, scaleX: 1.05, scaleY: 1.05, duration: 200 });
         });
         upgradeBg.on('pointerout', () => {
             upgradeBg.setFillStyle(0xff00e1, 0.1);
             upgradeBg.setStrokeStyle(2, 0xff00e1, 0.5);
-            this.tweens.add({ targets: upgradeBtnContainer, scale: 1, duration: 200 });
+            this.tweens.add({ targets: upgradeBtnContainer, scaleX: 1, scaleY: 1, duration: 200 });
         });
         upgradeBg.on('pointerdown', () => this.scene.start('UpgradeScene'));
 
