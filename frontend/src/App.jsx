@@ -102,7 +102,7 @@ function App() {
     <div className="App">
 
       {/* Música de Menú Global */}
-      <audio ref={audioRef} src="/src/assets/audio/menu_theme.mp3" loop />
+      <audio ref={audioRef} src="/assets/audio/menu_theme.mp3" loop />
 
       {/* ---- Pantalla de aviso móvil ---- */}
       {showMobileWarning && (
