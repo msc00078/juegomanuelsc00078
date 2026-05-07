@@ -1,6 +1,22 @@
 # Changelog - AI Boss Arena (Roguelike Edition)
 
 Todas las novedades y mejoras implementadas en el proyecto.
+\n## [3.0.0] - 2026-05-07
+### Añadido
+- **Sistema de Audio Inmersivo**:
+  - Implementación de SFX para Espada, Arco y Bombas.
+  - Añadido sonido de derrota (Game Over) para mayor feedback.
+  - Rotación dinámica de pistas musicales in-game.
+- **Estabilidad de Jefes**: 
+  - Refactor de `spawnBoss` para evitar crashes en la inicialización de UI.
+  - Barra de vida de jefe dual (suma la vida de todos los jefes activos).
+- **Kamikazes Letales**: Rediseño de la explosión para que inflija daño real y empuje al jugador.
+\n### Corregido
+- **Solapamiento de Música**: Limpieza agresiva de instancias de audio para evitar que suenen varias pistas a la vez.
+- **Reliquias**: 
+  - `Glitch Adhesivo` (Bombas Pegajosas) ahora rastrea jefes y persigue objetivos en movimiento.
+  - `Ojo del Debugger` (Sniper) ajustado para activarse a menor distancia y con mayor daño.
+- **Fugas de UI**: Eliminación de barras de vida huérfanas tras explosiones kamikaze.
 
 ## [2.1.0] - 2026-05-07
 ### Añadido

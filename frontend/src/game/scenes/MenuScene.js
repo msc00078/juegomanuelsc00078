@@ -61,7 +61,7 @@ export default class MenuScene extends Phaser.Scene {
             repeat: -1
         });
 
-        this.add.text(this.scale.width / 2, this.scale.height * 0.35, "Simulación Crítica v2.3.0 // Tú no deberías existir.", { 
+        this.add.text(this.scale.width / 2, this.scale.height * 0.35, "Simulación Crítica v3.0.0 // Tú no deberías existir.", { 
             fontFamily: 'Inter, sans-serif',
             fontSize: '20px', 
             fill: '#00f2ff',
