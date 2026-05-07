@@ -58,6 +58,11 @@ export default class MainScene extends Phaser.Scene {
         this.isBossLevel = (this.currentLevel % 5 === 0);
         this.isCountdown = true;
         this.nodeType = this.registry.get('nextNodeType') || 'combat';
+        
+        // Inicializar gestión de música si no existe
+        if (!this.registry.get('currentMusicKey')) {
+            this.registry.set('currentMusicKey', null);
+        }
     }
 
     create() {
@@ -139,6 +144,9 @@ export default class MainScene extends Phaser.Scene {
             fontFamily: 'Orbitron, sans-serif',
             fontSize: '24px', fill: '#ff00e1', fontStyle: 'bold'
         }).setOrigin(1, 0.5).setDepth(101).setScrollFactor(0);
+
+        // --- GESTIÓN DE MÚSICA IN-GAME ---
+        this.handleMusic();
 
         // Arma HUD
         this.weaponContainer = this.add.container(this.scale.width / 2, this.scale.height - 40).setDepth(101).setScrollFactor(0);
@@ -1368,6 +1376,9 @@ export default class MainScene extends Phaser.Scene {
         // Guardar resultado (El servidor calculará los cristales ganados de forma segura)
         saveRunResult(this.score, this.currentLevel).catch(err => console.error(err));
 
+        // Detener música in-game
+        this.sound.stopAll();
+
         // Auto-reinicio tras 5 segundos
         const restartTimer = this.time.delayedCall(5000, () => {
             this.scene.start('MenuScene');
@@ -1384,5 +1395,65 @@ export default class MainScene extends Phaser.Scene {
                 this.scene.start('MenuScene');
             });
         });
+    }
+
+    handleMusic() {
+        // Determinar la CATEGORÍA de música necesaria
+        const isCritical = this.isBossLevel || this.nodeType === 'elite';
+        const currentMusicKey = this.registry.get('currentMusicKey');
+
+        // CASO A: Necesitamos música de JEFE/ELITE
+        if (isCritical) {
+            if (currentMusicKey !== 'game_boss') {
+                this.switchTrack('game_boss');
+            }
+            return;
+        }
+
+        // CASO B: Necesitamos música NORMAL
+        // Si ya está sonando una pista normal (1 o 2), no hacemos nada para que siga sonando hasta que acabe
+        if (currentMusicKey === 'game_track1' || currentMusicKey === 'game_track2') {
+            // Verificar si la música se ha detenido por alguna razón (aunque tenga loop)
+            const currentMusic = this.sound.get(currentMusicKey);
+            if (!currentMusic || !currentMusic.isPlaying) {
+                // Si se detuvo, rotamos a la otra
+                const nextTrack = currentMusicKey === 'game_track1' ? 'game_track2' : 'game_track1';
+                this.switchTrack(nextTrack);
+            }
+            return;
+        }
+
+        // CASO C: No hay música o venimos de un Boss
+        // Empezamos con la pista 1 por defecto
+        this.switchTrack('game_track1');
+    }
+
+    switchTrack(targetTrack) {
+        const currentMusicKey = this.registry.get('currentMusicKey');
+
+        // Detener la anterior con fade
+        if (currentMusicKey) {
+            const currentMusic = this.sound.get(currentMusicKey);
+            if (currentMusic) {
+                this.tweens.add({
+                    targets: currentMusic,
+                    volume: 0,
+                    duration: 1000,
+                    onComplete: () => currentMusic.stop()
+                });
+            }
+        }
+
+        // Iniciar la nueva (con loop para que no haya silencios, pero detectamos si el usuario quiere rotación)
+        const music = this.sound.add(targetTrack, { loop: true, volume: 0 });
+        music.play();
+        
+        this.tweens.add({
+            targets: music,
+            volume: 0.5,
+            duration: 1000
+        });
+
+        this.registry.set('currentMusicKey', targetTrack);
     }
 }

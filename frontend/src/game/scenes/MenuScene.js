@@ -7,6 +7,9 @@ export default class MenuScene extends Phaser.Scene {
     }
 
     create() {
+        // Iniciar/Asegurar música de menú global
+        if (window.playMenuMusic) window.playMenuMusic();
+
         // Fondo Profundo con Gradiente
         const bg = this.add.graphics();
         bg.fillGradientStyle(0x050505, 0x050505, 0x111111, 0x111111, 1);
@@ -167,6 +170,10 @@ export default class MenuScene extends Phaser.Scene {
             this.registry.set('maxCombo', 0);
             
             this.registry.set('nextNodeType', 'combat'); // Empezar con combate
+            
+            // Detener la música del menú global (React)
+            if (window.stopMenuMusic) window.stopMenuMusic();
+            
             this.scene.start('MainScene');
         });
 

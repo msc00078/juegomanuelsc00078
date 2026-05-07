@@ -6,9 +6,42 @@ import './App.css';
 
 function App() {
   const gameRef = useRef(null);
+  const audioRef = useRef(null);
   const [showMobileWarning, setShowMobileWarning] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
   const [user, setUser] = useState(null);
+
+  // Función para iniciar la música (el navegador exige interacción previa)
+  const playMusic = () => {
+    if (audioRef.current && audioRef.current.paused) {
+      audioRef.current.play().catch(e => console.log("Auto-play bloqueado hasta interacción:", e));
+    }
+  };
+
+  // Exponer función para que Phaser detenga la música
+  useEffect(() => {
+    window.playMenuMusic = () => {
+      if (audioRef.current && audioRef.current.paused) {
+        audioRef.current.volume = 0.5;
+        audioRef.current.play().catch(e => console.log(e));
+      }
+    };
+
+    window.stopMenuMusic = () => {
+      if (audioRef.current) {
+        // Fade out suave
+        const fadeOut = setInterval(() => {
+          if (audioRef.current.volume > 0.05) {
+            audioRef.current.volume -= 0.05;
+          } else {
+            audioRef.current.pause();
+            audioRef.current.volume = 0.5; // Reset para la próxima vez
+            clearInterval(fadeOut);
+          }
+        }, 50);
+      }
+    };
+  }, []);
 
   // Detectar móvil al montar
   useEffect(() => {
@@ -39,6 +72,7 @@ function App() {
   }, [gameStarted, user]);
 
   const handleStartMobile = async () => {
+    playMusic(); // Iniciar música al tocar el aviso móvil
     try {
       // 1) Solicitar pantalla completa (elimina barra del navegador)
       const el = document.documentElement;
@@ -67,6 +101,9 @@ function App() {
   return (
     <div className="App">
 
+      {/* Música de Menú Global */}
+      <audio ref={audioRef} src="/src/assets/audio/menu_theme.mp3" loop />
+
       {/* ---- Pantalla de aviso móvil ---- */}
       {showMobileWarning && (
         <div className="mobile-warning" onClick={handleStartMobile}>
@@ -79,7 +116,9 @@ function App() {
       
       {/* ---- Pantalla de Login (Supabase) ---- */}
       {!user && !showMobileWarning && (
-        <Auth onLogin={(user) => setUser(user)} />
+        <div onClick={playMusic}>
+          <Auth onLogin={(user) => setUser(user)} />
+        </div>
       )}
 
       {/* ---- Cabecera (solo escritorio y logueado) ---- */}
