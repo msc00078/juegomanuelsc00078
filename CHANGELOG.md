@@ -2,6 +2,16 @@
 
 Todas las novedades y mejoras implementadas en el proyecto.
 
+## [2.1.0] - 2026-05-07
+### Añadido
+- **Modularización de Entidades**: Migración de todos los tipos de enemigos a clases individuales heredando de `EnemyBase`.
+- **Arquitectura de Gestores (Managers)**:
+  - `InputManager`: Unifica el control táctil y teclado.
+  - `HUDManager`: Gestiona toda la UI dinámica (vida, XP, oro, combo, armas).
+  - `SpawnManager`: Controla la lógica de aparición y escalado de enemigos.
+  - `MobileControls`: Desacopla la interfaz de botones para dispositivos móviles.
+- **Limpieza de Código Legado**: Eliminación de `Enemy.js` y refactorización masiva de `MainScene.js`.
+
 ## [2.0.0] - 2026-05-06
 > **Versión mayor** — Sistema de enemigos completamente renovado, Boss con IA mejorada y nuevo ecosistema de escalado de dificultad.
 ### Añadido
