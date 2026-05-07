@@ -30,47 +30,28 @@ export const signIn = async (email, password) => {
     return await supabase.auth.signInWithPassword({ email, password });
 };
 
-// Función para guardar puntuación y progreso
-export const saveRunResult = async (score, sector, crystalsEarned) => {
+// Función para guardar puntuación y progreso de forma SEGURA (Validado en Servidor)
+export const saveRunResult = async (score, sector) => {
+    if (!supabase) return;
     try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
-
-        // Primero obtenemos los datos actuales para sumar los cristales
-        const { data: profile } = await supabase
-            .from('profiles')
-            .select('total_crystals, high_score, max_sector')
-            .eq('id', user.id)
-            .single();
-
-        let newHighScore = score || 0;
-        let newMaxSector = sector || 1;
-        let newTotalCrystals = crystalsEarned || 0;
-
-        if (profile) {
-            newHighScore = Math.max(profile.high_score || 0, score || 0);
-            newMaxSector = Math.max(profile.max_sector || 1, sector || 1);
-            newTotalCrystals = (profile.total_crystals || 0) + (crystalsEarned || 0);
-        }
-
-        const { error } = await supabase
-            .from('profiles')
-            .upsert({ 
-                id: user.id,
-                username: profile?.username || user.email.split('@')[0],
-                high_score: newHighScore, 
-                max_sector: newMaxSector,
-                total_crystals: newTotalCrystals,
-                updated_at: new Date().toISOString()
-            }, { onConflict: 'id' });
+        // Usamos una función RPC de Supabase para que el servidor calcule los cristales
+        // y aplique límites de seguridad, evitando que el usuario los manipule en el cliente.
+        const { error } = await supabase.rpc('registrar_fin_partida', {
+            p_score: Math.floor(score || 0),
+            p_sector: Math.floor(sector || 1)
+        });
             
         if (error) {
-            console.error("Error guardando run:", error);
-            alert("⚠️ Error guardando tu puntuación en Supabase: " + error.message + "\n\n¿Tienes configuradas las políticas RLS de INSERT/UPDATE para la tabla 'profiles'?");
+            console.error("Error validando partida en servidor:", error);
+            // Si el error es que la función no existe, es que el usuario no ha ejecutado el SQL
+            if (error.code === 'P0001') {
+                alert("⚠️ Error de seguridad: " + error.message);
+            }
+        } else {
+            console.log("🛡️ Puntuación validada y guardada por el servidor.");
         }
     } catch (err) {
-        console.error("Error crítico en saveRunResult:", err);
-        alert("⚠️ Error crítico conectando con el ranking: " + err.message);
+        console.error("Error crítico en comunicación con servidor:", err);
     }
 };
 

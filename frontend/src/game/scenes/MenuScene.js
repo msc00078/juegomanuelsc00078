@@ -7,6 +7,9 @@ export default class MenuScene extends Phaser.Scene {
     }
 
     create() {
+        // Iniciar/Asegurar música de menú global
+        if (window.playMenuMusic) window.playMenuMusic();
+
         // Fondo Profundo con Gradiente
         const bg = this.add.graphics();
         bg.fillGradientStyle(0x050505, 0x050505, 0x111111, 0x111111, 1);
@@ -167,6 +170,10 @@ export default class MenuScene extends Phaser.Scene {
             this.registry.set('maxCombo', 0);
             
             this.registry.set('nextNodeType', 'combat'); // Empezar con combate
+            
+            // Detener la música del menú global (React)
+            if (window.stopMenuMusic) window.stopMenuMusic();
+            
             this.scene.start('MainScene');
         });
 
@@ -244,5 +251,26 @@ export default class MenuScene extends Phaser.Scene {
             fill: '#444', 
             letterSpacing: 4 
         }).setOrigin(0.5);
+
+        // Botón de Silenciar (esquina inferior derecha)
+        const muteBtn = this.add.text(
+            this.scale.width - 20, 
+            this.scale.height - 20, 
+            window.isMuted ? '🔇 MUTE' : '🔊 SONIDO',
+            {
+                fontFamily: 'Orbitron, sans-serif',
+                fontSize: '14px',
+                fill: '#555',
+                backgroundColor: 'rgba(0,0,0,0.4)',
+                padding: { x: 8, y: 5 }
+            }
+        ).setOrigin(1, 1).setInteractive({ useHandCursor: true }).setDepth(200);
+
+        muteBtn.on('pointerover', () => muteBtn.setFill('#00f2ff'));
+        muteBtn.on('pointerout', () => muteBtn.setFill('#555'));
+        muteBtn.on('pointerdown', () => {
+            const muted = window.toggleMute ? window.toggleMute() : false;
+            muteBtn.setText(muted ? '🔇 MUTE' : '🔊 SONIDO');
+        });
     }
 }

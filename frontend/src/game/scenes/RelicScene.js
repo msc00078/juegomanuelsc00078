@@ -15,7 +15,8 @@ const ALL_RELICS = [
     { id: 'vip', name: "ACCESO ROOT", desc: "Tienda 20% más barata", color: 0xffdd00 },
     { id: 'sangrado', name: "FILO CORRUPTO", desc: "Espada aplica daño en el tiempo", color: 0x880000 },
     { id: 'artemisa', name: "MATRIZ DE ARTEMISA", desc: "Dispara 3 flechas en abanico", color: 0x00ffaa },
-    { id: 'pegajosa', name: "GLITCH ADHESIVO", desc: "Las bombas se pegan al objetivo", color: 0x005500 }
+    { id: 'pegajosa', name: "GLITCH ADHESIVO", desc: "Las bombas se pegan al objetivo", color: 0x005500 },
+    { id: 'bypass_key', name: "LLAVE MAESTRA", desc: "+25% Prob. de bypass de Élite", color: 0x00ffcc }
 ];
 
 export default class RelicScene extends Phaser.Scene {

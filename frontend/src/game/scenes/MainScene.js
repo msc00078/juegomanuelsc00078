@@ -2,7 +2,7 @@ import * as Phaser from 'phaser';
 import { Player } from '../entities/Player';
 import { Boss } from '../entities/Boss';
 import { StandardEnemy, TankEnemy, RangedEnemy, KamikazeEnemy, SummonerEnemy,
-         TeleporterEnemy, HealerEnemy, GuardianEnemy, TrapperEnemy,
+         TeleporterEnemy, HealerEnemy, GuardianEnemy, TrapperEnemy, LaserEliteEnemy,
          applyEnemyScaling } from '../entities/Enemy';
 import { saveRunResult } from '../supabase';
 import axios from 'axios';
@@ -54,8 +54,15 @@ export default class MainScene extends Phaser.Scene {
         this.gold = this.registry.get('gold');
         this.score = this.registry.get('score');
         this.gameOver = false;
+        this.isChangingLevel = false;
         this.isBossLevel = (this.currentLevel % 5 === 0);
         this.isCountdown = true;
+        this.nodeType = this.registry.get('nextNodeType') || 'combat';
+        
+        // Inicializar gestión de música si no existe
+        if (!this.registry.get('currentMusicKey')) {
+            this.registry.set('currentMusicKey', null);
+        }
     }
 
     create() {
@@ -76,6 +83,7 @@ export default class MainScene extends Phaser.Scene {
         this.xpOrbs = this.physics.add.group();
         this.enemySprites = this.physics.add.group();
         this.trapZones = this.physics.add.staticGroup(); // zonas de ralentización del Trampero
+        this.crates = this.physics.add.staticGroup(); // Obstáculos
         this.portal = null;
 
         this.nodeType = this.registry.get('nextNodeType') || 'combat';
@@ -136,6 +144,9 @@ export default class MainScene extends Phaser.Scene {
             fontFamily: 'Orbitron, sans-serif',
             fontSize: '24px', fill: '#ff00e1', fontStyle: 'bold'
         }).setOrigin(1, 0.5).setDepth(101).setScrollFactor(0);
+
+        // --- GESTIÓN DE MÚSICA IN-GAME ---
+        this.handleMusic();
 
         // Arma HUD
         this.weaponContainer = this.add.container(this.scale.width / 2, this.scale.height - 40).setDepth(101).setScrollFactor(0);
@@ -250,6 +261,14 @@ export default class MainScene extends Phaser.Scene {
                     }
                 });
 
+                // NUEVO: Los bloques paran los proyectiles/ataques del boss
+                // Usamos overlap y comprobamos existencia para evitar crashes en dispositivos móviles
+                this.physics.add.overlap(boss.attacks, this.crates, (attackObj) => {
+                    if (attackObj && attackObj.active) {
+                        attackObj.destroy();
+                    }
+                });
+
                 this.physics.add.overlap(this.arrows, boss.sprite, (bossSprite, arrow) => {
                     if (boss.hp > 0) {
                         const relics = this.registry.get('relics') || [];
@@ -302,7 +321,6 @@ export default class MainScene extends Phaser.Scene {
             this.gainXp(10);
         });
 
-        this.crates = this.physics.add.staticGroup();
         this.physics.add.collider(this.player.sprite, this.crates);
 
         // Usar group en lugar de map para que afecte a futuros enemigos
@@ -397,13 +415,13 @@ export default class MainScene extends Phaser.Scene {
         
         this.mobileJoystick = { vx: 0, vy: 0, active: false };
 
-        const joyY = this.scale.height - 120;
-        const base = this.add.circle(130, joyY, 70, 0xffffff, 0.2).setDepth(1000).setScrollFactor(0);
-        const stick = this.add.circle(130, joyY, 35, 0x00ffff, 0.5).setDepth(1001).setScrollFactor(0);
+        const joyY = this.scale.height - 180;
+        const base = this.add.circle(130, joyY, 85, 0xffffff, 0.2).setDepth(1000).setScrollFactor(0);
+        const stick = this.add.circle(130, joyY, 40, 0x00ffff, 0.5).setDepth(1001).setScrollFactor(0);
         
-        const atkY = this.scale.height - 130;
-        const attackBtn = this.add.circle(this.scale.width - 110, atkY, 55, 0xff0000, 0.5).setDepth(1000).setScrollFactor(0).setInteractive();
-        const attackTxt = this.add.text(this.scale.width - 110, atkY, "ATK", { fontSize: '22px', fill: '#fff', fontStyle: 'bold' }).setOrigin(0.5).setDepth(1001).setScrollFactor(0);
+        const atkY = this.scale.height - 200;
+        const attackBtn = this.add.circle(this.scale.width - 120, atkY, 75, 0xff0000, 0.5).setDepth(1000).setScrollFactor(0).setInteractive();
+        const attackTxt = this.add.text(this.scale.width - 120, atkY, "ATK", { fontSize: '28px', fill: '#fff', fontStyle: 'bold' }).setOrigin(0.5).setDepth(1001).setScrollFactor(0);
         
         attackBtn.on('pointerdown', () => { 
             attackBtn.setAlpha(0.8);
@@ -412,9 +430,9 @@ export default class MainScene extends Phaser.Scene {
         attackBtn.on('pointerup', () => attackBtn.setAlpha(0.5));
         attackBtn.on('pointerout', () => attackBtn.setAlpha(0.5));
         
-        const dashY = this.scale.height - 60;
-        const dashBtn = this.add.circle(this.scale.width - 230, dashY, 42, 0x00ff00, 0.5).setDepth(1000).setScrollFactor(0).setInteractive();
-        const dashTxt = this.add.text(this.scale.width - 230, dashY, "DASH", { fontSize: '18px', fill: '#fff', fontStyle: 'bold' }).setOrigin(0.5).setDepth(1001).setScrollFactor(0);
+        const dashY = this.scale.height - 90;
+        const dashBtn = this.add.circle(this.scale.width - 250, dashY, 55, 0x00ff00, 0.5).setDepth(1000).setScrollFactor(0).setInteractive();
+        const dashTxt = this.add.text(this.scale.width - 250, dashY, "DASH", { fontSize: '22px', fill: '#fff', fontStyle: 'bold' }).setOrigin(0.5).setDepth(1001).setScrollFactor(0);
         
         dashBtn.on('pointerdown', () => { 
             dashBtn.setAlpha(0.8);
@@ -481,8 +499,13 @@ export default class MainScene extends Phaser.Scene {
         const fightBtn = this.add.rectangle(cx - 120, cy + 50, 180, 55, 0x00ffff).setInteractive().setDepth(201);
         const fightTxt = this.add.text(cx - 120, cy + 50, "PURGAR ENTE", { fontSize: '18px', fill: '#000', fontStyle: 'bold' }).setOrigin(0.5).setDepth(202);
 
+        const relics = this.registry.get('relics') || [];
+        let baseProb = Phaser.Math.Between(30, 70); // Probability between 30 and 70
+        if (relics.includes('bypass_key')) baseProb += 25;
+        if (baseProb > 95) baseProb = 95; // Cap at 95%
+
         const escapeBtn = this.add.rectangle(cx + 120, cy + 50, 180, 55, 0x333333).setInteractive().setDepth(201);
-        const escapeTxt = this.add.text(cx + 120, cy + 50, "BYPASS (50%)", { fontSize: '18px', fill: '#fff', fontStyle: 'bold' }).setOrigin(0.5).setDepth(202);
+        const escapeTxt = this.add.text(cx + 120, cy + 50, `BYPASS (${baseProb}%)`, { fontSize: '18px', fill: '#fff', fontStyle: 'bold' }).setOrigin(0.5).setDepth(202);
 
         const cleanup = () => {
             bg.destroy(); title.destroy(); desc.destroy();
@@ -494,6 +517,8 @@ export default class MainScene extends Phaser.Scene {
         fightBtn.on('pointerout', () => fightBtn.setFillStyle(0xaa0000));
 
         fightBtn.on('pointerdown', () => {
+            fightBtn.disableInteractive();
+            escapeBtn.disableInteractive();
             cleanup();
             this.isWaitingForElite = false;
             this.spawnElite();
@@ -503,7 +528,9 @@ export default class MainScene extends Phaser.Scene {
         escapeBtn.on('pointerout', () => escapeBtn.setFillStyle(0x555555));
 
         escapeBtn.on('pointerdown', () => {
-            if (Math.random() < 0.5) {
+            fightBtn.disableInteractive();
+            escapeBtn.disableInteractive();
+            if (Math.random() * 100 <= baseProb) {
                 const msg = this.add.text(this.scale.width / 2, this.scale.height / 2 + 80, "¡Escapaste con éxito!", { fontSize: '24px', fill: '#00ff00', backgroundColor: '#000' }).setOrigin(0.5).setDepth(205);
                 this.time.delayedCall(1000, () => {
                     cleanup(); msg.destroy();
@@ -535,28 +562,24 @@ export default class MainScene extends Phaser.Scene {
     }
 
     spawnElite() {
-        // Un Élite es una anomalía con nivel superior al actual (+15)
-        const eliteLevel = this.currentLevel + 15;
-        let elite;
-
-        // Selección dinámica del tipo de Élite según el nivel
-        if (this.currentLevel < 15) {
-            elite = new TankEnemy(this, this.scale.width / 2, 220);
-        } else if (this.currentLevel < 40) {
-            elite = new TeleporterEnemy(this, this.scale.width / 2, 220);
-        } else {
-            elite = new GuardianEnemy(this, this.scale.width / 2, 220);
-        }
+        // Un Élite es una anomalía con nivel ligeramente superior (+2) para que sea posible de matar
+        const eliteLevel = this.currentLevel + 2;
+        let elite = new LaserEliteEnemy(this, this.scale.width / 2, 220);
 
         // Aplicar escalado de 20 rangos + Alpha asegurado
         applyEnemyScaling(elite, eliteLevel);
         elite.applyAlpha(); 
 
-        // Bonus de estadísticas para que sea un mini-boss real
-        elite.hp = Math.round(elite.hp * 2.5);
+        // Bonus de estadísticas reducidos significativamente a petición del usuario
+        elite.hp = Math.round(elite.hp * 1.2);
         elite.maxHp = elite.hp;
+<<<<<<< HEAD
         elite.contactDamage = Math.round(elite.contactDamage * 1.5);
         elite.sprite.setScale(elite.sprite.scaleX * 1.3);
+=======
+        elite.contactDamage = Math.round(elite.contactDamage * 1.1);
+        elite.sprite.setScale(elite.sprite.scale * 1.2);
+>>>>>>> a4fa19942644ce4309c957386e3bc9e997cd86c1
 
         this.enemies.push(elite);
         this.setupEnemyCollisions(elite);
@@ -579,35 +602,46 @@ export default class MainScene extends Phaser.Scene {
             let enemy;
 
             if (level < 5) {
-                // NIVEL 1-4: Solo Glitchers y algún Tanque desde el 3
-                if (level >= 3 && rand < 0.2) enemy = new TankEnemy(this, rx, ry);
-                else enemy = new StandardEnemy(this, rx, ry);
+                // NIVEL 1-4: Mayormente Glitchers, pero con raros avistamientos
+                if (rand < 0.01)      enemy = new RangedEnemy(this, rx, ry);
+                else if (rand < 0.02) enemy = new KamikazeEnemy(this, rx, ry);
+                else if (rand < 0.03) enemy = new SummonerEnemy(this, rx, ry);
+                else if (level >= 3 && rand < 0.2) enemy = new TankEnemy(this, rx, ry);
+                else                  enemy = new StandardEnemy(this, rx, ry);
             } 
             else if (level < 12) {
-                // NIVEL 5-11: Introducimos Arqueros y Kamikazes
-                if (rand < 0.5)      enemy = new StandardEnemy(this, rx, ry);
-                else if (rand < 0.7) enemy = new TankEnemy(this, rx, ry);
-                else if (rand < 0.85)enemy = new RangedEnemy(this, rx, ry);
-                else                 enemy = new KamikazeEnemy(this, rx, ry);
+                // NIVEL 5-11: Introducimos Arqueros y Kamikazes, con raros Summoners/Trappers
+                if (rand < 0.02)      enemy = new SummonerEnemy(this, rx, ry);
+                else if (rand < 0.04) enemy = new TrapperEnemy(this, rx, ry);
+                else if (rand < 0.05) enemy = new TeleporterEnemy(this, rx, ry);
+                else if (rand < 0.5)  enemy = new StandardEnemy(this, rx, ry);
+                else if (rand < 0.7)  enemy = new TankEnemy(this, rx, ry);
+                else if (rand < 0.85) enemy = new RangedEnemy(this, rx, ry);
+                else                  enemy = new KamikazeEnemy(this, rx, ry);
             } 
             else if (level < 25) {
-                // NIVEL 12-24: Introducimos Invocadores y Trampas
-                if (rand < 0.3)      enemy = new StandardEnemy(this, rx, ry);
-                else if (rand < 0.5) enemy = new TankEnemy(this, rx, ry);
-                else if (rand < 0.65)enemy = new RangedEnemy(this, rx, ry);
-                else if (rand < 0.75)enemy = new KamikazeEnemy(this, rx, ry);
-                else if (rand < 0.88)enemy = new SummonerEnemy(this, rx, ry);
-                else                 enemy = new TrapperEnemy(this, rx, ry);
+                // NIVEL 12-24: Introducimos Invocadores y Trampas, con raros Healers/Guardians
+                if (rand < 0.02)      enemy = new HealerEnemy(this, rx, ry);
+                else if (rand < 0.04) enemy = new GuardianEnemy(this, rx, ry);
+                else if (rand < 0.06) enemy = new TeleporterEnemy(this, rx, ry);
+                else if (rand < 0.3)  enemy = new StandardEnemy(this, rx, ry);
+                else if (rand < 0.5)  enemy = new TankEnemy(this, rx, ry);
+                else if (rand < 0.65) enemy = new RangedEnemy(this, rx, ry);
+                else if (rand < 0.75) enemy = new KamikazeEnemy(this, rx, ry);
+                else if (rand < 0.88) enemy = new SummonerEnemy(this, rx, ry);
+                else                  enemy = new TrapperEnemy(this, rx, ry);
             } 
             else if (level < 45) {
-                // NIVEL 25-44: El Teletransportador entra en juego
-                if (rand < 0.25)     enemy = new StandardEnemy(this, rx, ry);
-                else if (rand < 0.45)enemy = new TankEnemy(this, rx, ry);
-                else if (rand < 0.6) enemy = new RangedEnemy(this, rx, ry);
-                else if (rand < 0.7) enemy = new KamikazeEnemy(this, rx, ry);
-                else if (rand < 0.8) enemy = new SummonerEnemy(this, rx, ry);
-                else if (rand < 0.9) enemy = new TrapperEnemy(this, rx, ry);
-                else                 enemy = new TeleporterEnemy(this, rx, ry);
+                // NIVEL 25-44: El Teletransportador entra en juego, Healer/Guardian raros
+                if (rand < 0.03)      enemy = new HealerEnemy(this, rx, ry);
+                else if (rand < 0.06) enemy = new GuardianEnemy(this, rx, ry);
+                else if (rand < 0.25) enemy = new StandardEnemy(this, rx, ry);
+                else if (rand < 0.45) enemy = new TankEnemy(this, rx, ry);
+                else if (rand < 0.6)  enemy = new RangedEnemy(this, rx, ry);
+                else if (rand < 0.7)  enemy = new KamikazeEnemy(this, rx, ry);
+                else if (rand < 0.8)  enemy = new SummonerEnemy(this, rx, ry);
+                else if (rand < 0.9)  enemy = new TrapperEnemy(this, rx, ry);
+                else                  enemy = new TeleporterEnemy(this, rx, ry);
             } 
             else {
                 // NIVEL 45+: Pool completo con Sanadores y Guardianes
@@ -747,6 +781,7 @@ export default class MainScene extends Phaser.Scene {
     spawnBomb(x, y, isSticky = false) {
         const bomb = this.add.circle(x, y, 10, 0x000000);
         bomb.setStrokeStyle(2, 0xff0000);
+        this.physics.add.existing(bomb); // Necesario para que moveToObject funcione
         this.tweens.add({ targets: bomb, scale: 1.2, duration: 200, yoyo: true, repeat: 9 });
 
         if (isSticky) {
@@ -979,7 +1014,11 @@ export default class MainScene extends Phaser.Scene {
             this.add.text(this.scale.width / 2, this.scale.height / 2 - 50, portalMsg, { fontSize: '18px', fill: '#0ff' }).setOrigin(0.5);
             this.tweens.add({ targets: this.portal, angle: 360, duration: 2000, repeat: -1 });
             this.physics.add.overlap(this.player.sprite, this.portal, () => {
-                this.nextLevel();
+                if (!this.isChangingLevel) {
+                    this.isChangingLevel = true;
+                    if (this.portal.body) this.portal.body.enable = false; // Desactivar física inmediatamente
+                    this.nextLevel();
+                }
             });
         }
     }
@@ -1006,11 +1045,11 @@ export default class MainScene extends Phaser.Scene {
         // Probabilidades de sala aumentadas para tienda y eventos
         const r = Math.random();
         let nextNode = 'combat';
-        if (r < 0.4) nextNode = 'combat';
-        else if (r < 0.55) nextNode = 'elite';
-        else if (r < 0.7) nextNode = 'treasure';
-        else if (r < 0.85) nextNode = 'shop'; // Aumentado a 15%
-        else nextNode = 'event'; // Aumentado a 15%
+        if (r < 0.55) nextNode = 'combat'; // 55% combate normal
+        else if (r < 0.625) nextNode = 'elite'; // 7.5% elite
+        else if (r < 0.70) nextNode = 'treasure'; // 7.5% tesoro
+        else if (r < 0.85) nextNode = 'shop'; // 15% tienda
+        else nextNode = 'event'; // 15% evento
 
         this.registry.set('nextNodeType', nextNode);
 
@@ -1339,8 +1378,11 @@ export default class MainScene extends Phaser.Scene {
 
         goContainer.add([box, title, statsText, hint]);
 
-        // Guardar resultado
-        saveRunResult(this.score, this.currentLevel, crystalsEarned).catch(err => console.error(err));
+        // Guardar resultado (El servidor calculará los cristales ganados de forma segura)
+        saveRunResult(this.score, this.currentLevel).catch(err => console.error(err));
+
+        // Detener música in-game
+        this.sound.stopAll();
 
         // Auto-reinicio tras 5 segundos
         const restartTimer = this.time.delayedCall(5000, () => {
@@ -1358,5 +1400,77 @@ export default class MainScene extends Phaser.Scene {
                 this.scene.start('MenuScene');
             });
         });
+    }
+
+    handleMusic() {
+        // Comprobar si los assets de audio están cargados
+        if (!this.cache.audio.exists('game_track1')) {
+            console.warn("⚠️ Audio no cargado en caché, omitiendo música.");
+            return;
+        }
+
+        // Determinar la CATEGORÍA de música necesaria
+        const isCritical = this.isBossLevel || this.nodeType === 'elite';
+        const currentMusicKey = this.registry.get('currentMusicKey');
+
+        // CASO A: Necesitamos música de JEFE/ELITE
+        if (isCritical) {
+            if (currentMusicKey !== 'game_boss') {
+                this.switchTrack('game_boss');
+            }
+            return;
+        }
+
+        // CASO B: Necesitamos música NORMAL
+        // Si ya está sonando una pista normal (1 o 2), no hacemos nada para que siga sonando hasta que acabe
+        if (currentMusicKey === 'game_track1' || currentMusicKey === 'game_track2') {
+            // Verificar si la música se ha detenido por alguna razón (aunque tenga loop)
+            const currentMusic = this.sound.get(currentMusicKey);
+            if (!currentMusic || !currentMusic.isPlaying) {
+                // Si se detuvo, rotamos a la otra
+                const nextTrack = currentMusicKey === 'game_track1' ? 'game_track2' : 'game_track1';
+                this.switchTrack(nextTrack);
+            }
+            return;
+        }
+
+        // CASO C: No hay música o venimos de un Boss
+        // Elegir una pista normal al azar para empezar
+        const randomTrack = Math.random() > 0.5 ? 'game_track1' : 'game_track2';
+        this.switchTrack(randomTrack);
+    }
+
+    switchTrack(targetTrack) {
+        const currentMusicKey = this.registry.get('currentMusicKey');
+
+        // Detener la anterior con fade
+        if (currentMusicKey) {
+            const currentMusic = this.sound.get(currentMusicKey);
+            if (currentMusic) {
+                this.tweens.add({
+                    targets: currentMusic,
+                    volume: 0,
+                    duration: 1000,
+                    onComplete: () => currentMusic.stop()
+                });
+            }
+        }
+
+        // Iniciar la nueva (sin loop para que podamos detectar cuando termina y rotar)
+        const music = this.sound.add(targetTrack, { loop: false, volume: 0 });
+        music.play();
+        
+        // Al terminar la canción, volver a llamar a handleMusic para que rote a la siguiente
+        music.once('complete', () => {
+            this.handleMusic();
+        });
+
+        this.tweens.add({
+            targets: music,
+            volume: 0.5,
+            duration: 1000
+        });
+
+        this.registry.set('currentMusicKey', targetTrack);
     }
 }

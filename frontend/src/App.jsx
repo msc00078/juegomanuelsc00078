@@ -6,9 +6,59 @@ import './App.css';
 
 function App() {
   const gameRef = useRef(null);
+  const audioRef = useRef(null);
   const [showMobileWarning, setShowMobileWarning] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
   const [user, setUser] = useState(null);
+
+  // Función para iniciar la música (el navegador exige interacción previa)
+  const playMusic = () => {
+    if (audioRef.current && audioRef.current.paused) {
+      audioRef.current.play().catch(e => console.log("Auto-play bloqueado hasta interacción:", e));
+    }
+  };
+
+  // Exponer funciones globales de audio para que Phaser pueda controlar la música
+  useEffect(() => {
+    window.isMuted = false;
+
+    window.playMenuMusic = () => {
+      if (audioRef.current && audioRef.current.paused && !window.isMuted) {
+        audioRef.current.volume = 0.5;
+        audioRef.current.play().catch(e => console.log(e));
+      }
+    };
+
+    window.stopMenuMusic = () => {
+      if (audioRef.current) {
+        const fadeOut = setInterval(() => {
+          if (audioRef.current && audioRef.current.volume > 0.05) {
+            audioRef.current.volume -= 0.05;
+          } else {
+            if (audioRef.current) {
+              audioRef.current.pause();
+              audioRef.current.volume = 0.5;
+            }
+            clearInterval(fadeOut);
+          }
+        }, 50);
+      }
+    };
+
+    // Silenciar / Activar toda la música
+    window.toggleMute = () => {
+      window.isMuted = !window.isMuted;
+      if (audioRef.current) {
+        if (window.isMuted) {
+          audioRef.current.volume = 0;
+        } else {
+          audioRef.current.volume = 0.5;
+          audioRef.current.play().catch(e => console.log(e));
+        }
+      }
+      return window.isMuted;
+    };
+  }, []);
 
   // Detectar móvil al montar
   useEffect(() => {
@@ -39,6 +89,7 @@ function App() {
   }, [gameStarted, user]);
 
   const handleStartMobile = async () => {
+    playMusic(); // Iniciar música al tocar el aviso móvil
     try {
       // 1) Solicitar pantalla completa (elimina barra del navegador)
       const el = document.documentElement;
@@ -67,6 +118,9 @@ function App() {
   return (
     <div className="App">
 
+      {/* Música de Menú Global */}
+      <audio ref={audioRef} src="/assets/audio/menu_theme.mp3" loop />
+
       {/* ---- Pantalla de aviso móvil ---- */}
       {showMobileWarning && (
         <div className="mobile-warning" onClick={handleStartMobile}>
@@ -79,7 +133,9 @@ function App() {
       
       {/* ---- Pantalla de Login (Supabase) ---- */}
       {!user && !showMobileWarning && (
-        <Auth onLogin={(user) => setUser(user)} />
+        <div onClick={playMusic}>
+          <Auth onLogin={(user) => setUser(user)} />
+        </div>
       )}
 
       {/* ---- Cabecera (solo escritorio y logueado) ---- */}

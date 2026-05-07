@@ -90,6 +90,8 @@ Todas las novedades y mejoras implementadas en el proyecto.
 ## [2.0.0] - 2026-05-06
 > **Versión mayor** — Sistema de enemigos completamente renovado, Boss con IA mejorada y nuevo ecosistema de escalado de dificultad.
 ### Añadido
+- **Reliquia LLAVE MAESTRA**: Añadida una nueva reliquia (`bypass_key`) que incrementa en un 25% la probabilidad de evadir exitosamente a un Élite.
+- **Probabilidad Dinámica de Evasión**: La probabilidad base de evadir a un Élite ahora varía de manera aleatoria entre el 30% y el 70% (con un máximo de 95% si se posee la Llave Maestra).
 - **Sistema de Variantes de Enemigos**: Los enemigos escalan visualmente y en estadísticas según el nivel actual.
   - Niveles 1-5: variante **Normal**.
   - Niveles 6-10: variante **Mejorado** (+40% HP, +10% velocidad, borde naranja).
@@ -106,8 +108,13 @@ Todas las novedades y mejoras implementadas en el proyecto.
   - En fase 2 el intervalo de llamadas a la API baja a 2s (más ataques).
   - En fase 3 el intervalo baja a 1.2s, los proyectiles son rafágas de 4 y el boss invoca 2 kamikazes al entrar en la fase.
   - Las ondas de área en fase 3 son dobles y concéntricas.
+- **Variedad de Enemigos (Rare Spawns)**: Implementada una probabilidad muy baja (1-3%) de que aparezcan enemigos avanzados en niveles tempranos, mejorando la sorpresa y variedad táctica.
+- **Nuevo Ataque Élite (Láser)**: El Élite de Bypass ahora tiene un ataque de rayo de energía con indicador de carga previa.
 
 ### Modificado
+- **Balanceo Crítico de Élites**: Reducida drásticamente la dificultad de los enemigos Élite (nerfeo extremo). El bonus de nivel bajó a +2, el multiplicador de HP a 1.2x y el daño a 1.1x.
+- **Reliquia GLITCH ADHESIVO**: Corregida la lógica de física de las bombas para que ahora sí se desplacen hacia los enemigos como se esperaba.
+- **Lógica de Spawn de Enemigos**: Refactorizado el sistema de selección de enemigos para priorizar el chequeo de probabilidades bajas, evitando el error de código muerto en las condiciones.
 - **Pool de spawn de enemigos**: Ahora se expande progresivamente según el nivel (3 rangos: niveles <3, 3-5, 6-9, 10+).
 - **`contactDamage` por tipo**: El daño de colisión ya no es fijo (5 para todos) sino que depende del tipo de enemigo.
 - **`Player._baseSpeed`**: Se guarda la velocidad inicial del jugador para poder restaurarla después de efectos de ralentización.
@@ -129,6 +136,7 @@ Todas las novedades y mejoras implementadas en el proyecto.
     - `GameConfig.test.js`: 5 tests (tipo, escala 1280x720, física, escenas)
 
 ### Corregido
+- **Crash al evadir un Élite**: Se solucionó un error que provocaba que el juego colapsara (crash) o generara comportamientos inesperados al hacer clic repetidamente en el botón de evasión ("Bypass") del encuentro con un Élite. Se han deshabilitado las interacciones de los botones tras el primer clic.
 - **Daño Fantasma del Boss**: Se corrigió un problema donde el jefe seguía haciendo daño al jugador después de morir si este caminaba sobre su posición o sobre ataques de área residuales. Ahora, al morir el jefe:
   - Se desactiva su cuerpo físico inmediatamente.
   - Se limpian todos sus ataques activos (`attacks.clear()`).

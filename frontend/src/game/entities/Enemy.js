@@ -547,8 +547,8 @@ export class TeleporterEnemy extends Enemy {
                 const angle = Phaser.Math.Angle.Between(
                     playerSprite.x, playerSprite.y, this.sprite.x, this.sprite.y
                 );
-                const offsetX = Math.cos(angle + Math.PI) * 45;
-                const offsetY = Math.sin(angle + Math.PI) * 45;
+                const offsetX = Math.cos(angle + Math.PI) * 15;
+                const offsetY = Math.sin(angle + Math.PI) * 15;
                 this.sprite.setPosition(
                     Phaser.Math.Clamp(playerSprite.x + offsetX, 20, this.scene.scale.width  - 20),
                     Phaser.Math.Clamp(playerSprite.y + offsetY, 90, this.scene.scale.height - 20)
@@ -732,8 +732,9 @@ export class TrapperEnemy extends Enemy {
         const angle = Phaser.Math.Angle.Between(
             this.sprite.x, this.sprite.y, targetX, targetY
         );
-        const tx = this.sprite.x + Math.cos(angle) * 80;
-        const ty = this.sprite.y + Math.sin(angle) * 80;
+        // Ahora apunta directamente al jugador o muy cerca
+        const tx = targetX + (Math.random() - 0.5) * 15;
+        const ty = targetY + (Math.random() - 0.5) * 15;
 
         const trap = this.scene.add.circle(tx, ty, 30, 0xffcc00, 0.35);
         trap.setStrokeStyle(2, 0xff8800);
@@ -747,5 +748,99 @@ export class TrapperEnemy extends Enemy {
 
         // Efecto de aparición
         this.scene.tweens.add({ targets: trap, alpha: { from: 0, to: 0.35 }, duration: 300 });
+    }
+}
+
+// ─── 10. ELITE DE BYPASS (Laser) ──────────────────────────────────────────────
+export class LaserEliteEnemy extends Enemy {
+    constructor(scene, x, y) {
+        super(scene, x, y, 180, 60, 0xff00ff, 50); // HP base más bajo para que sea más débil
+        this.name = 'Anomalía de Bypass';
+        this.lastLaserTime = 0;
+        this.laserCooldown = 3000;
+        this.isFiringLaser = false;
+    }
+
+    update(playerSprite, time) {
+        if (!this.sprite?.active || this.isDead) return;
+        
+        if (this.isFiringLaser) {
+            if (this.sprite.body) this.sprite.body.setVelocity(0, 0);
+            return;
+        }
+        
+        super.update(playerSprite, time);
+
+        if (time > this.lastLaserTime + this.laserCooldown) {
+            this.lastLaserTime = time;
+            this._fireLaser(playerSprite);
+        }
+    }
+
+    _fireLaser(playerSprite) {
+        if (!this.sprite?.active || this.isDead) return;
+        
+        this.isFiringLaser = true;
+        this.sprite.setFillStyle(0xffffff);
+        
+        // 1. BLOQUEAR EL ÁNGULO AL INICIO (Donde apunta el haz de luz)
+        const lockedAngle = Phaser.Math.Angle.Between(this.sprite.x, this.sprite.y, playerSprite.x, playerSprite.y);
+        
+        // Indicador de carga (haz de luz estático)
+        const line = this.scene.add.line(0, 0, this.sprite.x, this.sprite.y, 
+            this.sprite.x + Math.cos(lockedAngle) * 1200, 
+            this.sprite.y + Math.sin(lockedAngle) * 1200, 
+            0xff00ff, 0.3).setOrigin(0).setDepth(50);
+        
+        // Reducido tiempo de carga de 800 a 500ms
+        this.scene.time.delayedCall(500, () => {
+            line.destroy();
+            if (!this.sprite?.active || this.isDead) {
+                this.isFiringLaser = false;
+                return;
+            }
+
+            // Disparo del rayo (usa el ángulo bloqueado)
+            const beam = this.scene.add.rectangle(this.sprite.x, this.sprite.y, 1200, 25, 0xff00ff, 0.7).setOrigin(0, 0.5).setDepth(51);
+            beam.setRotation(lockedAngle);
+            
+            // Detección de colisión manual
+            let hasHit = false;
+            const checkCollision = () => {
+                if (hasHit || !beam.active || !this.scene.player) return;
+                const player = this.scene.player;
+                const dist = Phaser.Math.Distance.Between(this.sprite.x, this.sprite.y, player.sprite.x, player.sprite.y);
+                if (dist > 1200) return; // Fuera de rango
+                
+                const angToPlayer = Phaser.Math.Angle.Between(this.sprite.x, this.sprite.y, player.sprite.x, player.sprite.y);
+                const diff = Math.abs(Phaser.Math.Angle.Wrap(angToPlayer - lockedAngle));
+                
+                if (diff < 0.15 && !player.isInvulnerable) { // Margen reducido para que sea más justo esquivar
+                    hasHit = true;
+                    player.takeDamage(45); // DAÑO AUMENTADO
+                    this.scene.updateUI();
+                }
+            };
+            
+            // Comprobar colisión varias veces durante el disparo
+            const collisionTimer = this.scene.time.addEvent({
+                delay: 50,
+                repeat: 7,
+                callback: checkCollision
+            });
+
+            // Efecto visual y destrucción
+            this.scene.tweens.add({
+                targets: beam,
+                alpha: 0,
+                duration: 400,
+                onComplete: () => {
+                    beam.destroy();
+                    collisionTimer.destroy();
+                    this.isFiringLaser = false;
+                    if (this.sprite?.active) this.sprite.setFillStyle(this.color);
+                }
+            });
+        });
     }
 }
