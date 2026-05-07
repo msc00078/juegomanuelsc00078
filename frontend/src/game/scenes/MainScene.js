@@ -97,13 +97,36 @@ export default class MainScene extends Phaser.Scene {
 
         this.nodeType = this.registry.get('nextNodeType') || 'combat';
 
-        // Inicializar Gestores de UI, Spawning y Controles Móviles
+        // 1. Inicializar Gestores de UI y Controles
         this.hudManager = new HUDManager(this);
         this.spawnManager = new SpawnManager(this);
         this.mobileControls = new MobileControls(this);
         this.inputManager.setMobileJoystick(this.mobileControls.joystick);
 
-        // Cuenta atrás de 3 segundos antes de empezar
+        // 2. Preparar Contenedores de UI que se usarán en el spawn (Boss, etc)
+        this.gameOverText = this.add.text(this.scale.width / 2, this.scale.height / 2, "", { fontSize: '40px', fill: '#fff', backgroundColor: '#000' }).setOrigin(0.5).setDepth(101);
+        this.gameOverText.setVisible(false);
+
+        // Barra de Boss Mejorada (Abajo)
+        this.bossHpContainer = this.add.container(this.scale.width / 2, this.scale.height - 40).setVisible(false).setDepth(101).setScrollFactor(0);
+        this.bossHpBg = this.add.rectangle(0, 0, 400, 20, 0x330000).setOrigin(0.5);
+        this.bossHpBar = this.add.rectangle(-200, 0, 400, 20, 0xff0000).setOrigin(0, 0.5);
+        this.bossNameText = this.add.text(0, -25, "JEFE FINAL", { fontSize: '18px', fill: '#ff0000', fontStyle: 'bold' }).setOrigin(0.5);
+        this.bossHpContainer.add([this.bossHpBg, this.bossHpBar, this.bossNameText]);
+
+        // 3. Spawnear entidades (Ahora tienen sus contenedores listos)
+        if (!this.isBossLevel && this.nodeType !== 'elite' && this.nodeType !== 'treasure') {
+            this.spawnNormalEnemies();
+        } else if (this.isBossLevel) {
+            this.spawnBoss();
+        } else if (this.nodeType === 'elite') {
+            this.isWaitingForElite = true;
+            this.showElitePrompt();
+        } else if (this.nodeType === 'treasure') {
+            this.spawnTreasureRoom();
+        }
+
+        // 4. Iniciar Cuenta atrás
         const countdownText = this.add.text(this.scale.width / 2, this.scale.height / 2, "3", {
             fontSize: '120px', fill: '#ff0000', fontStyle: 'bold'
         }).setOrigin(0.5).setDepth(2000);
@@ -121,122 +144,20 @@ export default class MainScene extends Phaser.Scene {
                 } else {
                     countdownText.destroy();
                     this.isCountdown = false;
-                    // Solo spawnear enemigos si no es un nivel especial que ya lo maneja
-                    if (!this.isBossLevel && this.nodeType !== 'elite' && this.nodeType !== 'treasure') {
-                        this.spawnNormalEnemies();
-                    }
                 }
             },
             repeat: 3
         });
 
-
-
-        // Atajos de teclado adicionales
-        this.input.keyboard.on('keydown-P', () => this.pauseGame());
-        this.input.keyboard.on('keydown-ESC', () => this.pauseGame());
-
-        this.gameOverText = this.add.text(this.scale.width / 2, this.scale.height / 2, "", { fontSize: '40px', fill: '#fff', backgroundColor: '#000' }).setOrigin(0.5).setDepth(101);
-        this.gameOverText.setVisible(false);
-
-        // Barra de Boss Mejorada (Abajo)
-        this.bossHpContainer = this.add.container(this.scale.width / 2, this.scale.height - 40).setVisible(false).setDepth(101).setScrollFactor(0);
-        this.bossHpBg = this.add.rectangle(0, 0, 400, 20, 0x330000).setOrigin(0.5);
-        this.bossHpBar = this.add.rectangle(-200, 0, 400, 20, 0xff0000).setOrigin(0, 0.5);
-        this.bossNameText = this.add.text(0, -25, "JEFE FINAL", { fontSize: '18px', fill: '#ff0000', fontStyle: 'bold' }).setOrigin(0.5);
-        this.bossHpContainer.add([this.bossHpBg, this.bossHpBar, this.bossNameText]);
+        // 5. Atajos y resto de configuración
+        if (this.input.keyboard) {
+            this.input.keyboard.on('keydown-P', () => this.pauseGame());
+            this.input.keyboard.on('keydown-ESC', () => this.pauseGame());
+        }
 
         this.lastKillTime = 0;
 
-        if (this.isBossLevel) {
-            // Boss Intro Cinematic
-            this.cameras.main.flash(1000, 255, 0, 0);
-            this.cameras.main.shake(1000, 0.02);
-
-            this.bosses = [];
-            
-            // Si el nivel es >= 35, hay un 25% de probabilidad de Dual Boss (Más progresivo)
-            const isDual = this.currentLevel >= 35 && Math.random() < 0.25;
-            
-            if (isDual) {
-                const b1 = new Boss(this, this.scale.width / 4, 180, this.bossType, this.currentLevel);
-                const b2 = new Boss(this, (this.scale.width / 4) * 3, 180, this.bossType, this.currentLevel);
-                // Nerf de HP para duales
-                b1.hp = Math.round(b1.hp * 0.85); b1.maxHp = b1.hp;
-                b2.hp = Math.round(b2.hp * 0.85); b2.maxHp = b2.hp;
-                this.bosses.push(b1, b2);
-                this.bossNameText.setText(`${this.bossType.toUpperCase()}S (DUAL)`);
-            } else {
-                const boss = new Boss(this, this.scale.width / 2, 180, this.bossType, this.currentLevel);
-                this.bosses.push(boss);
-                this.bossNameText.setText(this.bossType.toUpperCase());
-            }
-
-            this.bossHpContainer.setVisible(true);
-
-            this.bossText = this.add.text(this.scale.width / 2, 130, "¡PREPÁRATE PARA TU FINAL!", {
-                fontSize: '20px', fill: '#ff0000', backgroundColor: '#000', fontStyle: 'bold', padding: { x: 10, y: 5 }
-            }).setOrigin(0.5).setDepth(101);
-
-            this.tweens.add({
-                targets: this.bossText,
-                alpha: { from: 1, to: 0.3 },
-                duration: 500,
-                yoyo: true,
-                repeat: -1
-            });
-
-            this.bosses.forEach(boss => {
-                this.physics.add.overlap(this.player.sword, boss.sprite, () => {
-                    if (this.player.isAttacking && boss.hp > 0) {
-                        this.pushBack(boss.sprite, this.player.sprite, 100);
-                        boss.takeDamage(this.getPlayerDamage() / 2);
-                        this.updateUI();
-                    }
-                });
-
-                this.physics.add.collider(this.player.sprite, boss.sprite, () => {
-                    if (!this.gameOver && boss.hp > 0) {
-                        // El daño de contacto del boss escala con su nivel
-                        this.player.takeDamage(boss.contactDamage || 15);
-                        this.updateUI();
-                        this.pushBack(this.player.sprite, boss.sprite, 300);
-                    }
-                });
-
-                this.physics.add.overlap(this.player.sprite, boss.attacks, (playerSprite, attackObj) => {
-                    if (!this.gameOver && boss.hp > 0) {
-                        // El daño del proyectil/área escala
-                        this.player.takeDamage(boss.attackDamage || 20);
-                        this.updateUI();
-                        attackObj.destroy();
-                    }
-                });
-
-                // NUEVO: Los bloques paran los proyectiles/ataques del boss
-                // Usamos overlap y comprobamos existencia para evitar crashes en dispositivos móviles
-                this.physics.add.overlap(boss.attacks, this.crates, (attackObj) => {
-                    if (attackObj && attackObj.active) {
-                        attackObj.destroy();
-                    }
-                });
-
-                this.physics.add.overlap(this.arrows, boss.sprite, (bossSprite, arrow) => {
-                    if (boss.hp > 0) {
-                        const relics = this.registry.get('relics') || [];
-                        if (!relics.includes('perforante')) arrow.destroy();
-                        boss.takeDamage(10);
-                        this.updateUI();
-                    }
-                });
-            });
-
-        } else if (this.nodeType === 'elite') {
-            this.isWaitingForElite = true;
-            this.showElitePrompt();
-        } else if (this.nodeType === 'treasure') {
-            this.spawnTreasureRoom();
-        }
+        // La lógica de spawn ya se manejó antes de la cuenta atrás
 
         // Inventario Tecla I o TAB (con seguridad para móvil)
         if (this.input.keyboard) {
@@ -306,18 +227,20 @@ export default class MainScene extends Phaser.Scene {
         // Daño al jugador por obstáculos peligrosos (Collider para mejor detección física)
         this.physics.add.collider(this.player.sprite, this.crates, (player, obstacle) => {
             if (obstacle.doesDamage && !this.player.isInvulnerable) {
-                this.player.takeDamage(10);
+                console.log("💥 COLISIÓN CON TRAMPA!");
+                this.player.takeDamage(20); 
+                this.cameras.main.flash(200, 255, 0, 0); // Flash rojo intenso
                 this.updateUI();
-                this.pushBack(this.player.sprite, obstacle, 500); // Fuerza aumentada
+                this.pushBack(this.player.sprite, obstacle, 1200); 
             }
         });
 
-        // Refuerzo con Overlap para asegurar daño constante si el jugador está sobre el bloque
+        // Refuerzo con Overlap (Detección de área ampliada)
         this.physics.add.overlap(this.player.sprite, this.crates, (player, obstacle) => {
             if (obstacle.doesDamage && !this.player.isInvulnerable) {
-                this.player.takeDamage(1); // Daño menor pero continuo
+                this.player.takeDamage(10);
+                this.cameras.main.flash(100, 255, 0, 0);
                 this.updateUI();
-                this.pushBack(this.player.sprite, obstacle, 100);
             }
         });
 
@@ -443,6 +366,90 @@ export default class MainScene extends Phaser.Scene {
         }
     }
 
+    spawnBoss() {
+        // Boss Intro Cinematic
+        this.cameras.main.flash(1000, 255, 0, 0);
+        this.cameras.main.shake(1000, 0.02);
+
+        this.bosses = [];
+        
+        // Si el nivel es >= 35, hay un 25% de probabilidad de Dual Boss (Más progresivo)
+        const isDual = this.currentLevel >= 35 && Math.random() < 0.25;
+        
+        if (isDual) {
+            const b1 = new Boss(this, this.scale.width / 4, 180, this.bossType, this.currentLevel);
+            const b2 = new Boss(this, (this.scale.width / 4) * 3, 180, this.bossType, this.currentLevel);
+            // Nerf de HP para duales
+            b1.hp = Math.round(b1.hp * 0.85); b1.maxHp = b1.hp;
+            b2.hp = Math.round(b2.hp * 0.85); b2.maxHp = b2.hp;
+            this.bosses.push(b1, b2);
+            this.bossNameText.setText(`${this.bossType.toUpperCase()}S (DUAL)`);
+        } else {
+            const boss = new Boss(this, this.scale.width / 2, 180, this.bossType, this.currentLevel);
+            this.bosses.push(boss);
+            this.bossNameText.setText(this.bossType.toUpperCase());
+        }
+
+        this.bossHpContainer.setVisible(true);
+
+        this.bossText = this.add.text(this.scale.width / 2, 130, "¡PREPÁRATE PARA TU FINAL!", {
+            fontSize: '20px', fill: '#ff0000', backgroundColor: '#000', fontStyle: 'bold', padding: { x: 10, y: 5 }
+        }).setOrigin(0.5).setDepth(101);
+
+        this.tweens.add({
+            targets: this.bossText,
+            alpha: { from: 1, to: 0.3 },
+            duration: 500,
+            yoyo: true,
+            repeat: -1
+        });
+
+        this.bosses.forEach(boss => {
+            this.physics.add.overlap(this.player.sword, boss.sprite, () => {
+                if (this.player.isAttacking && boss.hp > 0) {
+                    this.pushBack(boss.sprite, this.player.sprite, 100);
+                    boss.takeDamage(this.getPlayerDamage() / 2);
+                    this.updateUI();
+                }
+            });
+
+            this.physics.add.collider(this.player.sprite, boss.sprite, () => {
+                if (!this.gameOver && boss.hp > 0) {
+                    // El daño de contacto del boss escala con su nivel
+                    this.player.takeDamage(boss.contactDamage || 15);
+                    this.updateUI();
+                    this.pushBack(this.player.sprite, boss.sprite, 300);
+                }
+            });
+
+            this.physics.add.overlap(this.player.sprite, boss.attacks, (playerSprite, attackObj) => {
+                if (!this.gameOver && boss.hp > 0) {
+                    // El daño del proyectil/área escala
+                    this.player.takeDamage(boss.attackDamage || 20);
+                    this.updateUI();
+                    attackObj.destroy();
+                }
+            });
+
+            // NUEVO: Los bloques paran los proyectiles/ataques del boss
+            // Usamos overlap y comprobamos existencia para evitar crashes en dispositivos móviles
+            this.physics.add.overlap(boss.attacks, this.crates, (attackObj) => {
+                if (attackObj && attackObj.active) {
+                    attackObj.destroy();
+                }
+            });
+
+            this.physics.add.overlap(this.arrows, boss.sprite, (bossSprite, arrow) => {
+                if (boss.hp > 0) {
+                    const relics = this.registry.get('relics') || [];
+                    if (!relics.includes('perforante')) arrow.destroy();
+                    boss.takeDamage(10);
+                    this.updateUI();
+                }
+            });
+        });
+    }
+
     spawnNormalEnemies() {
         this.spawnManager.spawnNormalEnemies();
     }
@@ -501,7 +508,8 @@ export default class MainScene extends Phaser.Scene {
                     this.player.sprite.x, this.player.sprite.y,
                     enemySprite.x, enemySprite.y
                 );
-                if (dist > 300) dmg += 10;
+                // Reducido de 300 a 200 para que se note más
+                if (dist > 200) dmg += 15; 
             }
             if (!relics.includes('perforante')) arrow.destroy();
             enemy.takeDamage(dmg);
@@ -557,10 +565,25 @@ export default class MainScene extends Phaser.Scene {
 
         if (isSticky) {
             let targets = this.enemies.filter(e => e.hp > 0).map(e => e.sprite);
-            if (this.boss && this.boss.hp > 0) targets.push(this.boss.sprite);
+            // Corregido: Ahora busca en el array de bosses
+            if (this.bosses) {
+                this.bosses.forEach(b => {
+                    if (b.hp > 0) targets.push(b.sprite);
+                });
+            }
+            
             let closest = this.physics.closest(bomb, targets);
             if (closest) {
-                this.physics.moveToObject(bomb, closest, 150);
+                // Tracking continuo en lugar de un solo impulso
+                this.time.addEvent({
+                    delay: 50,
+                    repeat: 40, // 2 segundos aprox
+                    callback: () => {
+                        if (bomb.active && closest.active) {
+                            this.physics.moveToObject(bomb, closest, 250);
+                        }
+                    }
+                });
             }
         }
 
@@ -576,6 +599,14 @@ export default class MainScene extends Phaser.Scene {
         const explosion = this.add.circle(x, y, radius, 0xff8800, 0.6);
         this.tweens.add({ targets: explosion, alpha: 0, duration: 300, onComplete: () => explosion.destroy() });
         this.createParticles(x, y, 0xffaa00);
+        this.cameras.main.shake(200, 0.01);
+
+        // DAÑO AL JUGADOR (Nueva lógica para Kamikazes y bombas enemigas)
+        const distToPlayer = Phaser.Math.Distance.Between(x, y, this.player.sprite.x, this.player.sprite.y);
+        if (distToPlayer <= radius && !this.player.isInvulnerable) {
+            this.player.takeDamage(25);
+            this.updateUI();
+        }
 
         if (this.isBossLevel && this.bosses) {
             this.bosses.forEach(boss => {
@@ -694,23 +725,28 @@ export default class MainScene extends Phaser.Scene {
             const rx = Phaser.Math.Between(150, this.scale.width - 150);
             const ry = Phaser.Math.Between(150, this.scale.height - 250);
             
-            const obstacle = this.crates.create(rx, ry, null);
-            obstacle.setSize(30, 30);
+            const obstacle = this.add.rectangle(rx, ry, 30, 30, 0x5d4037).setStrokeStyle(2, 0x3e2723);
+            this.physics.add.existing(obstacle, true); // true = estático
+            this.crates.add(obstacle);
             
             const rand = Math.random();
-            let color = 0x5d4037; // Madera normal
-            let stroke = 0x3e2723;
 
             if (rand < 0.2) {
                 // OBSTÁCULO INDESTRUCTIBLE (Metálico)
                 obstacle.isIndestructible = true;
-                color = 0x444444;
-                stroke = 0xffffff;
+                obstacle.setFillStyle(0x444444);
+                obstacle.setStrokeStyle(2, 0xffffff);
             } else if (rand < 0.35) {
                 // OBSTÁCULO DAÑINO (Spikes / Error)
                 obstacle.doesDamage = true;
-                color = 0xcc0000;
-                stroke = 0xff00ff;
+                obstacle.setFillStyle(0xcc0000);
+                obstacle.setStrokeStyle(2, 0xff00ff);
+                
+                // Hacer el área física más grande que el dibujo (30x30 -> 45x45)
+                obstacle.body.setSize(45, 45);
+                obstacle.body.setOffset(-7.5, -7.5);
+                if (obstacle.body.updateFromGameObject) obstacle.body.updateFromGameObject();
+
                 // Efecto visual de parpadeo para avisar
                 this.tweens.add({
                     targets: obstacle,
@@ -720,9 +756,6 @@ export default class MainScene extends Phaser.Scene {
                     repeat: -1
                 });
             }
-
-            const rect = this.add.rectangle(rx, ry, 30, 30, color).setStrokeStyle(2, stroke);
-            obstacle.rect = rect;
             
             // Si es dañino, añadir un pequeño indicativo visual extra (un rombo interno)
             if (obstacle.doesDamage) {
@@ -736,7 +769,6 @@ export default class MainScene extends Phaser.Scene {
         if (!crate || !crate.active || crate.isIndestructible) return;
         const x = crate.x;
         const y = crate.y;
-        if (crate.rect) crate.rect.destroy();
         if (crate.spike) crate.spike.destroy();
         crate.destroy();
         this.createParticles(x, y, 0x5d4037);
@@ -855,6 +887,30 @@ export default class MainScene extends Phaser.Scene {
     updateUI() {
         this.hudManager.update();
 
+        // Actualizar barra de vida del Boss (Suma de todos los bosses activos)
+        if (this.isBossLevel && this.bosses && this.bossHpBar) {
+            let totalHp = 0;
+            let totalMaxHp = 0;
+            this.bosses.forEach(b => {
+                totalHp += Math.max(0, b.hp);
+                totalMaxHp += b.maxHp;
+            });
+
+            if (totalMaxHp > 0) {
+                const percent = totalHp / totalMaxHp;
+                this.bossHpBar.width = Math.max(0, 400 * percent);
+            }
+            
+            if (totalHp <= 0 && this.bosses.every(b => b.hp <= 0)) {
+                // Pequeño delay para que se vea la barra vacía antes de desaparecer
+                this.time.delayedCall(1000, () => {
+                    if (this.bossHpContainer) this.bossHpContainer.setVisible(false);
+                });
+            } else {
+                this.bossHpContainer.setVisible(true);
+            }
+        }
+
         if (this.player.hp <= 0 && !this.gameOver) {
             this.cameras.main.shake(500, 0.05);
             this.endGame("¡HAS CAÍDO EN COMBATE!");
@@ -885,8 +941,8 @@ export default class MainScene extends Phaser.Scene {
     pushBack(target, source, force) {
         if (!target || !target.body || !source || !source.x) return;
         const angle = Phaser.Math.Angle.Between(source.x, source.y, target.x, target.y);
-        // Limitar la fuerza máxima para que los límites del mundo puedan detenerlos
-        const cappedForce = Math.min(force, 250);
+        // Limitar la fuerza máxima pero permitir valores altos (Ej: 1500)
+        const cappedForce = Math.min(force, 1500);
         target.body.setVelocity(Math.cos(angle) * cappedForce, Math.sin(angle) * cappedForce);
     }
 
@@ -924,6 +980,19 @@ export default class MainScene extends Phaser.Scene {
                 } else {
                     // Fricción para que no floten para siempre si se alejan
                     orb.body.setVelocity(orb.body.velocity.x * 0.95, orb.body.velocity.y * 0.95);
+                }
+            }
+        });
+
+        // Detección manual de trampas (Garantiza daño incluso si falla la física)
+        this.crates.getChildren().forEach(crate => {
+            if (crate.doesDamage && crate.active) {
+                const dist = Phaser.Math.Distance.Between(this.player.sprite.x, this.player.sprite.y, crate.x, crate.y);
+                if (dist < 40 && !this.player.isInvulnerable) {
+                    this.player.takeDamage(20);
+                    this.cameras.main.flash(200, 255, 0, 0);
+                    this.updateUI();
+                    this.pushBack(this.player.sprite, crate, 1200);
                 }
             }
         });

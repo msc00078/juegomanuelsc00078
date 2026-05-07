@@ -230,7 +230,7 @@ export class Player {
         this.isInvulnerable = true;
         
         this.scene.registry.set('hp', this.hp);
-        this.scene.updateHealthUI?.();
+        this.scene.updateUI?.();
         
         this.sprite.setFillStyle?.(0xff0000);
         this.scene.time.delayedCall(100, () => {

@@ -22,18 +22,13 @@ export class KamikazeEnemy extends EnemyBase {
     if (dist < 40) this.explode();
   }
 
-  explode() {
+    explode() {
     if (this.isDead) return;
-    this.isDead = true;
-    this.hp = 0;
     const x = this.sprite.x, y = this.sprite.y;
-    this._alphaAura?.destroy();
-    this._alphaAuraOuter?.destroy();
-    this._alphaCrown?.destroy();
-    this._eliteAura?.destroy();
-    this.sprite?.destroy();
-    this.scene.explodeBomb?.(x, y, 30);
-    const idx = this.scene.enemies.indexOf(this);
-    if (idx !== -1) this.scene.enemies.splice(idx, 1);
+    
+    // Llamar a die() asegura que se limpie la barra de HP, auras y se suelte loot
+    this.die();
+    
+    this.scene.explodeBomb?.(x, y);
   }
 }
