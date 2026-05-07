@@ -1211,11 +1211,19 @@ export default class MainScene extends Phaser.Scene {
     }
 
     handleMusic() {
+        // Asegurar que el contexto de audio esté activo (necesario para móvil)
+        if (this.sound.context.state === 'suspended') {
+            this.sound.context.resume();
+        }
+
         // Comprobar si los assets de audio están cargados
         if (!this.cache.audio.exists('game_track1')) {
             console.warn("⚠️ Audio no cargado en caché, omitiendo música.");
             return;
         }
+
+        // Determinar volumen basado en si está silenciado
+        const targetVolume = window.isMuted ? 0 : 0.5;
 
         // Determinar la CATEGORÍA de música necesaria
         const isCritical = this.isBossLevel || this.nodeType === 'elite';
@@ -1250,6 +1258,16 @@ export default class MainScene extends Phaser.Scene {
 
     switchTrack(targetTrack) {
         const currentMusicKey = this.registry.get('currentMusicKey');
+        const targetVolume = window.isMuted ? 0 : 0.5;
+
+        if (currentMusicKey === targetTrack) {
+            // Ya está sonando, solo asegurar volumen si ha cambiado el mute
+            const current = this.sound.get(targetTrack);
+            if (current && current.volume !== targetVolume) {
+                this.tweens.add({ targets: current, volume: targetVolume, duration: 500 });
+            }
+            return;
+        }
 
         // Detener la anterior con fade
         if (currentMusicKey) {
@@ -1275,7 +1293,7 @@ export default class MainScene extends Phaser.Scene {
 
         this.tweens.add({
             targets: music,
-            volume: 0.5,
+            volume: targetVolume,
             duration: 1000
         });
 
