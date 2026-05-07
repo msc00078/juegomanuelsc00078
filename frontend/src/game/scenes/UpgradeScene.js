@@ -63,11 +63,11 @@ export default class UpgradeScene extends Phaser.Scene {
 
         backBg.on('pointerover', () => {
             backBg.setFillStyle(0x00f2ff, 0.2);
-            this.tweens.add({ targets: backBtnContainer, scale: 1.05, duration: 200 });
+            this.tweens.add({ targets: backBtnContainer, scaleX: 1.05, scaleY: 1.05, duration: 200 });
         });
         backBg.on('pointerout', () => {
             backBg.setFillStyle(0x00f2ff, 0.1);
-            this.tweens.add({ targets: backBtnContainer, scale: 1, duration: 200 });
+            this.tweens.add({ targets: backBtnContainer, scaleX: 1, scaleY: 1, duration: 200 });
         });
         backBg.on('pointerdown', () => this.scene.start('MenuScene'));
     }

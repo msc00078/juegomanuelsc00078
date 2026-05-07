@@ -101,16 +101,16 @@ export class Enemy {
         this.xpBonus = 50;
 
         // Visual: Mucho más grande y con efectos dorados
-        const currentScale = this.sprite.scale;
+        const currentScale = this.sprite.scaleX;
         this.sprite.setScale(currentScale * 1.3);
         this.sprite.setStrokeStyle(5, 0xffd700);
 
         // Aura dual (interna fija, externa pulsante)
         this._alphaAura = this.scene.add.circle(
-            this.sprite.x, this.sprite.y, this.size * this.sprite.scale * 0.8, 0xffd700, 0.3
+            this.sprite.x, this.sprite.y, this.size * this.sprite.scaleX * 0.8, 0xffd700, 0.3
         );
         this._alphaAuraOuter = this.scene.add.circle(
-            this.sprite.x, this.sprite.y, this.size * this.sprite.scale * 1.1, 0xffd700, 0.1
+            this.sprite.x, this.sprite.y, this.size * this.sprite.scaleX * 1.1, 0xffd700, 0.1
         );
         
         this.scene.tweens.add({
@@ -122,7 +122,7 @@ export class Enemy {
         });
 
         // "Corona" o indicador visual extra (un pequeño rombo encima)
-        this._alphaCrown = this.scene.add.rectangle(this.sprite.x, this.sprite.y - 40 * this.sprite.scale, 15, 15, 0xffd700);
+        this._alphaCrown = this.scene.add.rectangle(this.sprite.x, this.sprite.y - 40 * this.sprite.scaleX, 15, 15, 0xffd700);
         this._alphaCrown.setAngle(45);
         this._alphaCrown.setStrokeStyle(2, 0xffffff);
         this.scene.tweens.add({
@@ -163,7 +163,7 @@ export class Enemy {
         if (this.sprite && this.sprite.active) {
             if (this._alphaAura) this._alphaAura.setPosition(this.sprite.x, this.sprite.y);
             if (this._alphaAuraOuter) this._alphaAuraOuter.setPosition(this.sprite.x, this.sprite.y);
-            if (this._alphaCrown) this._alphaCrown.setPosition(this.sprite.x, this.sprite.y - 40 * this.sprite.scale);
+            if (this._alphaCrown) this._alphaCrown.setPosition(this.sprite.x, this.sprite.y - 40 * this.sprite.scaleX);
             if (this._eliteAura) this._eliteAura.setPosition(this.sprite.x, this.sprite.y);
         }
     }
@@ -198,7 +198,7 @@ export class Enemy {
             repeat: 5,
             callback: () => {
                 if (!this.sprite?.active) return;
-                const trail = this.scene.add.rectangle(this.sprite.x, this.sprite.y, this.size * this.sprite.scale, this.size * this.sprite.scale, this.color, 0.4);
+                const trail = this.scene.add.rectangle(this.sprite.x, this.sprite.y, this.size * this.sprite.scaleX, this.size * this.sprite.scaleX, this.color, 0.4);
                 this.scene.tweens.add({ targets: trail, alpha: 0, duration: 200, onComplete: () => trail.destroy() });
             }
         });

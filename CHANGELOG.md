@@ -2,6 +2,91 @@
 
 Todas las novedades y mejoras implementadas en el proyecto.
 
+## [2.4.8] - 2026-05-07
+### Corregido
+- **Crash de Bypass**: Corregido un error crítico que causaba el cierre del juego al fallar el bypass de una anomalía. El error se debía al acceso incorrecto a la propiedad `.scale` en objetos de Phaser 3, lo que generaba valores `NaN` en los cálculos de física y colisión.
+- **Visuales de Escala**: Corregidos todos los tweens y efectos visuales que usaban `.scale` en lugar de `.scaleX`/`.scaleY`, asegurando que el escalado de botones y auras funcione correctamente.
+
+## [2.4.7] - 2026-05-06
+### Corregido
+- **Error de Inicio de Sesión**: Corregido un `TypeError` que ocurría al intentar acceder al registro de Phaser (`this.registry`) antes de que la escena estuviera lista. Se ha movido la lógica de cálculo del intervalo de la IA al método `init()`.
+
+## [2.4.6] - 2026-05-06
+### Corregido
+- **Balance de Jefes**: Suavizada la velocidad de ataque de los jefes en los niveles iniciales (5, 10, 15). El ritmo de combate ahora escala de forma más justa con el progreso del jugador.
+- **Cobertura Física**: Los bloques (cajas/metálicos) ahora bloquean y cancelan los proyectiles de los enemigos, permitiendo usarlos como cobertura táctica.
+- **Trampas de Pinchos**: Reforzado el daño y la visibilidad de los bloques rojos para asegurar que sean un peligro real y evitable.
+
+## [2.4.5] - 2026-05-06
+### Corregido
+- **Bucle de Game Over**: Corregido error que impedía reiniciar el juego tras morir debido a la pausa total de la escena.
+- **Trampas de Pinchos**: Ahora los bloques rojos infligen daño y empuje de forma constante al contacto.
+- **Legibilidad de Tienda**: Ajustados los colores de los textos en la tienda para asegurar que las descripciones sean legibles en todos los dispositivos.
+
+## [2.4.4] - 2026-05-06
+### Modificado
+- **Flujo de Game Over**: El reinicio ya no está limitado a la tecla 'R'. Ahora puedes pulsar cualquier tecla, hacer click en pantalla o simplemente esperar 5 segundos para volver automáticamente al menú principal.
+
+## [2.4.3] - 2026-05-06
+### Añadido
+- **Overhaul Visual Total**: Todas las pantallas del juego (Pausa, Inventario, Tienda, Eventos, Reliquias, Carga) han sido rediseñadas con la estética Premium Cyberpunk.
+- **Unificación de Marca**: Uso coherente de tipografías Orbitron e Inter y paletas de neón en cada rincón de la interfaz.
+
+### Corregido
+- **Error de Sintaxis**: Limpieza final de redundancias en las escenas de menú y pausa.
+
+## [2.4.1] - 2026-05-06
+### Corregido
+- **Fallo de Despliegue**: Eliminado error de sintaxis en `MainScene.js` y corregida la versión de Phaser en `package.json` para asegurar compatibilidad en producción.
+
+## [2.4.0] - 2026-05-06
+### Añadido
+- **Overhaul Visual Premium**: Rediseño completo de la UI usando Glassmorphism, efectos de escaneo y tipografía Orbitron/Inter.
+- **HUD Rediseñado**: Barras de estado con esquinas redondeadas y panel superior estilizado.
+- **Game Over "System Failure"**: Nueva pantalla de fin de partida inspirada en terminales de seguridad.
+- **Refugio Neón**: Pantalla de mejoras meta-progresivas con tarjetas de hardware detalladas.
+
+### Modificado
+- **Balance de Inicio**: Nerfeado el primer jefe (Nivel 5) reduciendo su vida base y retrasando sus fases para una progresión más justa.
+
+## [2.1.2] - 2026-05-06
+### Añadido
+- **Élites Rediseñados**: Los enemigos del evento de Anomalía ahora son mini-bosses reales. Escalan a un nivel mucho mayor (+15), son siempre 'Alpha' y poseen una resistencia y daño aumentados (2.5x HP, 1.5x Daño).
+- **Variedad de Élite**: El tipo de enemigo élite ahora cambia según tu progreso (Tanque → Teletransportador → Guardián).
+
+## [2.1.1] - 2026-05-06
+### Añadido
+- **Enemigos Estándar**: Ahora tienen capacidad de ataque a distancia (disparo de proyectiles) al alcanzar el Rango 5+.
+- **Tanques Potenciados**: Los enemigos Tanque ahora son un 150% más resistentes y tienen un tamaño imponente.
+
+### Corregido
+- **Bug de NaN**: Se corrigió el error visual al golpear bloques indestructibles.
+- **Daño de Obstáculos**: Se ajustó el sistema de colisión para que los bloques dañinos funcionen correctamente.
+
+### Modificado
+- **Balance de Jefes**: El 'Dual Boss' se ha movido al nivel 35+ para una progresión más suave y se ha reducido un poco su vida individual.
+
+## [2.1.0] - 2026-05-06
+### Añadido
+- **Jefes Duales**: A partir del nivel 20, existe la probabilidad de enfrentarse a dos jefes simultáneos con barras de vida compartidas.
+- **IA de Enemigos Agresiva**: Los 'Entes' comunes (Estándar y Tanques) ahora pueden realizar un **Dash** hacia el jugador si tienen el rango suficiente.
+- **Boss 2.1**:
+  - Escalado de daño y vida dinámico según el nivel.
+  - Nuevo ataque: **Bombas de Fragmentación** que explotan tras un breve retraso.
+  - Agresividad extrema en Fase 3 (intervalo de acción reducido a 0.8s).
+- **Mecánica de Bombas Enemigas**: Implementada lógica de explosivos que dañan específicamente al jugador.
+
+## [2.0.1] - 2026-05-06
+### Añadido
+- **Sistema de Escalado Gradual (1-100)**: Los enemigos ahora crecen en estadísticas y tamaño de forma continua (0.5% tamaño/nivel).
+- **Rediseño de Alphas**: Nueva distinción visual con aura dual dorada y "Corona Glitch" flotante para diferenciarlos de los Elites.
+- **Tier 'Omega'**: Nueva variante visual para niveles 70+ con efectos de partículas púrpuras.
+- **Progresión de Spawn Refinada**: 
+  - Niveles 1-5: Glitchers y Tanques.
+  - Nivel 12+: Rango y Kamikazes.
+  - Nivel 25+: Invocadores y Tramperos.
+  - Nivel 45+: Teletransportadores, Sanadores y Guardianes.
+
 ## [2.0.0] - 2026-05-06
 > **Versión mayor** — Sistema de enemigos completamente renovado, Boss con IA mejorada y nuevo ecosistema de escalado de dificultad.
 ### Añadido
