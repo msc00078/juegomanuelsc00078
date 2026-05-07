@@ -213,6 +213,10 @@ export default class EnemyBase {
     this._eliteAura?.destroy();
     this._tierParticleTimer?.remove();
     this.sprite?.destroy();
+    if (this.hpBarGfx) {
+      this.hpBarGfx.destroy();
+      this.hpBarGfx = null;
+    }
     // loot
     try {
       const rand = Math.random();

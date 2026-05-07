@@ -97,9 +97,38 @@ export default class MainScene extends Phaser.Scene {
 
         this.nodeType = this.registry.get('nextNodeType') || 'combat';
 
-        // Inicializar Gestores de UI y Spawning
+        // Inicializar Gestores de UI, Spawning y Controles Móviles
         this.hudManager = new HUDManager(this);
         this.spawnManager = new SpawnManager(this);
+        this.mobileControls = new MobileControls(this);
+        this.inputManager.setMobileJoystick(this.mobileControls.joystick);
+
+        // Cuenta atrás de 3 segundos antes de empezar
+        const countdownText = this.add.text(this.scale.width / 2, this.scale.height / 2, "3", {
+            fontSize: '120px', fill: '#ff0000', fontStyle: 'bold'
+        }).setOrigin(0.5).setDepth(2000);
+
+        let count = 3;
+        this.time.addEvent({
+            delay: 1000,
+            callback: () => {
+                count--;
+                if (count > 0) {
+                    countdownText.setText(count);
+                } else if (count === 0) {
+                    countdownText.setText("¡ACCIÓN!");
+                    countdownText.setFill("#00ff00");
+                } else {
+                    countdownText.destroy();
+                    this.isCountdown = false;
+                    // Solo spawnear enemigos si no es un nivel especial que ya lo maneja
+                    if (!this.isBossLevel && this.nodeType !== 'elite' && this.nodeType !== 'treasure') {
+                        this.spawnNormalEnemies();
+                    }
+                }
+            },
+            repeat: 3
+        });
 
 
 
@@ -207,13 +236,15 @@ export default class MainScene extends Phaser.Scene {
             this.showElitePrompt();
         } else if (this.nodeType === 'treasure') {
             this.spawnTreasureRoom();
-        } else {
-            this.spawnNormalEnemies();
         }
 
-        // Inventario Tecla I o TAB
-        this.input.keyboard.on('keydown-I', () => this.toggleInventory());
-        this.input.keyboard.on('keydown-TAB', () => this.toggleInventory());
+        // Inventario Tecla I o TAB (con seguridad para móvil)
+        if (this.input.keyboard) {
+            this.input.keyboard.on('keydown-I', () => this.toggleInventory());
+            this.input.keyboard.on('keydown-TAB', () => this.toggleInventory());
+            this.input.keyboard.on('keydown-P', () => this.pauseGame());
+            this.input.keyboard.on('keydown-ESC', () => this.pauseGame());
+        }
 
         // Colisiones globales de jugador con objetos
         this.physics.add.overlap(this.player.sprite, this.enemyArrows, (playerSprite, arrow) => {
@@ -828,6 +859,19 @@ export default class MainScene extends Phaser.Scene {
             this.cameras.main.shake(500, 0.05);
             this.endGame("¡HAS CAÍDO EN COMBATE!");
         }
+    }
+
+    cycleWeapon() {
+        if (this.gameOver) return;
+        let current = this.registry.get('equippedWeapon') || 1;
+        let next = current + 1;
+        if (next > 3) next = 1;
+        
+        // Verificar si tiene el arma desbloqueada
+        if (next === 2 && !this.registry.get('hasBow')) next = 3;
+        if (next === 3 && !this.registry.get('hasBombs')) next = 1;
+        
+        this.player.equipWeapon(next);
     }
 
     drawVignette() {

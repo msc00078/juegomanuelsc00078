@@ -81,8 +81,9 @@ export default class ShopScene extends Phaser.Scene {
         const descTxt = this.add.text(0, -10, desc, { 
             fontFamily: 'Inter, sans-serif', fontSize: '12px', fill: '#ffffff' 
         }).setOrigin(0.5);
-        const priceTxt = this.add.text(0, 35, typeof priceLabel === 'number' ? `${priceLabel} 💎` : priceLabel, { 
-            fontFamily: 'Orbitron, sans-serif', fontSize: '16px', fill: color, fontStyle: 'bold' 
+        const priceTxt = this.add.text(0, 45, typeof priceLabel === 'number' ? `${priceLabel} 💎` : priceLabel, { 
+            fontFamily: 'Orbitron, sans-serif', fontSize: '22px', fill: '#ffffff', fontStyle: 'bold',
+            stroke: Phaser.Display.Color.IntegerToColor(color).rgba, strokeThickness: 2
         }).setOrigin(0.5);
 
         container.add([bg, titleTxt, descTxt, priceTxt]);
@@ -168,8 +169,8 @@ export default class ShopScene extends Phaser.Scene {
         let maxHp = this.registry.get('playerMaxHp');
         if (gold >= price) {
             this.registry.set('gold', gold - price);
-            this.registry.set('playerMaxHp', maxHp + 20);
-            this.registry.set('playerHp', this.registry.get('playerHp') + 20);
+            this.registry.set('playerMaxHp', maxHp + 10);
+            this.registry.set('playerHp', this.registry.get('playerHp') + 10);
             this.updateGoldUI();
             this.showFeedback("¡CHASIS AMPLIADO!");
         } else {

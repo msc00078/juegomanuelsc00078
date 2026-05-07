@@ -24,9 +24,9 @@ export default class LevelUpScene extends Phaser.Scene {
         }).setOrigin(0.5);
 
         const options = [
-            { id: 'hp',    title: "VITALIDAD", desc: "Aumenta la integridad del chasis (+20 HP)", icon: "❤️", color: 0xff0055 },
-            { id: 'dmg',   title: "POTENCIA",  desc: "Sobrecarga los sistemas de ataque (+3 Daño)", icon: "⚔️", color: 0xffcc00 },
-            { id: 'speed', title: "AGILIDAD",  desc: "Optimiza los servomotores (+10% Vel.)", icon: "⚡", color: 0x00f2ff }
+            { id: 'hp',    title: "VITALIDAD", desc: "Aumenta la integridad del chasis (+10 HP)", icon: "❤️", color: 0xff0055 },
+            { id: 'dmg',   title: "POTENCIA",  desc: "Sobrecarga los sistemas de ataque (+1 Daño)", icon: "⚔️", color: 0xffcc00 },
+            { id: 'speed', title: "AGILIDAD",  desc: "Optimiza los servomotores (+3% Vel.)", icon: "⚡", color: 0x00f2ff }
         ];
 
         const cardW = 220;
@@ -79,13 +79,13 @@ export default class LevelUpScene extends Phaser.Scene {
 
     applyUpgrade(id) {
         if (id === 'hp') {
-            const max = this.registry.get('playerMaxHp') + 20;
+            const max = this.registry.get('playerMaxHp') + 10;
             this.registry.set('playerMaxHp', max);
-            this.registry.set('playerHp', this.registry.get('playerHp') + 20);
+            this.registry.set('playerHp', this.registry.get('playerHp') + 10);
         } else if (id === 'dmg') {
-            this.registry.set('swordDamage', this.registry.get('swordDamage') + 3);
+            this.registry.set('swordDamage', this.registry.get('swordDamage') + 1);
         } else if (id === 'speed') {
-            this.registry.set('bonusSpeed', (this.registry.get('bonusSpeed') || 0) + 0.1);
+            this.registry.set('bonusSpeed', (this.registry.get('bonusSpeed') || 0) + 0.03);
         }
     }
 }

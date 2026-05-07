@@ -9,18 +9,23 @@ export class InputManager {
     this.scene = scene;
     
     // Configuración de Teclado
-    this.cursors = scene.input.keyboard.createCursorKeys();
-    this.wasd = scene.input.keyboard.addKeys({
-      up: Phaser.Input.Keyboard.KeyCodes.W,
-      down: Phaser.Input.Keyboard.KeyCodes.S,
-      left: Phaser.Input.Keyboard.KeyCodes.A,
-      right: Phaser.Input.Keyboard.KeyCodes.D,
-      space: Phaser.Input.Keyboard.KeyCodes.SPACE,
-      shift: Phaser.Input.Keyboard.KeyCodes.SHIFT,
-      one: Phaser.Input.Keyboard.KeyCodes.ONE,
-      two: Phaser.Input.Keyboard.KeyCodes.TWO,
-      three: Phaser.Input.Keyboard.KeyCodes.THREE
-    });
+    if (scene.input.keyboard) {
+      this.cursors = scene.input.keyboard.createCursorKeys();
+      this.wasd = scene.input.keyboard.addKeys({
+        up: Phaser.Input.Keyboard.KeyCodes.W,
+        down: Phaser.Input.Keyboard.KeyCodes.S,
+        left: Phaser.Input.Keyboard.KeyCodes.A,
+        right: Phaser.Input.Keyboard.KeyCodes.D,
+        space: Phaser.Input.Keyboard.KeyCodes.SPACE,
+        shift: Phaser.Input.Keyboard.KeyCodes.SHIFT,
+        one: Phaser.Input.Keyboard.KeyCodes.ONE,
+        two: Phaser.Input.Keyboard.KeyCodes.TWO,
+        three: Phaser.Input.Keyboard.KeyCodes.THREE
+      });
+    } else {
+      this.cursors = null;
+      this.wasd = null;
+    }
 
     this.mobileJoystick = null;
     this.isMobile = !scene.sys.game.device.os.desktop || navigator.maxTouchPoints > 0;
@@ -37,11 +42,13 @@ export class InputManager {
     let moveY = 0;
 
     // Teclado
-    if (this.cursors.left.isDown || this.wasd.left.isDown) moveX = -1;
-    else if (this.cursors.right.isDown || this.wasd.right.isDown) moveX = 1;
-
-    if (this.cursors.up.isDown || this.wasd.up.isDown) moveY = -1;
-    else if (this.cursors.down.isDown || this.wasd.down.isDown) moveY = 1;
+    if (this.cursors && this.wasd) {
+      if (this.cursors.left.isDown || this.wasd.left.isDown) moveX = -1;
+      else if (this.cursors.right.isDown || this.wasd.right.isDown) moveX = 1;
+    
+      if (this.cursors.up.isDown || this.wasd.up.isDown) moveY = -1;
+      else if (this.cursors.down.isDown || this.wasd.down.isDown) moveY = 1;
+    }
 
     // Móvil (Sobrescribe si hay input activo)
     if (this.mobileJoystick && this.mobileJoystick.active) {
@@ -62,16 +69,16 @@ export class InputManager {
   isActionJustDown(action) {
     switch (action) {
       case 'attack':
-        return Phaser.Input.Keyboard.JustDown(this.cursors.space) || 
-               Phaser.Input.Keyboard.JustDown(this.wasd.space);
+        return (this.cursors && Phaser.Input.Keyboard.JustDown(this.cursors.space)) || 
+               (this.wasd && Phaser.Input.Keyboard.JustDown(this.wasd.space));
       case 'dash':
-        return Phaser.Input.Keyboard.JustDown(this.wasd.shift);
+        return this.wasd && Phaser.Input.Keyboard.JustDown(this.wasd.shift);
       case 'weapon1':
-        return Phaser.Input.Keyboard.JustDown(this.wasd.one);
+        return this.wasd && Phaser.Input.Keyboard.JustDown(this.wasd.one);
       case 'weapon2':
-        return Phaser.Input.Keyboard.JustDown(this.wasd.two);
+        return this.wasd && Phaser.Input.Keyboard.JustDown(this.wasd.two);
       case 'weapon3':
-        return Phaser.Input.Keyboard.JustDown(this.wasd.three);
+        return this.wasd && Phaser.Input.Keyboard.JustDown(this.wasd.three);
       default:
         return false;
     }

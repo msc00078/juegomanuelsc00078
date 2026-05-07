@@ -24,60 +24,40 @@ html, body {
   width: 100%;
   height: 100%;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-color: #1a1a1a;
-  font-family: 'Courier New', Courier, monospace;
-  color: white;
+  background-color: #000;
+  margin: 0;
+  padding: 0;
 }
 
-/* Cabecera visible solo en escritorio */
-.App-header {
-  padding: 10px 20px;
-  text-align: center;
-}
-
-.App-header h1 {
-  margin: 0 0 5px 0;
-  color: #ffcc00;
-  font-size: 1.5rem;
-}
-
-/* El contenedor del juego en escritorio */
+/* El contenedor del juego ocupe el 100% del espacio disponible */
 .game-container {
-  border: 4px solid #fff;
-  border-radius: 8px;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
   overflow: hidden;
-  box-shadow: 0 0 20px rgba(0,255,0,0.3);
-  flex-shrink: 0;
+  background-color: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-/* Phaser inyecta el canvas directamente dentro de #phaser-container */
 #phaser-container {
-  display: block;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 #phaser-container canvas {
   display: block;
+  width: 100% !important;
+  height: 100% !important;
 }
 
-.instructions {
-  background-color: #333;
-  padding: 8px 16px;
-  border-radius: 5px;
-  border: 1px solid #555;
-  font-size: 0.85rem;
-  margin-top: 8px;
-}
-
-.controls-panel {
-  margin-top: 8px;
-  background: #222;
-  padding: 8px;
-  border-radius: 8px;
-  border: 1px solid #444;
-}
 
 .controls-panel select {
   padding: 5px 10px;

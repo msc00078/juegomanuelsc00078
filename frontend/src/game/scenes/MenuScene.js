@@ -149,14 +149,14 @@ export default class MenuScene extends Phaser.Scene {
                 speedLevel: savedMeta.speedLevel || 0
             };
             
-            // Reiniciar estado global con bonos
+            // Reiniciar estado global con bonos (Nerfeados según petición)
             this.registry.set('currentLevel', 1);
             this.registry.set('gold', 0);
             this.registry.set('score', 0);
-            this.registry.set('playerHp', 100 + (meta.hpLevel * 10));
-            this.registry.set('playerMaxHp', 100 + (meta.hpLevel * 10));
-            this.registry.set('swordDamage', 10 + (meta.dmgLevel * 2));
-            this.registry.set('bonusSpeed', meta.speedLevel * 0.05); // +5% por nivel
+            this.registry.set('playerHp', 100 + (meta.hpLevel * 5));
+            this.registry.set('playerMaxHp', 100 + (meta.hpLevel * 5));
+            this.registry.set('swordDamage', 10 + (meta.dmgLevel * 1));
+            this.registry.set('bonusSpeed', meta.speedLevel * 0.02); // +2% por nivel (antes 5%)
             
             this.registry.set('hasBow', false);
             this.registry.set('hasBombs', false);

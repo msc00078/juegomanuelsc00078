@@ -7,7 +7,12 @@ export class MobileControls {
   constructor(scene) {
     this.scene = scene;
     this.joystick = { vx: 0, vy: 0, active: false, pointerId: null };
-    this.create();
+    
+    // Solo crear si es móvil o táctil
+    this.isMobile = !scene.sys.game.device.os.desktop || navigator.maxTouchPoints > 0;
+    if (this.isMobile) {
+      this.create();
+    }
   }
 
   create() {

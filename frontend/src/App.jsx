@@ -138,22 +138,10 @@ function App() {
         </div>
       )}
 
-      {/* ---- Cabecera (solo escritorio y logueado) ---- */}
-      {user && !showMobileWarning && (
-        <header className="App-header">
-          <h1>AI Boss Arena</h1>
-        </header>
-      )}
 
       {/* ---- Canvas del juego ---- */}
       <div id="phaser-container" className="game-container"></div>
 
-      {/* ---- Instrucciones (solo escritorio) ---- */}
-      {!showMobileWarning && (
-        <div className="instructions">
-          <p>🕹️ <strong>WASD / Flechas:</strong> Moverse | ⚔️ <strong>ESPACIO:</strong> Atacar con espada</p>
-        </div>
-      )}
     </div>
   );
 }
