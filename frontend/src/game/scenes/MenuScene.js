@@ -170,6 +170,7 @@ export default class MenuScene extends Phaser.Scene {
             this.registry.set('maxCombo', 0);
             
             this.registry.set('nextNodeType', 'combat'); // Empezar con combate
+            this.registry.set('currentMusicKey', null); // Reset de música para que MainScene la inicie de cero
             
             // Detener la música del menú global (React)
             if (window.stopMenuMusic) window.stopMenuMusic();

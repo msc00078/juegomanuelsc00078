@@ -156,6 +156,9 @@ export default class MainScene extends Phaser.Scene {
         }
 
         this.lastKillTime = 0;
+        
+        // Iniciar música de la escena
+        this.handleMusic();
 
         // La lógica de spawn ya se manejó antes de la cuenta atrás
 
