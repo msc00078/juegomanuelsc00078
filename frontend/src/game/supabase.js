@@ -34,24 +34,36 @@ export const signIn = async (email, password) => {
 export const saveRunResult = async (score, sector) => {
     if (!supabase) return;
     try {
-        // Usamos una función RPC de Supabase para que el servidor calcule los cristales
-        // y aplique límites de seguridad, evitando que el usuario los manipule en el cliente.
-        const { error } = await supabase.rpc('registrar_fin_partida', {
-            p_score: Math.floor(score || 0),
-            p_sector: Math.floor(sector || 1)
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) return;
+
+        // Llamamos a nuestro backend en lugar de a Supabase directamente
+        // Esto añade una capa de validación humana/lógica que el "amigo" no podrá saltarse fácilmente
+        const response = await fetch('http://localhost:3001/api/save-score', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${session.access_token}`
+            },
+            body: JSON.stringify({
+                score: Math.floor(score || 0),
+                sector: Math.floor(sector || 1),
+                userId: session.user.id
+            })
         });
+
+        const result = await response.json();
             
-        if (error) {
-            console.error("Error validando partida en servidor:", error);
-            // Si el error es que la función no existe, es que el usuario no ha ejecutado el SQL
-            if (error.code === 'P0001') {
-                alert("⚠️ Error de seguridad: " + error.message);
+        if (!response.ok) {
+            console.error("⚠️ Fallo de validación:", result.error);
+            if (result.hacker_detected) {
+                alert("🚨 PROTOCOLO DE SEGURIDAD ACTIVADO:\nPuntuación anómala detectada. Los datos han sido descartados.");
             }
         } else {
-            console.log("🛡️ Puntuación validada y guardada por el servidor.");
+            console.log("🛡️ " + result.message);
         }
     } catch (err) {
-        console.error("Error crítico en comunicación con servidor:", err);
+        console.error("Error crítico en comunicación con servidor de validación:", err);
     }
 };
 
