@@ -1155,7 +1155,8 @@ export default class MainScene extends Phaser.Scene {
 
     endGame(message) {
         this.gameOver = true;
-        this.physics.pause(); // Pausar solo la física, no la escena completa
+        this.physics.pause(); 
+        this.playSFX('sonido_gameover', 0.8);
 
         // Oscurecer fondo
         const overlay = this.add.rectangle(this.scale.width / 2, this.scale.height / 2, this.scale.width, this.scale.height, 0x000000, 0.8).setDepth(1000);
@@ -1257,11 +1258,11 @@ export default class MainScene extends Phaser.Scene {
     }
 
     switchTrack(targetTrack) {
-        const currentMusicKey = this.registry.get('currentMusicKey');
         const targetVolume = window.isMuted ? 0 : 0.5;
+        const currentMusicKey = this.registry.get('currentMusicKey');
 
+        // Si ya está sonando esta canción, no hacer nada
         if (currentMusicKey === targetTrack) {
-            // Ya está sonando, solo asegurar volumen si ha cambiado el mute
             const current = this.sound.get(targetTrack);
             if (current && current.volume !== targetVolume) {
                 this.tweens.add({ targets: current, volume: targetVolume, duration: 500 });
@@ -1269,26 +1270,31 @@ export default class MainScene extends Phaser.Scene {
             return;
         }
 
-        // Detener la anterior con fade
-        if (currentMusicKey) {
-            const currentMusic = this.sound.get(currentMusicKey);
-            if (currentMusic) {
-                this.tweens.add({
-                    targets: currentMusic,
-                    volume: 0,
-                    duration: 1000,
-                    onComplete: () => currentMusic.stop()
-                });
-            }
-        }
+        // DETENER TODA LA MÚSICA PREVIA (Limpieza agresiva para evitar solapamientos)
+        const musicKeys = ['game_track1', 'game_track2', 'game_boss'];
+        musicKeys.forEach(key => {
+            const instances = this.sound.getAll(key);
+            instances.forEach(ins => {
+                if (ins.isPlaying) {
+                    this.tweens.add({
+                        targets: ins,
+                        volume: 0,
+                        duration: 800,
+                        onComplete: () => ins.stop()
+                    });
+                }
+            });
+        });
 
-        // Iniciar la nueva (sin loop para que podamos detectar cuando termina y rotar)
+        // Iniciar la nueva
         const music = this.sound.add(targetTrack, { loop: false, volume: 0 });
         music.play();
         
-        // Al terminar la canción, volver a llamar a handleMusic para que rote a la siguiente
         music.once('complete', () => {
-            this.handleMusic();
+            // Solo rotar si esta sigue siendo la pista activa según el registro
+            if (this.registry.get('currentMusicKey') === targetTrack) {
+                this.handleMusic();
+            }
         });
 
         this.tweens.add({
@@ -1298,5 +1304,14 @@ export default class MainScene extends Phaser.Scene {
         });
 
         this.registry.set('currentMusicKey', targetTrack);
+    }
+
+    playSFX(key, volume = 0.6) {
+        if (window.isMuted) return;
+        try {
+            this.sound.play(key, { volume });
+        } catch (e) {
+            console.warn(`Error al reproducir SFX ${key}:`, e);
+        }
     }
 }

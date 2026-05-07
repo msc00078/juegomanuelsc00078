@@ -46,5 +46,11 @@ export default class PreloadScene extends Phaser.Scene {
         this.load.audio('game_track1', 'assets/audio/game_track1.mp3'); // Data Run
         this.load.audio('game_track2', 'assets/audio/game_track2.mp3'); // Glitch Sector
         this.load.audio('game_boss', 'assets/audio/game_boss.mp3');     // Boss/Elite
+        
+        // Efectos de Sonido (SFX)
+        this.load.audio('sonido_espada', 'assets/audio/sonido_espada.wav');
+        this.load.audio('sonido_arco', 'assets/audio/sonido_arco.mp3');
+        this.load.audio('sonido_bomba', 'assets/audio/sonido_bomba.wav');
+        this.load.audio('sonido_gameover', 'assets/audio/sonido_gameover.mp3');
     }
 }

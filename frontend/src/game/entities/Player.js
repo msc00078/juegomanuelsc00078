@@ -180,6 +180,7 @@ export class Player {
             this.sword.body.enable = true;
 
             this.updateSwordPosition();
+            this.scene.playSFX('sonido_espada');
 
             this.scene.tweens.add({
                 targets: this.sword,
@@ -209,12 +210,14 @@ export class Player {
             } else {
                 this.scene.spawnArrow(this.sprite.x, this.sprite.y, this.facing);
             }
+            this.scene.playSFX('sonido_arco');
         }
         else if (weapon === 3) {
             // BOMBAS
             if (time < this.lastBombTime + (1500 * cooldownMod)) return;
             this.lastBombTime = time;
             this.scene.spawnBomb(this.sprite.x, this.sprite.y, relics.includes('pegajosa'));
+            this.scene.playSFX('sonido_bomba', 0.4);
         }
     }
 
