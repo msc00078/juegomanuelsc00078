@@ -5,7 +5,8 @@ Todas las novedades y mejoras implementadas en el proyecto.
 ## [2.4.8] - 2026-05-07
 ### Corregido
 - **Crash de Bypass**: Corregido un error crítico que causaba el cierre del juego al fallar el bypass de una anomalía. El error se debía al acceso incorrecto a la propiedad `.scale` en objetos de Phaser 3, lo que generaba valores `NaN` en los cálculos de física y colisión.
-- **Visuales de Escala**: Corregidos todos los tweens y efectos visuales que usaban `.scale` en lugar de `.scaleX`/`.scaleY`, asegurando que el escalado de botones y auras funcione correctamente.
+- **Restauración de Balance**: Revertidas las probabilidades de las salas a sus valores originales tras finalizar el periodo de testeo.
+- **Resolución de Conflictos**: Solucionado conflicto de fusión en `MainScene.js` manteniendo las correcciones de escalado (`scaleX`).
 
 ## [2.4.7] - 2026-05-06
 ### Corregido
