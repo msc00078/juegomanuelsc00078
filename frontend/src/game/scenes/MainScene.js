@@ -1398,6 +1398,12 @@ export default class MainScene extends Phaser.Scene {
     }
 
     handleMusic() {
+        // Comprobar si los assets de audio están cargados
+        if (!this.cache.audio.exists('game_track1')) {
+            console.warn("⚠️ Audio no cargado en caché, omitiendo música.");
+            return;
+        }
+
         // Determinar la CATEGORÍA de música necesaria
         const isCritical = this.isBossLevel || this.nodeType === 'elite';
         const currentMusicKey = this.registry.get('currentMusicKey');
@@ -1424,8 +1430,9 @@ export default class MainScene extends Phaser.Scene {
         }
 
         // CASO C: No hay música o venimos de un Boss
-        // Empezamos con la pista 1 por defecto
-        this.switchTrack('game_track1');
+        // Elegir una pista normal al azar para empezar
+        const randomTrack = Math.random() > 0.5 ? 'game_track1' : 'game_track2';
+        this.switchTrack(randomTrack);
     }
 
     switchTrack(targetTrack) {
@@ -1444,10 +1451,15 @@ export default class MainScene extends Phaser.Scene {
             }
         }
 
-        // Iniciar la nueva (con loop para que no haya silencios, pero detectamos si el usuario quiere rotación)
-        const music = this.sound.add(targetTrack, { loop: true, volume: 0 });
+        // Iniciar la nueva (sin loop para que podamos detectar cuando termina y rotar)
+        const music = this.sound.add(targetTrack, { loop: false, volume: 0 });
         music.play();
         
+        // Al terminar la canción, volver a llamar a handleMusic para que rote a la siguiente
+        music.once('complete', () => {
+            this.handleMusic();
+        });
+
         this.tweens.add({
             targets: music,
             volume: 0.5,
