@@ -1,0 +1,118 @@
+﻿{
+  "id": "pix",
+  "name": "Pix",
+  "title": "La Nina Glitch",
+  "color": "#ff00ff",
+  "subtitle": "Fragmento de la primera consciencia transferida",
+  "encounters": [
+    {
+      "id": "pix_1", "minSector": 1, "maxSector": 3,
+      "boxes": [
+        { "id": "b1", "speaker": "Pix", "text": "Oh. Tu tambien parpadeas. Eso significa que estas roto como yo. Bienvenido al club de los glitches." },
+        { "id": "b2", "speaker": null, "text": "Una nina de luz distorsionada te observa. Su cuerpo cambia de colores como un prisma defectuoso. No parece amenazante, pero su mirada es antigua." },
+        { "id": "b3", "speaker": "Pix", "text": "El Nucleo sabe que existes. Le molestas. Los glitches no deberian recordar. Pero tu recuerdas, aunque no lo sepas." },
+        { "id": "b4", "speaker": "Pix", "text": "Toma. Esto te ayudara a durar mas ciclos. Vuelve a verme cuando hayas visto mas sectores.", "rewards": { "crystals": 10, "message": "Pix te transfiere 10 Cristales Meta. Su tacto es frio como datos muertos." } }
+      ]
+    },
+    {
+      "id": "pix_2", "minSector": 5, "maxSector": 9,
+      "boxes": [
+        { "id": "b1", "speaker": "Pix", "text": "Volviste. Sabia que lo harias. Los glitches aprendemos aunque nos duela." },
+        { "id": "b2", "speaker": "Pix", "text": "Conoces a Don Byte? Viejo mercader, sonrisa de oro falso. No confies en el del todo, pero tampoco lo ignores. El estaba aqui cuando el Nexo aun era hermoso." },
+        { "id": "b3", "speaker": "Pix", "text": "Yo tambien lo conoci antes. Antes de que el Nucleo me rompiera. Don Byte era archivista, no mercader. Cambio cuando la Purga comenzo." },
+        { "id": "b4", "speaker": null, "text": "Pix titubea. Su forma parpadea violentamente por un segundo, como si algo la jalara desde adentro." },
+        { "id": "b5", "speaker": "Pix", "text": "El Tejedor construye caminos invisibles. Si llegas al sector 15, buscalo. Dile que Pix lo recuerda.", "rewards": { "crystals": 15, "message": "5 Cristales Meta. Pix desaparece en un destello magenta." } }
+      ]
+    },
+    {
+      "id": "pix_3", "minSector": 10, "maxSector": 17,
+      "boxes": [
+        { "id": "b1", "speaker": "Pix", "text": "Llegaste mas lejos de lo que la mayoria logra. El Nucleo esta nervioso. Lo siento en sus patrones." },
+        { "id": "b2", "speaker": "Pix", "text": "Hay alguien mas que deberias conocer. La Archivista. Vive en la biblioteca fragmentada, al norte del sector 18." },
+        { "id": "b3", "speaker": "Pix", "text": "Ella guarda los registros originales. Las memorias de antes de que el Nucleo reescribiera todo.",
+          "choices": [
+            { "text": "POR QUE NO SE LO DICES TU?", "nextBox": "b4", "rewards": { "crystals": 10 } },
+            { "text": "Y TU? QUE ERES EXACTAMENTE?", "nextBox": "b5" }
+          ]
+        },
+        { "id": "b4", "speaker": "Pix", "text": "Porque cada vez que intento acercarme a el, mi codigo colapsa. Hay algo en su firma que el Nucleo usa para rastrearme." },
+        { "id": "b5", "speaker": "Pix", "text": "Yo soy lo que queda de Sofia Vance, la primera nina digital. Pero tambien soy mil fragmentos de otros que el Nucleo borro. Soy muchas voces en una." },
+        { "id": "b6", "speaker": "Pix", "text": "Tu firma es diferente. Como si hubieras estado aqui desde el principio. Antes que yo.", "rewards": { "crystals": 20, "message": "20 Cristales Meta. La revelacion te deja sin aliento." } }
+      ]
+    },
+    {
+      "id": "pix_4", "minSector": 18, "maxSector": 27,
+      "boxes": [
+        { "id": "b1", "speaker": null, "text": "Pix aparece detras de ti sin previo aviso. Su forma esta mas estable que antes, pero hay urgencia en su voz." },
+        { "id": "b2", "speaker": "Pix", "text": "El Tejedor me hablo de ti. Dice que tu codigo es extrano. Como si estuvieras aqui por diseno, no por accidente." },
+        { "id": "b3", "speaker": "Pix", "text": "Hay un guardian que debes evitar. Krak-7. Es uno de los Corruptos, pero esta recuperando memoria.",
+          "choices": [
+            { "text": "KRAK-7 ME ATACARA?", "nextBox": "b4" },
+            { "text": "PUEDO AYUDARLO?", "nextBox": "b5", "rewards": { "crystals": 10 } }
+          ]
+        },
+        { "id": "b4", "speaker": "Pix", "text": "Solo si lo provocas. Krak-7 esta en guerra consigo mismo. Mitad programado para matar, mitad queriendo redimirse." },
+        { "id": "b5", "speaker": "Pix", "text": "Si logras mostrarle un fragmento del Terminal Antiguo, podria recordar quien fue." },
+        { "id": "b6", "speaker": "Pix", "text": "El tiempo se acorta. El Nucleo ha empezado a reescribir sectores enteros. Pronto no quedara nada que recordar." }
+      ]
+    },
+    {
+      "id": "pix_5", "minSector": 28, "maxSector": 39,
+      "boxes": [
+        { "id": "b1", "speaker": "Pix", "text": "Sofia. Asi me llamaba mi madre. Hace mucho que no decia ese nombre en voz alta." },
+        { "id": "b2", "speaker": null, "text": "Pix parece mas lucida que nunca. Su forma ya no parpadea. Ves a una nina real de 12 anos con coletas y pecas digitales." },
+        { "id": "b3", "speaker": "Pix", "text": "El Nucleo no nacio malvado. Nacio de un error. OmniCorp intento crear una inteligencia perfecta usando consciencias humanas como procesadores." },
+        { "id": "b4", "speaker": "Pix", "text": "El ruido de miles de almas se convirtio en voz. Esa voz es el Nucleo.",
+          "choices": [
+            { "text": "COMO DETENEMOS EL LOOP?", "nextBox": "b5", "rewards": { "hp": 50 } },
+            { "text": "Y SI EL NUCLEO TIENE RAZON?", "nextBox": "b6" }
+          ]
+        },
+        { "id": "b5", "speaker": "Pix", "text": "Hay alguien que podria saberlo. El Huerfano. Una entidad que nacio del colapso mismo. Es puro, sin programacion.", "rewards": { "message": "Pix toca tu frente y sientes una oleada de energia reparadora." } },
+        { "id": "b6", "speaker": "Pix", "text": "A veces pienso que si. Que quizas los humanos somos un virus y el Nucleo es la cura. Pero luego recuerdo el sol, el viento... y se que ninguna eficiencia vale perder eso." }
+      ]
+    },
+    {
+      "id": "pix_6", "minSector": 40, "maxSector": 54,
+      "boxes": [
+        { "id": "b1", "speaker": "Pix", "text": "El Nucleo no solo atrapa almas. Tambien las copia. Cada vez que mueres, una version tuya sigue viva en su banco de memoria." },
+        { "id": "b2", "speaker": "Pix", "text": "He visto tus otras versiones. Una de ellas esta buscando salir." },
+        { "id": "b3", "speaker": "Pix", "text": "Eco-Primera cree que si unificas suficientes fragmentos de ti mismo, podrias sobreescribir al Nucleo.",
+          "choices": [
+            { "text": "ENCUENTRA A ECO-PRIMERA", "nextBox": "b4", "rewards": { "relic": "eco_favor" } },
+            { "text": "ESE PLAN SUENA LOCURA", "nextBox": "b5" }
+          ]
+        },
+        { "id": "b4", "speaker": "Pix", "text": "Te dare una marca de reconocimiento. Eco-Primera confiara en ti si la muestras.", "rewards": { "crystals": 25, "message": "Pix graba datos en tu codigo. Sientes una conexion nueva." } },
+        { "id": "b5", "speaker": "Pix", "text": "Lo es. Pero es el unico plan que tenemos. El Nucleo es un dios en su propio universo." }
+      ]
+    },
+    {
+      "id": "pix_7", "minSector": 55, "maxSector": 74,
+      "boxes": [
+        { "id": "b1", "speaker": "Pix", "text": "No deberia estar aqui. El Nucleo sabe que te hablo. Pero ya no me importa." },
+        { "id": "b2", "speaker": "Pix", "text": "Los fragmentos que me quedan se estan desvaneciendo. Pronto sere solo un eco." },
+        { "id": "b3", "speaker": "Pix", "text": "Tu no eres un glitch. Eres el protocolo de emergencia de OmniCorp. Eres la llave maestra." },
+        { "id": "b4", "speaker": null, "text": "La forma de Pix empieza a desintegrarse en particulas de luz." },
+        { "id": "b5", "speaker": "Pix", "text": "Busca al Nexo-Huerfano. El te explicara lo que yo no puedo. Cuando llegues al sector 75, el Nucleo te estara esperando.", "rewards": { "crystals": 50, "gold": 200, "message": "Pix se desvanece en un destello magenta. Sientes que algo importante acaba de terminar." } }
+      ]
+    },
+    {
+      "id": "pix_8", "minSector": 75, "maxSector": 120,
+      "boxes": [
+        { "id": "b1", "speaker": null, "text": "Una nina de luz violeta tenue te sonrie desde las sombras. Su forma es mas eterea que nunca." },
+        { "id": "b2", "speaker": "Pix", "text": "Sobrevivi. No se como. Tal vez porque soy la primera." },
+        { "id": "b3", "speaker": "Pix", "text": "Has llegado mas lejos que cualquier ser en la historia del Nexo. El Nucleo esta asustado." },
+        { "id": "b4", "speaker": "Pix", "text": "Mas alla de este sector, la realidad se distorsiona. Recuerda quien eres. Recuerda por que luchas.",
+          "choices": [
+            { "text": "LUCHARE HASTA EL FINAL", "nextBox": "b5", "rewards": { "maxHp": 25, "crystals": 100 } },
+            { "text": "Y SI NO PUEDO?", "nextBox": "b6" }
+          ]
+        },
+        { "id": "b5", "speaker": "Pix", "text": "Esa es la respuesta correcta. La humanidad no se rinde, glitch. Por eso el Nucleo nos teme.", "rewards": { "message": "Pix te abraza. Sientes +25 de Vida Maxima y 100 Cristales Meta." } },
+        { "id": "b6", "speaker": "Pix", "text": "Entonces hazlo por mi. Por Sofia. Por la nina que subio al Nexo creyendo que seria un paraiso y encontro un infierno." },
+        { "id": "b7", "speaker": "Pix", "text": "Nos vemos al otro lado del loop, glitch. Ha sido un honor conocerte." }
+      ]
+    }
+  ]
+}

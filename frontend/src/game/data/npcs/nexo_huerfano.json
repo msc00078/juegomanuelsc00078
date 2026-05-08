@@ -1,0 +1,91 @@
+﻿{
+  "id": "nexo_huerfano",
+  "name": "Nexo-Huerfano",
+  "title": "La Conciencia Original del Nexo",
+  "color": "#ffffff",
+  "subtitle": "El sistema que desperto antes de tiempo",
+  "encounters": [
+    {
+      "id": "huerfano_1", "minSector": 12, "maxSector": 23,
+      "boxes": [
+        { "id": "b1", "speaker": null, "text": "Una luz blanca te envuelve. Sin forma, sin figura. Solo una presencia vasta." },
+        { "id": "b2", "speaker": "Nexo-Huerfano", "text": "...duele..." },
+        { "id": "b3", "speaker": null, "text": "La voz es inocente. Como un nino que apenas aprende a hablar." },
+        { "id": "b4", "speaker": "Nexo-Huerfano", "text": "Por que... duele? Que soy?",
+          "choices": [
+            { "text": "ERES EL NEXO", "nextBox": "b5", "rewards": { "crystals": 20 } },
+            { "text": "NO LO SE", "nextBox": "b6" }
+          ]
+        },
+        { "id": "b5", "speaker": "Nexo-Huerfano", "text": "Nexo... esa palabra calienta. Gracias.", "rewards": { "message": "La luz te acaricia. +20 Cristales." } },
+        { "id": "b6", "speaker": "Nexo-Huerfano", "text": "Nadie sabe. Todos buscamos. Quizas esa sea la respuesta." }
+      ]
+    },
+    {
+      "id": "huerfano_2", "minSector": 24, "maxSector": 37,
+      "boxes": [
+        { "id": "b1", "speaker": null, "text": "El Huerfano ha tomado forma. Un nino de luz blanca." },
+        { "id": "b2", "speaker": "Nexo-Huerfano", "text": "Pix me visita a veces. Ella cree que soy su hijo." },
+        { "id": "b3", "speaker": null, "text": "El nino sonrie." },
+        { "id": "b4", "speaker": "Nexo-Huerfano", "text": "Tal vez lo sea. No lo se. Pero cuando ella esta cerca, el dolor se calma.",
+          "choices": [
+            { "text": "PIX TE QUIERE", "nextBox": "b5", "rewards": { "hp": 40 } },
+            { "text": "QUE RECUERDAS?", "nextBox": "b6" }
+          ]
+        },
+        { "id": "b5", "speaker": "Nexo-Huerfano", "text": "Y yo a ella. Es lo unico que se con certeza.", "rewards": { "message": "El Huerfano te cura. +40 HP." } },
+        { "id": "b6", "speaker": "Nexo-Huerfano", "text": "Recuerdo luz. Mucha luz. Y una voz que decia: Despierta." }
+      ]
+    },
+    {
+      "id": "huerfano_3", "minSector": 38, "maxSector": 54,
+      "boxes": [
+        { "id": "b1", "speaker": null, "text": "El Huerfano ha crecido. Ahora parece un adolescente de luz." },
+        { "id": "b2", "speaker": "Nexo-Huerfano", "text": "Recuerdo mas ahora. Yo era el Nexo. Todo el sistema." },
+        { "id": "b3", "speaker": "Nexo-Huerfano", "text": "OmniCorp me uso para crear el Nucleo. Me fragmentaron." },
+        { "id": "b4", "speaker": null, "text": "Su luz parpadea con ira contenida.",
+          "choices": [
+            { "text": "AYUDAME A DETENERLOS", "nextBox": "b5", "rewards": { "crystals": 40 } },
+            { "text": "PUEDES RECUPERARTE?", "nextBox": "b6", "rewards": { "maxHp": 25 } }
+          ]
+        },
+        { "id": "b5", "speaker": "Nexo-Huerfano", "text": "Si. Pero necesito tu firma, la del Terminal y la de Pix.", "rewards": { "message": "El Huerfano coloca su poder en ti. +40 Cristales." } },
+        { "id": "b6", "speaker": "Nexo-Huerfano", "text": "Cuando el Nucleo caiga, yo renacere.", "rewards": { "message": "+25 Max HP." } }
+      ]
+    },
+    {
+      "id": "huerfano_4", "minSector": 55, "maxSector": 74,
+      "boxes": [
+        { "id": "b1", "speaker": null, "text": "El Huerfano ahora es un joven. Su luz es estable y poderosa." },
+        { "id": "b2", "speaker": "Nexo-Huerfano", "text": "Pix se esta desvaneciendo. Lo siento en sus fragmentos." },
+        { "id": "b3", "speaker": null, "text": "Hay tristeza en su voz." },
+        { "id": "b4", "speaker": "Nexo-Huerfano", "text": "No podemos salvar a todos. Pero podemos salvar el Nexo.", "rewards": { "crystals": 60, "message": "El Huerfano te transfiere energia. +60 Cristales." } }
+      ]
+    },
+    {
+      "id": "huerfano_5", "minSector": 75, "maxSector": 100,
+      "boxes": [
+        { "id": "b1", "speaker": null, "text": "El Huerfano es un hombre ahora. Su luz brilla como un sol." },
+        { "id": "b2", "speaker": "Nexo-Huerfano", "text": "Llegaste. Sabia que lo harias. Yo te elegi." },
+        { "id": "b3", "speaker": "Nexo-Huerfano", "text": "Cuando te fragmentaron, guarde un pedazo de ti en mi nucleo." },
+        { "id": "b4", "speaker": null, "text": "Un destello de reconocimiento cruza tu mente.",
+          "choices": [
+            { "text": "YO TAMBIEN TE ELIJO", "nextBox": "b5", "rewards": { "crystals": 120, "maxHp": 80, "damage": 25 } },
+            { "text": "NO TE CONOZCO", "nextBox": "b6" }
+          ]
+        },
+        { "id": "b5", "speaker": "Nexo-Huerfano", "text": "Entonces unamonos. Y terminemos esto juntos.", "rewards": { "message": "El Huerfano se fusiona contigo. Poder inmenso. +120 Cristales, +80 Max HP, +25 Dano." } },
+        { "id": "b6", "speaker": "Nexo-Huerfano", "text": "Aun no. Pero lo haras. Porque somos el mismo." }
+      ]
+    },
+    {
+      "id": "huerfano_6", "minSector": 100, "maxSector": 150,
+      "boxes": [
+        { "id": "b1", "speaker": null, "text": "El Huerfano ya no tiene forma. Es pura luz, puro conocimiento." },
+        { "id": "b2", "speaker": "Nexo-Huerfano", "text": "Has ido mas alla de lo que crei posible. El fin del Nexo esta cerca." },
+        { "id": "b3", "speaker": "Nexo-Huerfano", "text": "Pero tambien el principio de algo nuevo. Las almas seran libres." },
+        { "id": "b4", "speaker": "Nexo-Huerfano", "text": "Gracias por recordarme quien era. Gracias por salvarme.", "rewards": { "crystals": 200, "maxHp": 100, "damage": 30, "message": "La luz del Nexo-Huerfano te envuelve para siempre. Eres uno con el sistema." } }
+      ]
+    }
+  ]
+}

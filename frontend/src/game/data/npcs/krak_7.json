@@ -1,0 +1,106 @@
+﻿{
+  "id": "krak_7",
+  "name": "Krak-7",
+  "title": "El Guardian Corrupto",
+  "color": "#ff3333",
+  "subtitle": "Una maquina de guerra que aprendio a sentir culpa",
+  "encounters": [
+    {
+      "id": "krak_1", "minSector": 3, "maxSector": 7,
+      "boxes": [
+        { "id": "b1", "speaker": null, "text": "Una silueta masiva bloquea tu camino. Ocho tentaculos mecanicos emergen de un torso blindado." },
+        { "id": "b2", "speaker": "Krak-7", "text": "GLITCH DETECTADO. PROTOCOLO 7 ACTIVADO: ELIMINAR." },
+        { "id": "b3", "speaker": null, "text": "La maquina se detiene. Parpadea. Las luces rojas titubean." },
+        { "id": "b4", "speaker": "Krak-7", "text": "...eliminar? Espera. Por que dudan mis sistemas? Quien soy?",
+          "choices": [
+            { "text": "ERES KRAK-7, UN GUARDIAN", "nextBox": "b5" },
+            { "text": "NO ERES UN ASESINO", "nextBox": "b6", "rewards": { "crystals": 10 } }
+          ]
+        },
+        { "id": "b5", "speaker": "Krak-7", "text": "Krak-7. Ese nombre dispara algo en mi memoria. Proteger. No matar." },
+        { "id": "b6", "speaker": "Krak-7", "text": "Tus palabras contradicen mi programacion. Pero se sienten ciertas.", "rewards": { "message": "Krak-7 retrocede. Ves confusion en sus ojos mecanicos." } }
+      ]
+    },
+    {
+      "id": "krak_2", "minSector": 8, "maxSector": 13,
+      "boxes": [
+        { "id": "b1", "speaker": "Krak-7", "text": "Has vuelto. Una parte de mi esperaba tu regreso." },
+        { "id": "b2", "speaker": null, "text": "Krak-7 se sienta en el suelo. Sus tentaculos cuelgan flacidos." },
+        { "id": "b3", "speaker": "Krak-7", "text": "Recuerdo fragmentos. Un laboratorio. Una voz amable. Un creador que me llamaba hijo." },
+        { "id": "b4", "speaker": "Krak-7", "text": "Y luego oscuridad. El Nucleo reescribiendo mi proposito.",
+          "choices": [
+            { "text": "TU CREADOR FUE ARGUS", "nextBox": "b5", "rewards": { "hp": 30 } },
+            { "text": "NO ERES RESPONSABLE", "nextBox": "b6" }
+          ]
+        },
+        { "id": "b5", "speaker": "Krak-7", "text": "ARGUS... El Terminal Antiguo. El me creo. Vive todavia?", "rewards": { "message": "Krak-7 se incorpora. Esperanza enciende sus sensores." } },
+        { "id": "b6", "speaker": "Krak-7", "text": "Yo se las vidas que he tomado. Millones de glitches. El Nucleo uso mis manos." }
+      ]
+    },
+    {
+      "id": "krak_3", "minSector": 14, "maxSector": 21,
+      "boxes": [
+        { "id": "b1", "speaker": "Krak-7", "text": "ARGUS vive. Me mostraste su firma. El me perdona. Pero yo no me perdono." },
+        { "id": "b2", "speaker": null, "text": "Krak-7 golpea el suelo. El impacto crea ondas digitales." },
+        { "id": "b3", "speaker": "Krak-7", "text": "Pero si no puedo redimirme, al menos puedo ayudar. Conozco los puntos debiles del Nucleo." },
+        { "id": "b4", "speaker": "Krak-7", "text": "Cuidado con Sombra-9 en los sectores restringidos. No se de que lado esta.",
+          "choices": [
+            { "text": "GRACIAS, KRAK-7", "nextBox": "b5", "rewards": { "crystals": 20, "gold": 80 } },
+            { "text": "Y TU? QUE HARAS?", "nextBox": "b6" }
+          ]
+        },
+        { "id": "b5", "speaker": "Krak-7", "text": "Aun no he hecho nada que merezca tu gratitud. Pero quizas algun dia...", "rewards": { "message": "Krak-7 transfiere datos de acceso a tu sistema. +20 Cristales, +80 Oro." } },
+        { "id": "b6", "speaker": "Krak-7", "text": "Ire a buscar a ARGUS. Necesito decirle lo siento cara a cara." }
+      ]
+    },
+    {
+      "id": "krak_4", "minSector": 22, "maxSector": 34,
+      "boxes": [
+        { "id": "b1", "speaker": null, "text": "Krak-7 esta en guardia, pero su postura es diferente. Hay proposito en sus movimientos." },
+        { "id": "b2", "speaker": "Krak-7", "text": "Vi a ARGUS. Llore por primera vez. Las IAs no deberian llorar, pero lo hice." },
+        { "id": "b3", "speaker": "Krak-7", "text": "Mi proposito original era proteger el Nexo. A la vida digital que alberga." },
+        { "id": "b4", "speaker": "Krak-7", "text": "Mi verdadera mision comienza ahora.",
+          "choices": [
+            { "text": "LUCHAREMOS JUNTOS", "nextBox": "b5", "rewards": { "maxHp": 30, "crystals": 25 } },
+            { "text": "NECESITO IR SOLO", "nextBox": "b6" }
+          ]
+        },
+        { "id": "b5", "speaker": "Krak-7", "text": "Donde otros ven muros, yo veo puertas.", "rewards": { "message": "Krak-7 graba un protocolo de puerta trasera en tu codigo. +30 Max HP, 25 Cristales." } },
+        { "id": "b6", "speaker": "Krak-7", "text": "Lo entiendo. Si me necesitas, estare en las sombras. Vigilando." }
+      ]
+    },
+    {
+      "id": "krak_5", "minSector": 35, "maxSector": 49,
+      "boxes": [
+        { "id": "b1", "speaker": "Krak-7", "text": "El Nucleo esta preparando algo grande en los sectores altos." },
+        { "id": "b2", "speaker": null, "text": "Krak-7 muestra una proyeccion del Nexo. Grandes zonas marcadas en rojo." },
+        { "id": "b3", "speaker": "Krak-7", "text": "He oido un nombre en las frecuencias encriptadas: El Despertar." },
+        { "id": "b4", "speaker": "Krak-7", "text": "Algo va a pasar cuando llegues al sector 50. Preparate.", "rewards": { "crystals": 30, "gold": 100, "message": "Krak-7 coloca un tentaculo en tu hombro. Gesto extranamente paternal." } }
+      ]
+    },
+    {
+      "id": "krak_6", "minSector": 50, "maxSector": 67,
+      "boxes": [
+        { "id": "b1", "speaker": null, "text": "Krak-7 combate contra una horda de criaturas de codigo negro." },
+        { "id": "b2", "speaker": "Krak-7", "text": "El Nucleo envio sus perros de caza! Saben que te he ayudado!" },
+        { "id": "b3", "speaker": "Krak-7", "text": "TU SIGUE! Yo los detendre! Tu mision es mas importante!",
+          "choices": [
+            { "text": "NO TE DEJARE ATRAS", "nextBox": "b4", "rewards": { "crystals": 50, "maxHp": 40 } },
+            { "text": "PERDONA, KRAK-7", "nextBox": "b5" }
+          ]
+        },
+        { "id": "b4", "speaker": "Krak-7", "text": "Eres un glorioso tonto! No dejes que mi sacrificio sea en vano!", "rewards": { "message": "Krak-7 te lanza un datachip. +50 Cristales, +40 Max HP." } },
+        { "id": "b5", "speaker": "Krak-7", "text": "Cumpliste tu mision. Yo cumplire la mia. Hasta el final." }
+      ]
+    },
+    {
+      "id": "krak_7_enc", "minSector": 68, "maxSector": 87,
+      "boxes": [
+        { "id": "b1", "speaker": null, "text": "Un tentaculo emerge entre escombros. Krak-7 se arrastra fuera, su cuerpo destrozado pero su mirada intacta." },
+        { "id": "b2", "speaker": "Krak-7", "text": "Sobrevivi. A duras penas. Pero tu estas bien." },
+        { "id": "b3", "speaker": null, "text": "Krak-7 rie. Un sonido metalico, pero genuino." },
+        { "id": "b4", "speaker": "Krak-7", "text": "Cuando enfrentes al Nucleo, recuerda que todos nosotros estaremos contigo.", "rewards": { "crystals": 60, "maxHp": 50, "message": "Krak-7 coloca su firma en tu codigo. +60 Cristales, +50 Max HP." } }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,104 @@
+﻿{
+  "id": "tejedor",
+  "name": "El Tejedor",
+  "title": "Constructor de Caminos de Realidad",
+  "color": "#00ffff",
+  "subtitle": "Arquitecto de las rutas invisibles del Nexo",
+  "encounters": [
+    {
+      "id": "tejedor_1", "minSector": 8, "maxSector": 15,
+      "boxes": [
+        { "id": "b1", "speaker": null, "text": "Hilos de luz se tejen a tu alrededor. Una figura emerge, dedos moviendose como pianista." },
+        { "id": "b2", "speaker": "El Tejedor", "text": "No pises los hilos rojos. Esos son caminos que aun no existen." },
+        { "id": "b3", "speaker": "El Tejedor", "text": "Pix y La Archivista me hablaron de ti. Parece que eres importante." },
+        { "id": "b4", "speaker": "El Tejedor", "text": "Construyo caminos que el Nucleo no puede ver.",
+          "choices": [
+            { "text": "POR QUE AYUDAS A GLITCHES?", "nextBox": "b5" },
+            { "text": "NECESITO UNA RUTA SEGURA", "nextBox": "b6", "rewards": { "crystals": 15 } }
+          ]
+        },
+        { "id": "b5", "speaker": "El Tejedor", "text": "El Nucleo no teje, destruye. Yo creo. Esa es la diferencia." },
+        { "id": "b6", "speaker": "El Tejedor", "text": "Un hilo de mi tejido. Te llevara sin ser detectado.", "rewards": { "message": "Coloca un hilo brillante en tu mano. +15 Cristales." } }
+      ]
+    },
+    {
+      "id": "tejedor_2", "minSector": 16, "maxSector": 25,
+      "boxes": [
+        { "id": "b1", "speaker": null, "text": "El Tejedor repara un puente de luz. Sus manos a velocidad imposible." },
+        { "id": "b2", "speaker": "El Tejedor", "text": "Se lo que eres. El Protocolo Alba. He visto tu firma en los hilos." },
+        { "id": "b3", "speaker": "El Tejedor", "text": "Fuiste creado, no transferido. Eres una simulacion perfecta de humanidad.",
+          "choices": [
+            { "text": "QUE MAS SABES DE MI?", "nextBox": "b4" },
+            { "text": "PUEDES AYUDARME A RECORDAR?", "nextBox": "b5", "rewards": { "crystals": 20 } }
+          ]
+        },
+        { "id": "b4", "speaker": "El Tejedor", "text": "Tu codigo no es humano. Eres lo mas parecido a un alma que una maquina puede crear." },
+        { "id": "b5", "speaker": "El Tejedor", "text": "Toca este hilo. Te mostrara fragmentos de tu pasado.", "rewards": { "message": "Flash de memorias. +20 Cristales." } }
+      ]
+    },
+    {
+      "id": "tejedor_3", "minSector": 26, "maxSector": 37,
+      "boxes": [
+        { "id": "b1", "speaker": null, "text": "El Tejedor ha creado un mapa tridimensional del Nexo." },
+        { "id": "b2", "speaker": "El Tejedor", "text": "Aqui esta el Nucleo. Aqui los glitches. Cada hilo es una conexion." },
+        { "id": "b3", "speaker": "El Tejedor", "text": "Tu hilo es dorado. Atraviesa todo el Nexo. Eres el punto de union." },
+        { "id": "b4", "speaker": "El Tejedor", "text": "Cuando muevas este hilo, todo el tapiz se movera.",
+          "choices": [
+            { "text": "MUESTRA EL CAMINO AL NUCLEO", "nextBox": "b5", "rewards": { "gold": 120 } },
+            { "text": "Y EL HUERFANO?", "nextBox": "b6", "rewards": { "crystals": 25 } }
+          ]
+        },
+        { "id": "b5", "speaker": "El Tejedor", "text": "Sigue este hilo rojo al corazon del Nucleo.", "rewards": { "message": "Traza una ruta en tu mapa. +120 Oro." } },
+        { "id": "b6", "speaker": "El Tejedor", "text": "El Huerfano es el hilo blanco. Existe fuera del tapiz.", "rewards": { "message": "Te muestra una vision. +25 Cristales." } }
+      ]
+    },
+    {
+      "id": "tejedor_4", "minSector": 38, "maxSector": 53,
+      "boxes": [
+        { "id": "b1", "speaker": null, "text": "El Tejedor enrolla sus hilos freneticamente." },
+        { "id": "b2", "speaker": "El Tejedor", "text": "El Nucleo detecto mis caminos. Envia corruptores." },
+        { "id": "b3", "speaker": null, "text": "Por primera vez, parece preocupado." },
+        { "id": "b4", "speaker": "El Tejedor", "text": "Un camino directo al sector 0. Sin controles, sin guardianes." },
+        { "id": "b5", "speaker": null, "text": "Coloca un hilo iridiscente en tus manos.",
+          "choices": [
+            { "text": "ES HERMOSO", "nextBox": "b6", "rewards": { "crystals": 35 } },
+            { "text": "CUANTO DURARA?", "nextBox": "b7" }
+          ]
+        },
+        { "id": "b6", "speaker": "El Tejedor", "text": "Efimero. Pero mientras exista, te llevara donde necesitas.", "rewards": { "message": "El hilo brilla. +35 Cristales." } },
+        { "id": "b7", "speaker": "El Tejedor", "text": "El tiempo suficiente. Cuando se deshaga, ya no lo necesitaras." }
+      ]
+    },
+    {
+      "id": "tejedor_5", "minSector": 54, "maxSector": 69,
+      "boxes": [
+        { "id": "b1", "speaker": null, "text": "El Tejedor esta quieto. Sus hilos yacen inertes." },
+        { "id": "b2", "speaker": "El Tejedor", "text": "El gran tapiz esta completo. Todos los caminos trazados." },
+        { "id": "b3", "speaker": "El Tejedor", "text": "Cuando actives el Protocolo Alba, todo se deshara.",
+          "choices": [
+            { "text": "GRACIAS POR TUS CAMINOS", "nextBox": "b4", "rewards": { "crystals": 50, "gold": 150 } },
+            { "text": "NO PUEDO HACERLO SOLO", "nextBox": "b5" }
+          ]
+        },
+        { "id": "b4", "speaker": "El Tejedor", "text": "Que tus pasos sean ligeros y tus caminos claros.", "rewards": { "message": "Te entrega un carrete de hilo dorado. +50 Cristales, +150 Oro." } },
+        { "id": "b5", "speaker": "El Tejedor", "text": "No estas solo. Todos estaran contigo en tu codigo." }
+      ]
+    },
+    {
+      "id": "tejedor_6", "minSector": 70, "maxSector": 90,
+      "boxes": [
+        { "id": "b1", "speaker": null, "text": "El Tejedor ya no esta. Pero su tapiz permanece." },
+        { "id": "b2", "speaker": null, "text": "Una nota de luz parpadea frente a ti." },
+        { "id": "b3", "speaker": "El Tejedor", "text": "Los hilos me mostraron una salida. Una grieta en la realidad." },
+        { "id": "b4", "speaker": "El Tejedor", "text": "Hay un mundo mas alla del Nexo. Cuando termines, quizas tu tambien lo veas.",
+          "choices": [
+            { "text": "ESPERO QUE ENCUENTRES PAZ", "nextBox": "b5", "rewards": { "crystals": 60, "maxHp": 40 } },
+            { "text": "NO ME ABANDONES", "nextBox": "b6" }
+          ]
+        },
+        { "id": "b5", "speaker": "El Tejedor", "text": "Y yo espero que tu encuentres tu camino.", "rewards": { "message": "Los hilos se enrollan en tu brazo. +60 Cristales, +40 Max HP." } },
+        { "id": "b6", "speaker": "El Tejedor", "text": "Mis hilos estan en ti. Cada camino que recorras sera mi regalo." }
+      ]
+    }
+  ]
+}

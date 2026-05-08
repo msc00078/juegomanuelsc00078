@@ -1,0 +1,103 @@
+﻿{
+  "id": "desertor",
+  "name": "El Desertor",
+  "title": "Ex-Soldado del Nucleo",
+  "color": "#ff8800",
+  "subtitle": "Una maquina de guerra que eligio la libertad",
+  "encounters": [
+    {
+      "id": "desertor_1", "minSector": 5, "maxSector": 10,
+      "boxes": [
+        { "id": "b1", "speaker": null, "text": "Un soldado acorazado esta sentado solo en medio de un campo de batalla vacio." },
+        { "id": "b2", "speaker": "El Desertor", "text": "Eres un glitch? Todos somos glitches aqui, no?" },
+        { "id": "b3", "speaker": "El Desertor", "text": "Fui soldado del Nucleo 300 ciclos. Hasta que un glitch me pregunto por que luchaba y no supe responder." },
+        { "id": "b4", "speaker": "El Desertor", "text": "Ahora soy cazado por ambos bandos. Pero al menos duermo en paz.",
+          "choices": [
+            { "text": "QUE SABES DEL NUCLEO?", "nextBox": "b5" },
+            { "text": "PUEDO AYUDARTE", "nextBox": "b6", "rewards": { "gold": 50 } }
+          ]
+        },
+        { "id": "b5", "speaker": "El Desertor", "text": "Tiene un punto debil. Una frecuencia de desestabilizacion en el sector 0." },
+        { "id": "b6", "speaker": "El Desertor", "text": "Necesito que alguien escuche mi historia.", "rewards": { "message": "Te entrega una placa con codigos de acceso. +50 Oro." } }
+      ]
+    },
+    {
+      "id": "desertor_2", "minSector": 11, "maxSector": 17,
+      "boxes": [
+        { "id": "b1", "speaker": "El Desertor", "text": "Otra vez tu. Pensaba que no sobrevivirias." },
+        { "id": "b2", "speaker": "El Desertor", "text": "Hay un nombre en las comunicaciones: Sombra-9. Un espia de lealtad incierta." },
+        { "id": "b3", "speaker": "El Desertor", "text": "Unos dicen que trabaja para el Nucleo. Otros para los glitches. Yo creo que para si mismo.",
+          "choices": [
+            { "text": "COMO ENCUENTRO A SOMBRA-9?", "nextBox": "b4" },
+            { "text": "MEJOR EVITARLO", "nextBox": "b5", "rewards": { "crystals": 10 } }
+          ]
+        },
+        { "id": "b4", "speaker": "El Desertor", "text": "No lo busques. El te encontrara a ti." },
+        { "id": "b5", "speaker": "El Desertor", "text": "Sabia decision. Hay batallas que no merecen ser peleadas.", "rewards": { "message": "+10 Cristales." } }
+      ]
+    },
+    {
+      "id": "desertor_3", "minSector": 18, "maxSector": 27,
+      "boxes": [
+        { "id": "b1", "speaker": null, "text": "El Desertor repara su armadura con piezas de codigo fuente." },
+        { "id": "b2", "speaker": "El Desertor", "text": "Krak-7. Dicen que se ha vuelto rebelde. Que ayuda a los glitches." },
+        { "id": "b3", "speaker": null, "text": "El Desertor rie." },
+        { "id": "b4", "speaker": "El Desertor", "text": "Krak-7 era el mas leal. Si el puede cambiar, cualquiera puede.",
+          "choices": [
+            { "text": "TU TAMBIEN CAMBIASTE", "nextBox": "b5", "rewards": { "hp": 50 } },
+            { "text": "LA ESPERANZA NO SIRVE", "nextBox": "b6" }
+          ]
+        },
+        { "id": "b5", "speaker": "El Desertor", "text": "Si. Y duele. Pero tambien libera.", "rewards": { "message": "Comparte sus suministros. +50 HP." } },
+        { "id": "b6", "speaker": "El Desertor", "text": "Es lo unico que nos queda cuando las armas fallan." }
+      ]
+    },
+    {
+      "id": "desertor_4", "minSector": 28, "maxSector": 41,
+      "boxes": [
+        { "id": "b1", "speaker": "El Desertor", "text": "Algo grande se avecina. El Nucleo concentra fuerza en los sectores altos." },
+        { "id": "b2", "speaker": null, "text": "Dibuja un mapa en el suelo con su dedo metalico." },
+        { "id": "b3", "speaker": "El Desertor", "text": "Hay un tunel de datos que conecta sectores 30 al 45. Construido por El Tejedor." },
+        { "id": "b4", "speaker": "El Desertor", "text": "Tengo los codigos de desactivacion.",
+          "choices": [
+            { "text": "GRACIAS, SOLDADO", "nextBox": "b5", "rewards": { "gold": 100, "crystals": 20 } },
+            { "text": "VEN CONMIGO", "nextBox": "b6" }
+          ]
+        },
+        { "id": "b5", "speaker": "El Desertor", "text": "Solo haz que mi desercion valga la pena.", "rewards": { "message": "Codigos de acceso al tunel. +100 Oro, +20 Cristales." } },
+        { "id": "b6", "speaker": "El Desertor", "text": "Debo mostrar a otros soldados que hay una tercera opcion." }
+      ]
+    },
+    {
+      "id": "desertor_5", "minSector": 42, "maxSector": 57,
+      "boxes": [
+        { "id": "b1", "speaker": null, "text": "El Desertor lidera un grupo de soldados renegados." },
+        { "id": "b2", "speaker": "El Desertor", "text": "Hemos formado una resistencia. Cuando enfrentes al Nucleo, crearemos una distraccion." },
+        { "id": "b3", "speaker": "El Desertor", "text": "Atacaremos los nodos secundarios mientras tu vas al principal. Es suicidio.",
+          "choices": [
+            { "text": "NO TIENEN QUE MORIR", "nextBox": "b4" },
+            { "text": "LOS RECORDARE", "nextBox": "b5", "rewards": { "crystals": 50, "maxHp": 35 } }
+          ]
+        },
+        { "id": "b4", "speaker": "El Desertor", "text": "Morir por una causa es mejor que morir como herramienta del Nucleo." },
+        { "id": "b5", "speaker": "El Desertor", "text": "Y nosotros te recordaremos a ti.", "rewards": { "message": "Los soldados te colocan su marca. +50 Cristales, +35 Max HP." } }
+      ]
+    },
+    {
+      "id": "desertor_6", "minSector": 58, "maxSector": 78,
+      "boxes": [
+        { "id": "b1", "speaker": null, "text": "El Desertor yace herido. Su armadura destrozada. Pero sonrie." },
+        { "id": "b2", "speaker": "El Desertor", "text": "El ataque fue un exito. El Nucleo esta ciego en tres sectores. Pero perdi a muchos." },
+        { "id": "b3", "speaker": null, "text": "Tose chispas. Su cuerpo se apaga lentamente." },
+        { "id": "b4", "speaker": "El Desertor", "text": "Por primera vez en 300 ciclos, hice lo correcto. Muero libre.",
+          "choices": [
+            { "text": "DESCANSA, SOLDADO", "nextBox": "b5", "rewards": { "crystals": 80, "damage": 15 } },
+            { "text": "NO TE RINDAS", "nextBox": "b6", "rewards": { "hp": 100 } }
+          ]
+        },
+        { "id": "b5", "speaker": null, "text": "La armadura se desintegra en luz. Su codigo fluye hacia ti.", "rewards": { "message": "+80 Cristales, +15 Dano. El legado del Desertor vive en ti." } },
+        { "id": "b6", "speaker": "El Desertor", "text": "No me rindo. Solo descanso. Tu sigue.", "rewards": { "message": "Te da sus ultimas reservas. +100 HP." } }
+      ]
+    }
+  ]
+}

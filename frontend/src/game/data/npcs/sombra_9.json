@@ -1,0 +1,89 @@
+﻿{
+  "id": "sombra_9",
+  "name": "Sombra-9",
+  "title": "El Espia de Lealtad Incierta",
+  "color": "#9933ff",
+  "subtitle": "Nadie sabe para quien trabaja. Ni siquiera el.",
+  "encounters": [
+    {
+      "id": "sombra_1", "minSector": 10, "maxSector": 19,
+      "boxes": [
+        { "id": "b1", "speaker": null, "text": "Una figura liquida emerge de las sombras. Sin rostro fijo." },
+        { "id": "b2", "speaker": "Sombra-9", "text": "No te asustes. O si. Depende de como termine esto." },
+        { "id": "b3", "speaker": "Sombra-9", "text": "El Nucleo planea algo en el sector 15. Pero la informacion tiene precio.",
+          "choices": [
+            { "text": "QUE PRECIO?", "nextBox": "b4" },
+            { "text": "NO CONFIO EN TI", "nextBox": "b5", "rewards": { "crystals": 10 } }
+          ]
+        },
+        { "id": "b4", "speaker": "Sombra-9", "text": "Nada que no puedas permitirte. Oro o un secreto." },
+        { "id": "b5", "speaker": "Sombra-9", "text": "Desconfiar de mi es lo mas inteligente.", "rewards": { "message": "Te lanza un cristal. +10 Cristales." } }
+      ]
+    },
+    {
+      "id": "sombra_2", "minSector": 20, "maxSector": 31,
+      "boxes": [
+        { "id": "b1", "speaker": "Sombra-9", "text": "Te he observado. Eres diferente." },
+        { "id": "b2", "speaker": "Sombra-9", "text": "Trabajo para el Nucleo. Y para los glitches. Depende de quien pague." },
+        { "id": "b3", "speaker": "Sombra-9", "text": "Contigo hare una excepcion. Informacion gratis.",
+          "choices": [
+            { "text": "QUE INFORMACION?", "nextBox": "b4" },
+            { "text": "NO QUIERO TUS REGALOS", "nextBox": "b5", "rewards": { "crystals": 15 } }
+          ]
+        },
+        { "id": "b4", "speaker": "Sombra-9", "text": "El Nucleo busca algo en el sector 0. Esta obsesionado." },
+        { "id": "b5", "speaker": "Sombra-9", "text": "La oferta sigue en pie. Cuando cambies de opinion, silba.", "rewards": { "message": "15 Cristales aparecen en tu bolsillo." } }
+      ]
+    },
+    {
+      "id": "sombra_3", "minSector": 32, "maxSector": 45,
+      "boxes": [
+        { "id": "b1", "speaker": null, "text": "Sombra-9 esta herido. Su forma gotea datos como sangre." },
+        { "id": "b2", "speaker": "Sombra-9", "text": "El Nucleo descubrio que te ayudo. Me castigaron." },
+        { "id": "b3", "speaker": null, "text": "Por primera vez, su voz es estable. Una sola persona." },
+        { "id": "b4", "speaker": "Sombra-9", "text": "Fui humano. Mi nombre era Alex. Ayude a construir el Nexo para OmniCorp." },
+        { "id": "b5", "speaker": null, "text": "Alex tiembla.",
+          "choices": [
+            { "text": "POR QUE NOS AYUDAS?", "nextBox": "b6" },
+            { "text": "PUEDES REDIMIRTE", "nextBox": "b7", "rewards": { "crystals": 30, "gold": 100 } }
+          ]
+        },
+        { "id": "b6", "speaker": "Sombra-9", "text": "Vi lo que creamos. Vi a Pix, a todos atrapados en mi creacion." },
+        { "id": "b7", "speaker": "Sombra-9", "text": "Al menos puedo intentar no empeorar las cosas.", "rewards": { "message": "Sonrie con cara propia. +30 Cristales, +100 Oro." } }
+      ]
+    },
+    {
+      "id": "sombra_4", "minSector": 46, "maxSector": 59,
+      "boxes": [
+        { "id": "b1", "speaker": "Sombra-9", "text": "Estuve en el sector 0. Encontre el conmutador de emergencia." },
+        { "id": "b2", "speaker": null, "text": "Su forma es mas estable ahora. Mas humana." },
+        { "id": "b3", "speaker": "Sombra-9", "text": "Necesita tres firmas de administrador. Una es biologica. Tuya." },
+        { "id": "b4", "speaker": "Sombra-9", "text": "Tu codigo esta firmado por los creadores del sistema.",
+          "choices": [
+            { "text": "LLEVAME AL SECTOR 0", "nextBox": "b5", "rewards": { "crystals": 40 } },
+            { "text": "POR QUE ME AYUDAS?", "nextBox": "b6" }
+          ]
+        },
+        { "id": "b5", "speaker": "Sombra-9", "text": "Te dare las coordenadas. Pero el Nucleo te espera.", "rewards": { "message": "Datachip con coordenadas. +40 Cristales." } },
+        { "id": "b6", "speaker": "Sombra-9", "text": "Tengo una hija. Sofia. La subieron al Nexo con 12 anos. Necesito encontrarla." }
+      ]
+    },
+    {
+      "id": "sombra_5", "minSector": 60, "maxSector": 80,
+      "boxes": [
+        { "id": "b1", "speaker": null, "text": "Alex esta solido. Un hombre de mediana edad, cansado, pero en paz." },
+        { "id": "b2", "speaker": "Sombra-9", "text": "Encontre a Pix. Mi hija. Es Sofia." },
+        { "id": "b3", "speaker": null, "text": "Alex llora lagrimas reales." },
+        { "id": "b4", "speaker": "Sombra-9", "text": "No me reconocio. Pero yo la reconoci. Todo valio la pena." },
+        { "id": "b5", "speaker": null, "text": "Te da su firma de administrador.",
+          "choices": [
+            { "text": "GRACIAS, ALEX", "nextBox": "b6", "rewards": { "crystals": 100, "maxHp": 50 } },
+            { "text": "DEBES DECIRSELO", "nextBox": "b7", "rewards": { "crystals": 60 } }
+          ]
+        },
+        { "id": "b6", "speaker": "Sombra-9", "text": "Libera a mi hija. Libera a todos.", "rewards": { "message": "Coloca su firma en tu codigo. +100 Cristales, +50 Max HP." } },
+        { "id": "b7", "speaker": "Sombra-9", "text": "Cuando todo termine, si sobrevivo, entonces se lo dire.", "rewards": { "message": "Alex te sonrie. +60 Cristales." } }
+      ]
+    }
+  ]
+}

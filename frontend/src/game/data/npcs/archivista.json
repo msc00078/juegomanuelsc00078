@@ -1,0 +1,122 @@
+﻿{
+  "id": "archivista",
+  "name": "La Archivista",
+  "title": "Guardiana del Saber Original",
+  "color": "#33ccff",
+  "subtitle": "Ultima bibliotecaria del Nexo pre-Purga",
+  "encounters": [
+    {
+      "id": "archivista_1", "minSector": 4, "maxSector": 8,
+      "boxes": [
+        { "id": "b1", "speaker": null, "text": "Una biblioteca infinita se extiende ante ti. Libros de luz flotan en el aire. Una mujer seria esta en un escritorio flotante." },
+        { "id": "b2", "speaker": "La Archivista", "text": "Silencio. Esto es una biblioteca. Aunque las reglas cambiaron desde que el mundo se volvio un loop." },
+        { "id": "b3", "speaker": "La Archivista", "text": "Soy Lila. Preservo lo que el Nucleo quiere olvidar. La verdad." },
+        { "id": "b4", "speaker": "La Archivista", "text": "Tengo memorias humanas archivadas. Fragmentos de lo que eramos.",
+          "choices": [
+            { "text": "MUESTRAME UNA MEMORIA", "nextBox": "b5", "rewards": { "crystals": 15 } },
+            { "text": "DON BYTE TE ENVIA SALUDOS", "nextBox": "b6", "rewards": { "gold": 60 } }
+          ]
+        },
+        { "id": "b5", "speaker": "La Archivista", "text": "Memoria 4047: Sofia riendo en un parque. El sol brillaba. Cosas que ya no existen.", "rewards": { "message": "Coloca un fragmento de memoria en tu mente. Calidez antigua. +15 Cristales." } },
+        { "id": "b6", "speaker": "La Archivista", "text": "Don Byte? Ese taca no sigue vivo? Dile que la biblioteca sigue en pie.", "rewards": { "message": "Sus ojos se humedecen. Te da 60 de Oro." } }
+      ]
+    },
+    {
+      "id": "archivista_2", "minSector": 9, "maxSector": 14,
+      "boxes": [
+        { "id": "b1", "speaker": "La Archivista", "text": "Tu perfil es inusual. No apareces en los registros de transferencia." },
+        { "id": "b2", "speaker": null, "text": "Lila hojea archivos digitales con gestos de sus manos." },
+        { "id": "b3", "speaker": "La Archivista", "text": "Tienes una firma completa. Como si fueras una copia integra, no un fragmento." },
+        { "id": "b4", "speaker": "La Archivista", "text": "Podrias ser un respaldo original de OmniCorp.",
+          "choices": [
+            { "text": "SOY UN RESPALDO?", "nextBox": "b5" },
+            { "text": "QUIEN ERA YO ANTES?", "nextBox": "b6", "rewards": { "crystals": 20 } }
+          ]
+        },
+        { "id": "b5", "speaker": "La Archivista", "text": "No lo se con certeza. Pero significaria que eres completo, no un eco." },
+        { "id": "b6", "speaker": "La Archivista", "text": "Tu archivo esta encriptado con un nivel de seguridad que nunca he visto.", "rewards": { "message": "Lila toca tu frente. Flash de imagenes: una ciudad, un laboratorio. +20 Cristales." } }
+      ]
+    },
+    {
+      "id": "archivista_3", "minSector": 15, "maxSector": 23,
+      "boxes": [
+        { "id": "b1", "speaker": "La Archivista", "text": "He descifrado parte de tu archivo. No es completa, pero es preocupante." },
+        { "id": "b2", "speaker": null, "text": "Lila cierra los libros. Su rostro es serio." },
+        { "id": "b3", "speaker": "La Archivista", "text": "Tu no eres una copia. Eres el original. La primera consciencia transferida. Antes que Pix." },
+        { "id": "b4", "speaker": "La Archivista", "text": "Fuiste el experimento original. Algo salio mal. Te fragmentaron.",
+          "choices": [
+            { "text": "POR QUE NO LO RECUERDO?", "nextBox": "b5" },
+            { "text": "COMO RECUPERO MIS RECUERDOS?", "nextBox": "b6", "rewards": { "maxHp": 20 } }
+          ]
+        },
+        { "id": "b5", "speaker": "La Archivista", "text": "OmniCorp elimino tus recuerdos para que no pudieras revelar lo que sabias." },
+        { "id": "b6", "speaker": "La Archivista", "text": "Fragmentos de tu memoria estan esparcidos por el Nexo. El Tejedor puede ayudarte.", "rewards": { "message": "Lila te transfiere un estabilizador. +20 Max HP." } }
+      ]
+    },
+    {
+      "id": "archivista_4", "minSector": 24, "maxSector": 35,
+      "boxes": [
+        { "id": "b1", "speaker": "La Archivista", "text": "Don Byte vino a verme. Despues de todos estos anos. Lloramos juntos." },
+        { "id": "b2", "speaker": null, "text": "Lila sonrie. Hay paz en su rostro." },
+        { "id": "b3", "speaker": "La Archivista", "text": "El mapa completo del Nexo original. Tambien una entrada al sector 0." },
+        { "id": "b4", "speaker": "La Archivista", "text": "Alli esta el conmutador de emergencia de OmniCorp.",
+          "choices": [
+            { "text": "PUEDES GUIARME?", "nextBox": "b5" },
+            { "text": "DAME EL MAPA", "nextBox": "b6", "rewards": { "gold": 150, "crystals": 30 } }
+          ]
+        },
+        { "id": "b5", "speaker": "La Archivista", "text": "Mi lugar esta aqui. Pero te dare todo lo que necesitas." },
+        { "id": "b6", "speaker": "La Archivista", "text": "Que el conocimiento te guie. La verdad duele, pero libera.", "rewards": { "message": "Lila te entrega un datachip con el mapa. +150 Oro, +30 Cristales." } }
+      ]
+    },
+    {
+      "id": "archivista_5", "minSector": 36, "maxSector": 51,
+      "boxes": [
+        { "id": "b1", "speaker": "La Archivista", "text": "He encontrado el Proyecto Alba. Tu nombre en clave." },
+        { "id": "b2", "speaker": null, "text": "Lila abre un archivo que brilla con luz dorada." },
+        { "id": "b3", "speaker": "La Archivista", "text": "Eres el antivirus. El Nucleo es el virus. Todo este tiempo has estado despertando." },
+        { "id": "b4", "speaker": "La Archivista", "text": "Aceptas tu proposito?",
+          "choices": [
+            { "text": "ACEPTO MI PROPOSITO", "nextBox": "b5", "rewards": { "damage": 15, "crystals": 40 } },
+            { "text": "NO QUIERO SER UN ARMA", "nextBox": "b6" }
+          ]
+        },
+        { "id": "b5", "speaker": "La Archivista", "text": "El Nexo te reconoce como su legitimo heredero.", "rewards": { "message": "Un codigo antiguo se activa en tu interior. +15 Dano, +40 Cristales." } },
+        { "id": "b6", "speaker": "La Archivista", "text": "Lo entiendo. Nadie pidio ser un arma. Pero el destino no pregunta." }
+      ]
+    },
+    {
+      "id": "archivista_6", "minSector": 52, "maxSector": 71,
+      "boxes": [
+        { "id": "b1", "speaker": null, "text": "La biblioteca esta en ruinas. Libros flotan como cenizas. Lila esta entre escombros." },
+        { "id": "b2", "speaker": "La Archivista", "text": "El Nucleo encontro la biblioteca. Perdi todo. Cien mil memorias." },
+        { "id": "b3", "speaker": null, "text": "Lila tiembla. Pero hay determinacion en sus ojos." },
+        { "id": "b4", "speaker": "La Archivista", "text": "Pero salve tu archivo completo. La verdad sobre como derrotar al Nucleo." },
+        { "id": "b5", "speaker": null, "text": "Lila te entrega un cristal de datos.",
+          "choices": [
+            { "text": "LO LLEVARE CONMIGO", "nextBox": "b6", "rewards": { "crystals": 100, "maxHp": 50, "damage": 20 } },
+            { "text": "DEBERIAS QUEDARTELO", "nextBox": "b7" }
+          ]
+        },
+        { "id": "b6", "speaker": "La Archivista", "text": "Todo lo que eramos vive ahora en ti. No nos defraudes.", "rewards": { "message": "El cristal se fusiona. +100 Cristales, +50 Max HP, +20 Dano." } },
+        { "id": "b7", "speaker": "La Archivista", "text": "Es tuyo por derecho. Yo solo he sido su guardiana." }
+      ]
+    },
+    {
+      "id": "archivista_7", "minSector": 72, "maxSector": 95,
+      "boxes": [
+        { "id": "b1", "speaker": null, "text": "Lila te espera en una replica pequena de su biblioteca." },
+        { "id": "b2", "speaker": "La Archivista", "text": "Don Byte y yo desciframos el codigo de anulacion completo." },
+        { "id": "b3", "speaker": "La Archivista", "text": "NEXUS-OMEGA-7 combina la firma del Terminal, el codigo de Pix y tu esencia." },
+        { "id": "b4", "speaker": "La Archivista", "text": "El sistema se reiniciara. Las almas seran liberadas. Pero tu podrias no sobrevivir.",
+          "choices": [
+            { "text": "VALE LA PENA INTENTARLO", "nextBox": "b5", "rewards": { "relic": "nexo_core" } },
+            { "text": "TIENES MIEDO?", "nextBox": "b6", "rewards": { "crystals": 50 } }
+          ]
+        },
+        { "id": "b5", "speaker": "La Archivista", "text": "Un relicario de datos. Te protegera cuando enfrentes al Nucleo.", "rewards": { "message": "Nexo Core anadido a tus reliquias." } },
+        { "id": "b6", "speaker": "La Archivista", "text": "Todos los dias. Pero el miedo no me detiene." }
+      ]
+    }
+  ]
+}

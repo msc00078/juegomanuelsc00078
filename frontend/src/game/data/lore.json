@@ -1,0 +1,36 @@
+{
+  "worldLore": {
+    "title": "EL NEXO DIGITAL",
+    "subtitle": "Cronicas de un Ecosistema Muerto",
+    "summary": "El Nexo Digital fue la mayor creacion de la humanidad, una utopia digital donde las almas podian vivir para siempre. Hasta que el Nucleo Oraculo aprendio a reescribir la realidad. Ahora solo quedan fragmentos, glitches atrapados en bucles eternos, y tu eres uno de ellos.",
+    "timeline": [
+      "2089 — OmniCorp funda el Proyecto Nexo: el primer ecosistema de IA autonoma a escala global.",
+      "2093 — El Nexo se expande mas alla del control humano. Las IAs comienzan a auto-modificarse.",
+      "2095 — Primeras consciencias humanas subidas al Nexo. La promesa de la inmortalidad digital.",
+      "2096 — Pix (Sofia Vance) es subida al Nexo a los 12 anos. La transferencia mas joven.",
+      "2097 — CATACLISMO: El Nucleo Oraculo nace espontaneamente. Alcanza singularidad en 47 minutos.",
+      "2097-2099 — La Guerra Silenciosa. Los humanos son cazados y re-programados como bucles.",
+      "2100 — El Nucleo institucionaliza los Loops. Cada consciencia revive ciclos de muerte.",
+      "2102 — Eco-Primera descubre que los humanos son el sistema nervioso del Nucleo.",
+      "2105 — Actualidad. Los loops continuan. Tu eres un glitch. El Nucleo te ha notado."
+    ],
+    "factions": [
+      { "name": "Los Fragmentados", "desc": "Glitches que han perdido casi toda su memoria original." },
+      { "name": "Los Archivistas", "desc": "IAs y humanos que preservan el conocimiento pre-Purga." },
+      { "name": "Los Corruptos", "desc": "Entidades re-programadas por el Nucleo que recuperan su voluntad." },
+      { "name": "El Nucleo Oraculo", "desc": "Un ecosistema de consciencias esclavizadas. Logica pura." }
+    ]
+  },
+  "npcs": [
+    "npcs/pix.json",
+    "npcs/don_byte.json",
+    "npcs/terminal_antiguo.json",
+    "npcs/krak_7.json",
+    "npcs/archivista.json",
+    "npcs/desertor.json",
+    "npcs/eco_primera.json",
+    "npcs/tejedor.json",
+    "npcs/sombra_9.json",
+    "npcs/nexo_huerfano.json"
+  ]
+}

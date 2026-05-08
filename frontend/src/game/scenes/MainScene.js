@@ -197,7 +197,7 @@ export default class MainScene extends Phaser.Scene {
         // Colisiones globales de jugador con objetos
         this.physics.add.overlap(this.player.sprite, this.enemyArrows, (playerSprite, arrow) => {
             arrow.destroy();
-            if (!this.player.isInvulnerable) {
+            if (!this.player.isInvulnerable && !this.isCountdown) {
                 this.player.takeDamage(10);
                 this.updateUI();
             }
@@ -421,7 +421,7 @@ export default class MainScene extends Phaser.Scene {
 
         // Colisión cuerpo → jugador (usa contactDamage del enemigo)
         this.physics.add.collider(this.player.sprite, enemy.sprite, () => {
-            if (this.gameOver || enemy.hp <= 0) return;
+            if (this.gameOver || this.isCountdown || enemy.hp <= 0) return;
             if (relics.includes('espinas')) enemy.takeDamage(10);
             this.player.takeDamage(enemy.contactDamage ?? 5);
             this.updateUI();
@@ -583,7 +583,7 @@ export default class MainScene extends Phaser.Scene {
             }
             return;
         }
-        this.player.update(time);
+        this.player.update(time, delta);
 
         this.lootManager.updateMagnetism();
 

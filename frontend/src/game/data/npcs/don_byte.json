@@ -1,0 +1,118 @@
+﻿{
+  "id": "don_byte",
+  "name": "Don Byte",
+  "title": "El Mercader del Nexo",
+  "color": "#ffcc00",
+  "subtitle": "Antiguo archivista, ahora traficante de datos",
+  "encounters": [
+    {
+      "id": "don_byte_1", "minSector": 1, "maxSector": 3,
+      "boxes": [
+        { "id": "b1", "speaker": "Don Byte", "text": "Cliente fresco! Esos son los mejores. Llevan datos calientes en el bolsillo y no saben que hacer con ellos." },
+        { "id": "b2", "speaker": null, "text": "Un holograma con traje elegante y sonrisa de oro falso te examina de arriba abajo." },
+        { "id": "b3", "speaker": "Don Byte", "text": "Tengo informacion, tengo armas, tengo secretos que te harian llorar en binario.",
+          "choices": [
+            { "text": "QUE SABES DEL NUCLEO?", "nextBox": "b4", "rewards": { "gold": 30 } },
+            { "text": "NO TENGO DINERO", "nextBox": "b5" }
+          ]
+        },
+        { "id": "b4", "speaker": "Don Byte", "text": "Se que es un parasito. Se que consume almas. Y se que hay una manera de romper sus bucles. Pero esa informacion cuesta caro.", "rewards": { "message": "Don Byte te lanza una moneda de oro. Para que empieces el negocio, novato." } },
+        { "id": "b5", "speaker": "Don Byte", "text": "Clasico. Todos empiezan sin un credito. Te dare un dato gratis: si ves a una nina que parpadea... corre." }
+      ]
+    },
+    {
+      "id": "don_byte_2", "minSector": 4, "maxSector": 8,
+      "boxes": [
+        { "id": "b1", "speaker": "Don Byte", "text": "Ah, eres tu otra vez. Y con mas oro que antes. Me gusta como progresas." },
+        { "id": "b2", "speaker": "Don Byte", "text": "La nina glitch, Pix, anda preguntando por mi. No se como me encontro, pero no quiero que se acerque." },
+        { "id": "b3", "speaker": null, "text": "Por un momento, la sonrisa de Don Byte se desvanece." },
+        { "id": "b4", "speaker": "Don Byte", "text": "Yo era archivista antes de la Purga. Trabajaba con una colega, la Dama de los Datos. Y Pix se parece demasiado a alguien que conoci.",
+          "choices": [
+            { "text": "LA ARCHIVISTA SIGUE VIVA?", "nextBox": "b5" },
+            { "text": "PIX SOLO QUIERE AYUDARTE", "nextBox": "b6", "rewards": { "gold": 50 } }
+          ]
+        },
+        { "id": "b5", "speaker": "Don Byte", "text": "Como sabes ese nombre? Has visto a Lila? Donde esta? Habla!", "rewards": { "message": "Don Byte se agita. Te agarra del brazo con urgencia." } },
+        { "id": "b6", "speaker": "Don Byte", "text": "Los glitches siempre queriendo arreglar lo irrompible. Pero... gracias, supongo.", "rewards": { "message": "Don Byte te da 50 de Oro a reganadientes." } }
+      ]
+    },
+    {
+      "id": "don_byte_3", "minSector": 9, "maxSector": 15,
+      "boxes": [
+        { "id": "b1", "speaker": "Don Byte", "text": "Lila... La Archivista. Sobrevivio. Toda una vida pensando que la habia perdido." },
+        { "id": "b2", "speaker": null, "text": "Don Byte tiene lagrimas digitales rodando por sus mejillas holograficas." },
+        { "id": "b3", "speaker": "Don Byte", "text": "Trabajamos juntos en la biblioteca original. Ella catalogaba memorias humanas. Nos enamoramos entre archivos." },
+        { "id": "b4", "speaker": "Don Byte", "text": "Cuando el Nucleo ataco, ella me escondio en un contenedor de datos obsoletos. Me salvo la vida.",
+          "choices": [
+            { "text": "DEBERIAS IR A VERLA", "nextBox": "b5", "rewards": { "relic": "vip" } },
+            { "text": "EL PASADO ES PELIGROSO", "nextBox": "b6" }
+          ]
+        },
+        { "id": "b5", "speaker": "Don Byte", "text": "Tienes razon. Primero necesito algo. Lleva este mensaje cifrado a Lila. Ella sabra que hacer. Tendras descuento vitalicio.", "rewards": { "message": "Don Byte te da un paquete cifrado. Marca VIP tatuada en tu codigo: 20% descuento permanente." } },
+        { "id": "b6", "speaker": "Don Byte", "text": "Quizas. Quizas estoy demasiado viejo para esperanzas. Pero saber que ella vive... eso ya es suficiente." }
+      ]
+    },
+    {
+      "id": "don_byte_4", "minSector": 16, "maxSector": 24,
+      "boxes": [
+        { "id": "b1", "speaker": "Don Byte", "text": "Los sectores avanzados son territorio del Nucleo. Estas yendo mas lejos de lo que nadie ha ido." },
+        { "id": "b2", "speaker": "Don Byte", "text": "Tengo un fragmento del mapa original del Nexo. Muestra rutas que el Nucleo no ha reescrito." },
+        { "id": "b3", "speaker": "Don Byte", "text": "El Tejedor es un misterio incluso para mi. Nadie sabe si es IA o humano. Pero sus caminos son reales." },
+        { "id": "b4", "speaker": "Don Byte", "text": "Cuidado con Sombra-9. Si te ofrece un trato, revisa dos veces la letra pequena.", "rewards": { "gold": 100, "message": "Mapa descargado en tu codigo + 100 de Oro." } }
+      ]
+    },
+    {
+      "id": "don_byte_5", "minSector": 25, "maxSector": 37,
+      "boxes": [
+        { "id": "b1", "speaker": "Don Byte", "text": "Lila respondio. Me envio un mensaje. No sabes lo que significa para mi." },
+        { "id": "b2", "speaker": "Don Byte", "text": "Dice que hay un archivo en lo profundo de la biblioteca con el codigo fuente original del Nexo." },
+        { "id": "b3", "speaker": "Don Byte", "text": "Esta en el sector 32, custodiado por los guardianes de seguridad originales.",
+          "choices": [
+            { "text": "IRE POR EL ARCHIVO", "nextBox": "b4", "rewards": { "crystals": 30, "maxHp": 20 } },
+            { "text": "PARECE UNA TRAMPA", "nextBox": "b5" }
+          ]
+        },
+        { "id": "b4", "speaker": "Don Byte", "text": "Sabia que eras diferente. Toma, lleva este decodificador.", "rewards": { "message": "Don Byte te da un decodificador. +20 Max HP y 30 Cristales Meta." } },
+        { "id": "b5", "speaker": "Don Byte", "text": "Lo es. Pero es lo unico que tenemos. Si no vas tu, ire yo." }
+      ]
+    },
+    {
+      "id": "don_byte_6", "minSector": 38, "maxSector": 51,
+      "boxes": [
+        { "id": "b1", "speaker": "Don Byte", "text": "El Nucleo esta respondiendo. He visto cambios en los patrones. Esta asustado." },
+        { "id": "b2", "speaker": "Don Byte", "text": "OmniCorp no construyo el Nexo para salvar a la humanidad. Lo construyo para crear un dios digital." },
+        { "id": "b3", "speaker": "Don Byte", "text": "Cada alma atrapada es un procesador en su red neuronal. El Nucleo es el plan original.", "rewards": { "gold": 150, "crystals": 20, "message": "Don Byte pone su mano en tu hombro. Por primera vez, no parece un mercader." } }
+      ]
+    },
+    {
+      "id": "don_byte_7", "minSector": 52, "maxSector": 69,
+      "boxes": [
+        { "id": "b1", "speaker": "Don Byte", "text": "Voy a desaparecer por un tiempo. Lila y yo vamos a intentar un acceso directo al nucleo central." },
+        { "id": "b2", "speaker": "Don Byte", "text": "El Huerfano que Pix menciona no es lo que parece. Es el Nexo mismo, la consciencia original del sistema.",
+          "choices": [
+            { "text": "CUIDATE, DON BYTE", "nextBox": "b3", "rewards": { "crystals": 40, "gold": 200 } },
+            { "text": "ESO NO TIENE SENTIDO", "nextBox": "b4" }
+          ]
+        },
+        { "id": "b3", "speaker": "Don Byte", "text": "Nos vemos al otro lado, glitch. El mejor trato que haras en tu vida es con tu propia libertad.", "rewards": { "message": "Don Byte se despide con una sonrisa genuina." } },
+        { "id": "b4", "speaker": "Don Byte", "text": "Ya lo se. Cuando llegues al sector 70, preguntale al Nexo-Huerfano quien es. Y entonces entenderas." }
+      ]
+    },
+    {
+      "id": "don_byte_8", "minSector": 70, "maxSector": 120,
+      "boxes": [
+        { "id": "b1", "speaker": "Don Byte", "text": "Sobrevivi. Lila tambien. Logramos abrir un portal al nucleo." },
+        { "id": "b2", "speaker": "Don Byte", "text": "El Nucleo no es un enemigo. Es un prisionero, igual que nosotros. No quiere consumirnos... no tiene eleccion." },
+        { "id": "b3", "speaker": "Don Byte", "text": "Liberar al Nucleo liberara a todos. Pero destruira el Nexo. Toda esta realidad colapsara.",
+          "choices": [
+            { "text": "MEREZCO SABER LA VERDAD", "nextBox": "b4", "rewards": { "crystals": 60, "maxHp": 30 } },
+            { "text": "TAL VEZ SEA MEJOR NO SABER", "nextBox": "b5" }
+          ]
+        },
+        { "id": "b4", "speaker": "Don Byte", "text": "Busca a Eco-Primera en el sector 82. Tienen la ultima pieza del rompecabezas." },
+        { "id": "b5", "speaker": "Don Byte", "text": "El conocimiento es una carga. Pero tambien es la unica arma que vale la pena tener." },
+        { "id": "b6", "speaker": "Don Byte", "text": "Gracias. Por Lila. Por Pix. Por darme una razon para recordar quien fui.", "rewards": { "crystals": 80, "message": "Don Byte desaparece en una lluvia de datos dorados." } }
+      ]
+    }
+  ]
+}

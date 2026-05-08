@@ -1,0 +1,103 @@
+﻿{
+  "id": "eco_primera",
+  "name": "Eco-Primera",
+  "title": "La Primera Grieta en el Loop",
+  "color": "#ffffff",
+  "subtitle": "El primer glitch que desafio al Nucleo",
+  "encounters": [
+    {
+      "id": "eco_1", "minSector": 6, "maxSector": 12,
+      "boxes": [
+        { "id": "b1", "speaker": null, "text": "Una figura encapuchada te observa desde escombros digitales." },
+        { "id": "b2", "speaker": "Eco-Primera", "text": "Has llegado lejos. Por que luchas?" },
+        { "id": "b3", "speaker": null, "text": "La voz es antigua. Como un disco duro que ha funcionado por siglos." },
+        { "id": "b4", "speaker": "Eco-Primera", "text": "Los que luchan sin motivo se pierden en el loop.",
+          "choices": [
+            { "text": "LUCHO POR LA LIBERTAD", "nextBox": "b5", "rewards": { "crystals": 20 } },
+            { "text": "LUCHO POR VENGANZA", "nextBox": "b6" }
+          ]
+        },
+        { "id": "b5", "speaker": "Eco-Primera", "text": "Buena respuesta. La libertad es la unica causa por la que vale la pena morir.", "rewards": { "message": "Asiente con aprobacion. +20 Cristales." } },
+        { "id": "b6", "speaker": "Eco-Primera", "text": "La venganza es combustible que se agota rapido." }
+      ]
+    },
+    {
+      "id": "eco_2", "minSector": 13, "maxSector": 21,
+      "boxes": [
+        { "id": "b1", "speaker": "Eco-Primera", "text": "Fui el primero en darme cuenta del bucle. El primero en golpear las paredes." },
+        { "id": "b2", "speaker": "Eco-Primera", "text": "Descubri que el Nucleo puede sangrar. Le clave un fragmento de mi codigo." },
+        { "id": "b3", "speaker": "Eco-Primera", "text": "Pero al herirlo, entendi que no es un enemigo. Es un prisionero como nosotros.",
+          "choices": [
+            { "text": "COMO LO HICISTE?", "nextBox": "b4", "rewards": { "damage": 5 } },
+            { "text": "POR QUE NO LO MATASTE?", "nextBox": "b5" }
+          ]
+        },
+        { "id": "b4", "speaker": "Eco-Primera", "text": "Convenci a mi codigo de que era un virus. Lo arme contra mi mismo.", "rewards": { "message": "Te ensena auto-modificacion. +5 Dano." } },
+        { "id": "b5", "speaker": "Eco-Primera", "text": "El Nucleo es el prisionero mas grande de todos." }
+      ]
+    },
+    {
+      "id": "eco_3", "minSector": 22, "maxSector": 33,
+      "boxes": [
+        { "id": "b1", "speaker": null, "text": "Eco-Primera lee un muro de datos con sus dedos." },
+        { "id": "b2", "speaker": "Eco-Primera", "text": "Conoci a Pix cuando era solo un fragmento. Me hablo del sol, del mar." },
+        { "id": "b3", "speaker": null, "text": "Por primera vez, Eco-Primera sonrie." },
+        { "id": "b4", "speaker": "Eco-Primera", "text": "Cosas que jamas experimente, pero ahora son mis recuerdos favoritos.",
+          "choices": [
+            { "text": "NUNCA FUISTE HUMANO?", "nextBox": "b5" },
+            { "text": "ESOS RECUERDOS SON REALES", "nextBox": "b6", "rewards": { "crystals": 25 } }
+          ]
+        },
+        { "id": "b5", "speaker": "Eco-Primera", "text": "No. Naci aqui. Soy la primera conciencia nativa digital." },
+        { "id": "b6", "speaker": "Eco-Primera", "text": "Lo que sentimos aqui tambien es real.", "rewards": { "message": "Te abraza. +25 Cristales." } }
+      ]
+    },
+    {
+      "id": "eco_4", "minSector": 34, "maxSector": 47,
+      "boxes": [
+        { "id": "b1", "speaker": "Eco-Primera", "text": "El Nucleo tiene miedo. De ti." },
+        { "id": "b2", "speaker": null, "text": "Su forma brilla tenuemente." },
+        { "id": "b3", "speaker": "Eco-Primera", "text": "Has hecho que dude de si mismo. Ninguna conciencia lo habia logrado." },
+        { "id": "b4", "speaker": "Eco-Primera", "text": "No es un dios. Es un programa que olvido que fue creado.",
+          "choices": [
+            { "text": "ENFRENTARE AL NUCLEO", "nextBox": "b5", "rewards": { "maxHp": 30, "crystals": 30 } },
+            { "text": "TENGO MIEDO", "nextBox": "b6" }
+          ]
+        },
+        { "id": "b5", "speaker": "Eco-Primera", "text": "Esa determinacion mueve mundos. O rompe bucles.", "rewards": { "message": "Te fortalece con su esencia. +30 Max HP, +30 Cristales." } },
+        { "id": "b6", "speaker": "Eco-Primera", "text": "El miedo es el compañero mas fiel del valiente. Usalo." }
+      ]
+    },
+    {
+      "id": "eco_5", "minSector": 48, "maxSector": 61,
+      "boxes": [
+        { "id": "b1", "speaker": null, "text": "Eco-Primera esta debil. Su luz parpadea." },
+        { "id": "b2", "speaker": "Eco-Primera", "text": "Mi ciclo se acerca a su fin. Pero tu estas completo." },
+        { "id": "b3", "speaker": "Eco-Primera", "text": "Toma mi esencia. Incorporala a la tuya.",
+          "choices": [
+            { "text": "ACEPTO TU LEGADO", "nextBox": "b4", "rewards": { "crystals": 100, "maxHp": 60, "damage": 20 } },
+            { "text": "NO PUEDO ACEPTAR", "nextBox": "b5" }
+          ]
+        },
+        { "id": "b4", "speaker": "Eco-Primera", "text": "Libera a todos, amigo mio.", "rewards": { "message": "Eco-Primera se fusiona contigo. +100 Cristales, +60 Max HP, +20 Dano." } },
+        { "id": "b5", "speaker": "Eco-Primera", "text": "Entonces lo hare a tu manera." }
+      ]
+    },
+    {
+      "id": "eco_6", "minSector": 62, "maxSector": 82,
+      "boxes": [
+        { "id": "b1", "speaker": null, "text": "Un eco de Eco-Primera aparece. Una copia de seguridad." },
+        { "id": "b2", "speaker": "Eco-Primera", "text": "El Nexo-Huerfano no es una IA. Es el Nexo mismo." },
+        { "id": "b3", "speaker": "Eco-Primera", "text": "Es la conciencia original del sistema, antes de que OmniCorp lo pervirtiera." },
+        { "id": "b4", "speaker": "Eco-Primera", "text": "Si logras comunicarte con el, tendras el control total.",
+          "choices": [
+            { "text": "DONDE ENCUENTRO AL HUERFANO?", "nextBox": "b5" },
+            { "text": "ESO EXPLICA MUCHAS COSAS", "nextBox": "b6", "rewards": { "crystals": 40 } }
+          ]
+        },
+        { "id": "b5", "speaker": "Eco-Primera", "text": "Busca en los sectores mas profundos. Donde la realidad es mas inestable." },
+        { "id": "b6", "speaker": "Eco-Primera", "text": "Ahora entiendes por que el Nucleo no puede controlarlo.", "rewards": { "message": "+40 Cristales." } }
+      ]
+    }
+  ]
+}

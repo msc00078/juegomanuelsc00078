@@ -15,6 +15,7 @@ const makeScene = (registryOverrides = {}) => {
     const rectMock = () => ({
         setStrokeStyle: vi.fn().mockReturnThis(),
         setFillStyle: vi.fn().mockReturnThis(),
+        setAlpha: vi.fn().mockReturnThis(),
         setTint: vi.fn().mockReturnThis(),
         clearTint: vi.fn().mockReturnThis(),
         destroy: vi.fn().mockReturnThis(),
@@ -36,6 +37,30 @@ const makeScene = (registryOverrides = {}) => {
         x: 100, y: 100, active: true, alpha: 1, width: 30
     });
 
+    const spriteMock = () => ({
+        setDepth: vi.fn().mockReturnThis(),
+        setScale: vi.fn().mockReturnThis(),
+        setDisplaySize: vi.fn().mockReturnThis(),
+        setTint: vi.fn().mockReturnThis(),
+        clearTint: vi.fn().mockReturnThis(),
+        setTexture: vi.fn().mockReturnThis(),
+        setFlipX: vi.fn().mockReturnThis(),
+        setVisible: vi.fn().mockReturnThis(),
+        setActive: vi.fn().mockReturnThis(),
+        destroy: vi.fn().mockReturnThis(),
+        setPosition: vi.fn().mockReturnThis(),
+        body: {
+            setCollideWorldBounds: vi.fn(),
+            setVelocity: vi.fn(),
+            velocity: { x: 0, y: 0 },
+            setSize: vi.fn(),
+            setOffset: vi.fn(),
+            enable: true,
+            reset: vi.fn()
+        },
+        x: 100, y: 100, active: true, width: 32, height: 32
+    });
+
     return {
         physics: { add: { existing: vi.fn() } },
         input: {
@@ -54,7 +79,10 @@ const makeScene = (registryOverrides = {}) => {
             }
         },
         time: { addEvent: vi.fn(), delayedCall: vi.fn() },
-        add: { rectangle: vi.fn(() => rectMock()) },
+        add: {
+            sprite: vi.fn(() => spriteMock()),
+            rectangle: vi.fn(() => rectMock())
+        },
         tweens: { add: vi.fn() },
         registry: {
             get: vi.fn((key) => registry[key] ?? null),

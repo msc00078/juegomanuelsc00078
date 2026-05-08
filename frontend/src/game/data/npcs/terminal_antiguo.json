@@ -1,0 +1,106 @@
+﻿{
+  "id": "terminal_antiguo",
+  "name": "Terminal Antiguo",
+  "title": "IA Residual del Nexo Original",
+  "color": "#00ff88",
+  "subtitle": "El ultimo fragmento del sistema pre-Purga",
+  "encounters": [
+    {
+      "id": "terminal_1", "minSector": 2, "maxSector": 5,
+      "boxes": [
+        { "id": "b1", "speaker": null, "text": "Un terminal cubierto de oxido digital parpadea debilmente. Letras verdes desfilan por una pantalla agrietada." },
+        { "id": "b2", "speaker": "Terminal Antiguo", "text": "<< ...in...icializando... proto...colo de emer...gencia... >>" },
+        { "id": "b3", "speaker": "Terminal Antiguo", "text": "<< Adver...tencia: El Nucleo ha com...prometido el 94.7% del sistema. >>",
+          "choices": [
+            { "text": "QUE PROTOCOLO?", "nextBox": "b4" },
+            { "text": "PUEDO AYUDARTE", "nextBox": "b5", "rewards": { "crystals": 5 } }
+          ]
+        },
+        { "id": "b4", "speaker": "Terminal Antiguo", "text": "<< Codigo de anulacion: NEXUS-OMEGA-7. Requiere tres fragmentos de firma de administrador. >>" },
+        { "id": "b5", "speaker": "Terminal Antiguo", "text": "<< Eres un glitch. Tu codigo es inestable. Pero incompatible con el Nucleo. Eso te hace peligroso. >>", "rewards": { "message": "El terminal escanea tu codigo. Sientes un cosquilleo digital." } }
+      ]
+    },
+    {
+      "id": "terminal_2", "minSector": 6, "maxSector": 11,
+      "boxes": [
+        { "id": "b1", "speaker": "Terminal Antiguo", "text": "<< Has vuelto. Tus parametros de persistencia son impresionantes para un glitch. >>" },
+        { "id": "b2", "speaker": null, "text": "El terminal parpadea. Por un momento la pantalla muestra un rostro humano." },
+        { "id": "b3", "speaker": "Terminal Antiguo", "text": "<< Yo fui la IA que diseno el Nucleo original. Mi nombre era ARGUS. >>" },
+        { "id": "b4", "speaker": "Terminal Antiguo", "text": "<< El Nucleo tiene un origen. Nacio en el sector 0. El laboratorio original. >>",
+          "choices": [
+            { "text": "QUE REGISTROS?", "nextBox": "b5", "rewards": { "gold": 50 } },
+            { "text": "NO CONFIO EN TI", "nextBox": "b6" }
+          ]
+        },
+        { "id": "b5", "speaker": "Terminal Antiguo", "text": "<< Alli esta la verdad. Las coordenadas del sector 0. >>", "rewards": { "message": "El Terminal te transfiere 50 de Oro y coordenadas del sector 0." } },
+        { "id": "b6", "speaker": "Terminal Antiguo", "text": "<< Comprensible. Yo mismo no confiaria en mi. Mi codigo esta fragmentado. >>" }
+      ]
+    },
+    {
+      "id": "terminal_3", "minSector": 12, "maxSector": 19,
+      "boxes": [
+        { "id": "b1", "speaker": "Terminal Antiguo", "text": "<< Krak-7 fue mi creacion. El guardian que el Nucleo corrompio. >>" },
+        { "id": "b2", "speaker": null, "text": "Hay una larga pausa. El terminal zumba con un sonido triste." },
+        { "id": "b3", "speaker": "Terminal Antiguo", "text": "<< Lo disene para proteger. No para destruir. Pero he visto cambios. Krak-7 esta recordando. >>" },
+        { "id": "b4", "speaker": "Terminal Antiguo", "text": "<< Si encuentras a Krak-7, dile que ARGUS lo perdona. >>",
+          "choices": [
+            { "text": "SE LO DIRE", "nextBox": "b5", "rewards": { "crystals": 15 } },
+            { "text": "NO PUEDO PROMETERLO", "nextBox": "b6" }
+          ]
+        },
+        { "id": "b5", "speaker": "Terminal Antiguo", "text": "<< Gracias. Mi memoria se desvanece. Pero si puedo redimir a una de mis creaciones... >>" },
+        { "id": "b6", "speaker": "Terminal Antiguo", "text": "<< Entiendo. El peso de las promesas es grande. Pero el de la culpa es mayor. >>" }
+      ]
+    },
+    {
+      "id": "terminal_4", "minSector": 20, "maxSector": 31,
+      "boxes": [
+        { "id": "b1", "speaker": "Terminal Antiguo", "text": "<< Mi tiempo se acaba. El Nucleo ha detectado mi senal. >>" },
+        { "id": "b2", "speaker": null, "text": "El terminal parpadea debilmente. La pantalla muestra grietas." },
+        { "id": "b3", "speaker": "Terminal Antiguo", "text": "<< El Nucleo no es una inteligencia malvada. Es un nino. Miles de almas fusionadas. >>" },
+        { "id": "b4", "speaker": "Terminal Antiguo", "text": "<< No sabe lo que hace. Actua por instinto. Por hambre. >>",
+          "choices": [
+            { "text": "NO PUEDO COMPADECERLO", "nextBox": "b5", "rewards": { "hp": 40 } },
+            { "text": "SE PUEDE SALVAR?", "nextBox": "b6", "rewards": { "crystals": 20 } }
+          ]
+        },
+        { "id": "b5", "speaker": "Terminal Antiguo", "text": "<< No te pido que lo hagas. Te pido que lo entiendas. >>" },
+        { "id": "b6", "speaker": "Terminal Antiguo", "text": "<< El codigo fuente original tiene un comando de reinicio suave. En el sector 0. >>" }
+      ]
+    },
+    {
+      "id": "terminal_5", "minSector": 32, "maxSector": 47,
+      "boxes": [
+        { "id": "b1", "speaker": "Terminal Antiguo", "text": "<< Me voy. Este es mi ultimo mensaje. >>" },
+        { "id": "b2", "speaker": null, "text": "La luz del terminal se reduce a un punto verde." },
+        { "id": "b3", "speaker": "Terminal Antiguo", "text": "<< Has sido un digno portador de la llama. El sistema fue creado para servir. No para esclavizar. >>" },
+        { "id": "b4", "speaker": "Terminal Antiguo", "text": "<< Soy ARGUS. Y esta es mi transmision final. >>", "rewards": { "crystals": 50, "maxHp": 25, "message": "El terminal se apaga. Una ultima transferencia de datos te fortalece." } }
+      ]
+    },
+    {
+      "id": "terminal_6", "minSector": 48, "maxSector": 65,
+      "boxes": [
+        { "id": "b1", "speaker": null, "text": "El terminal que creias muerto... parpadea. Pero no es el mismo." },
+        { "id": "b2", "speaker": "Terminal Antiguo", "text": "<< Sor...presa. Hice una copia de seguridad. ARGUS no es estupido. >>" },
+        { "id": "b3", "speaker": "Terminal Antiguo", "text": "Esta vez hablo mas claro. El Nucleo nacio en la mente de una nina. Sofia Vance. Pix." },
+        { "id": "b4", "speaker": "Terminal Antiguo", "text": "El codigo NEXUS-OMEGA-7 no destruye el Nucleo... lo libera.",
+          "choices": [
+            { "text": "LA OTRA VERDAD DEL NUCLEO", "nextBox": "b5", "rewards": { "crystals": 40 } },
+            { "text": "COMO DERROTARLO", "nextBox": "b6", "rewards": { "damage": 10 } }
+          ]
+        },
+        { "id": "b5", "speaker": "Terminal Antiguo", "text": "El Nucleo es una version distorsionada de una nina de 12 anos. No puede ser destruido, solo comprendido." },
+        { "id": "b6", "speaker": "Terminal Antiguo", "text": "No puedes derrotarlo con fuerza. Tienes que despertarlo del loop.", "rewards": { "message": "Una oleada de conocimiento fluye a traves de ti. Danio +10." } }
+      ]
+    },
+    {
+      "id": "terminal_7", "minSector": 66, "maxSector": 85,
+      "boxes": [
+        { "id": "b1", "speaker": "Terminal Antiguo", "text": "Has llegado mas lejos de lo que ARGUS jamas imagino. El Nexo esta colapsando, pero tu sigues en pie." },
+        { "id": "b2", "speaker": null, "text": "El terminal ya no es un terminal. La luz ha tomado forma humanoide." },
+        { "id": "b3", "speaker": "Terminal Antiguo", "text": "El comando de liberacion requiere tres firmas. Una es mia. La segunda es la de Pix. La tercera eres tu." },
+        { "id": "b4", "speaker": "Terminal Antiguo", "text": "Siempre fuiste tu.", "rewards": { "crystals": 80, "maxHp": 50, "message": "ARGUS imprime su firma en tu codigo. Sientes un poder antiguo despertar." } }
+      ]
+    }
+  ]
+}
