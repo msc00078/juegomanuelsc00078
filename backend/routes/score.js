@@ -9,41 +9,32 @@ const router = express.Router();
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL;
 const SUPABASE_KEY = process.env.VITE_SUPABASE_ANON_KEY;
 
-// Endpoint para guardar puntuación con validación de servidor
 router.post('/save-score', async (req, res) => {
-    const { score, sector, userId } = req.body;
+    const { score, sector, crystalsEarned, userId } = req.body;
 
-    // --- LOGICA DE VALIDACION (ANTI-HACK) ---
-    
-    // 1. Verificación de cordura básica
     if (score == null || sector == null || !userId) {
         return res.status(400).json({ error: 'Datos incompletos' });
     }
 
-    // 2. Validación de "Plausibilidad"
-    // Un jugador normal no puede hacer más de X puntos por sector.
-    // Ajusta estos valores según el balance de tu juego.
-    const MAX_POINTS_PER_SECTOR = 4000; 
+    const MAX_POINTS_PER_SECTOR = 4000;
     const maxPlausible = sector * MAX_POINTS_PER_SECTOR;
 
     if (score > maxPlausible) {
         console.warn(`[SECURITY] Intento de hack detectado: User ${userId} envió ${score} puntos en Sector ${sector}`);
-        return res.status(403).json({ 
+        return res.status(403).json({
             error: 'Puntuación anómala detectada. La simulación ha invalidado estos datos.',
             hacker_detected: true
         });
     }
 
-    // 3. Reenvío a Supabase (Proxy Seguro)
-    // En el futuro, aquí deberías usar una SERVICE_ROLE_KEY para mayor seguridad
     try {
         const response = await axios.post(
             `${SUPABASE_URL}/rest/v1/rpc/registrar_fin_partida`,
-            { p_score: score, p_sector: sector },
+            { p_score: score, p_sector: sector, p_crystals: Math.max(0, Math.floor(crystalsEarned || 0)) },
             {
                 headers: {
                     'apikey': SUPABASE_KEY,
-                    'Authorization': req.headers.authorization, // Reenviamos el JWT del usuario
+                    'Authorization': req.headers.authorization,
                     'Content-Type': 'application/json'
                 }
             }

@@ -183,72 +183,127 @@ export default class MenuScene extends Phaser.Scene {
             this.scene.start('MainScene');
         });
 
-        // Mostrar Leaderboard (Izquierda)
+        // Mostrar Leaderboard (Izquierda) — estilo Auth.jsx
+        const panelW = 340;
+        const panelX = 20;
+        const panelY = 40;
+        const panelPad = 16;
+        const rowH2 = 38;
+        const panelH = 56 + (10 * rowH2) + 16; // header + 10 filas + padding
         const leaderPanel = this.add.graphics();
-        leaderPanel.fillStyle(0x000000, 0.4);
-        leaderPanel.fillRoundedRect(30, 40, 260, 240, 12);
-        leaderPanel.lineStyle(1, 0xff00e1, 0.3);
-        leaderPanel.strokeRoundedRect(30, 40, 260, 240, 12);
+        leaderPanel.fillStyle(0x0a0a0f, 0.7);
+        leaderPanel.fillRoundedRect(panelX, panelY, panelW, panelH, 12);
+        leaderPanel.lineStyle(2, 0xff00e1, 0.2);
+        leaderPanel.strokeRoundedRect(panelX, panelY, panelW, panelH, 12);
 
-        this.add.text(45, 55, "LEADERBOARD", { 
-            fontFamily: 'Orbitron, sans-serif',
-            fontSize: '20px', 
-            fill: '#ff00e1', 
-            fontStyle: 'bold' 
+        this.add.text(panelX + panelPad, panelY + 16, "RANKING GLOBAL", {
+            fontFamily: 'Orbitron, sans-serif', fontSize: '18px', fill: '#ff00e1', fontStyle: 'bold'
         });
-        
-        getLeaderboard().then(({ data, error }) => {
-            if (!error && data) {
-                let yPos = 95;
-                data.slice(0, 5).forEach((player, index) => {
-                    let color = index === 0 ? '#ffcc00' : '#ffffff';
-                    this.add.text(45, yPos, `${index + 1}. ${player.username || 'Anon'}`, { 
-                        fontFamily: 'Inter, sans-serif',
-                        fontSize: '15px', 
-                        fill: color 
-                    });
-                    this.add.text(280, yPos, `${player.high_score}`, { 
-                        fontFamily: 'Inter, sans-serif',
-                        fontSize: '15px', 
-                        fill: '#00f2ff' 
-                    }).setOrigin(1, 0);
-                    yPos += 32;
-                });
-            }
-        });
-
-        // Mostrar Controles (Derecha)
-        const rightX = this.scale.width - 30;
-        const controlPanel = this.add.graphics();
-        controlPanel.fillStyle(0x000000, 0.4);
-        controlPanel.fillRoundedRect(this.scale.width - 290, 40, 260, 240, 12);
-        controlPanel.lineStyle(1, 0x00f2ff, 0.3);
-        controlPanel.strokeRoundedRect(this.scale.width - 290, 40, 260, 240, 12);
-
-        this.add.text(rightX - 10, 55, "COMANDOS", { 
-            fontFamily: 'Orbitron, sans-serif',
-            fontSize: '20px', 
-            fill: '#00f2ff', 
-            fontStyle: 'bold' 
+        this.add.text(panelX + panelW - panelPad, panelY + 16, "📡 LIVE", {
+            fontFamily: 'Inter, sans-serif', fontSize: '12px', fill: '#00f2ff', fontStyle: 'bold'
         }).setOrigin(1, 0);
-        
-        const controls = [
-            "WASD / 🕹️ : Moverse",
-            "SPACE / ⚔️ : Atacar",
-            "SHIFT / ⚡ : Dash",
-            "1, 2, 3 / 🎒 : Armas",
-            "I - TAB / 📜 : Inv.",
-            "ESC - P / ⏸️ : Pausa"
+
+        const statusText = this.add.text(panelX + panelPad, panelY + 60, "Cargando datos del Núcleo...", {
+            fontFamily: 'Inter, sans-serif', fontSize: '14px', fill: '#666'
+        });
+
+        getLeaderboard().then(({ data, error }) => {
+            if (statusText) statusText.destroy();
+            if (error || !data || data.length === 0) {
+                this.add.text(panelX + panelPad, panelY + 60, "Aún no hay registros en la simulación.", {
+                    fontFamily: 'Inter, sans-serif', fontSize: '14px', fill: '#666'
+                });
+                return;
+            }
+            data.slice(0, 10).forEach((player, index) => {
+                const rowY = panelY + 56 + (index * rowH2);
+                const isFirst = index === 0;
+
+                const rowGfx = this.add.graphics();
+                const rowColor = isFirst ? 0xffd700 : 0xffffff;
+                rowGfx.fillStyle(0xffffff, isFirst ? 0.05 : 0.02);
+                rowGfx.fillRoundedRect(panelX + 4, rowY, panelW - 8, rowH2 - 4, 6);
+                if (isFirst) {
+                    rowGfx.lineStyle(1, 0xffd700, 0.3);
+                    rowGfx.strokeRoundedRect(panelX + 4, rowY, panelW - 8, rowH2 - 4, 6);
+                }
+
+                const rankX = panelX + panelPad;
+                const nameX = rankX + 40;
+                const scoreX = panelX + panelW - panelPad - 80;
+                const sectorX = panelX + panelW - panelPad - 5;
+
+                const rankTxt = this.add.text(rankX, rowY + 5, isFirst ? '👑' : `#${index + 1}`, {
+                    fontFamily: 'Orbitron, sans-serif', fontSize: isFirst ? '18px' : '14px', fill: isFirst ? '#ffcc00' : '#555', fontStyle: 'bold'
+                });
+
+                const name = player.username || 'Sujeto Anónimo';
+                const nameTxt = this.add.text(nameX, rowY + 5, name, {
+                    fontFamily: 'Inter, sans-serif', fontSize: '14px', fill: '#eee'
+                });
+                if (nameTxt.width > 140) {
+                    nameTxt.setText(name.substring(0, 16) + '...');
+                }
+
+                this.add.text(scoreX, rowY + 5, `${(player.high_score || 0).toLocaleString()} PTS`, {
+                    fontFamily: 'Inter, sans-serif', fontSize: '13px', fill: '#00f2ff', fontStyle: 'bold'
+                }).setOrigin(1, 0);
+
+                this.add.text(sectorX, rowY + 5, `S.${player.max_sector || 1}`, {
+                    fontFamily: 'Orbitron, sans-serif', fontSize: '12px', fill: '#ff00e1', fontStyle: 'bold'
+                }).setOrigin(1, 0);
+            });
+        });
+
+        // Mostrar Controles (Derecha) — estilo 2 columnas mejorado
+        const cmdPanelH = 40 + (6 * rowH2) + 24;
+        const rightPanelX = this.scale.width - panelW - 30;
+        const controlPanel = this.add.graphics();
+        controlPanel.fillStyle(0x0a0a0f, 0.7);
+        controlPanel.fillRoundedRect(rightPanelX, panelY, panelW, cmdPanelH, 12);
+        controlPanel.lineStyle(2, 0x00f2ff, 0.2);
+        controlPanel.strokeRoundedRect(rightPanelX, panelY, panelW, cmdPanelH, 12);
+
+        this.add.text(rightPanelX + panelPad, panelY + 16, "COMANDOS", {
+            fontFamily: 'Orbitron, sans-serif', fontSize: '18px', fill: '#00f2ff', fontStyle: 'bold'
+        });
+
+        const controlGroups = [
+            [
+                ['WASD  🎮', 'Moverse'],
+                ['SPACE  ⚔️', 'Atacar'],
+                ['SHIFT  ⚡', 'Dash'],
+            ],
+            [
+                ['1-3  🎒', 'Armas'],
+                ['I/TAB  📜', 'Inventario'],
+                ['ESC/P  ⏸️', 'Pausa'],
+            ]
         ];
-        
-        let cy = 95;
-        controls.forEach(ctrl => {
-            this.add.text(rightX - 10, cy, ctrl, { 
-                fontFamily: 'Inter, sans-serif',
-                fontSize: '14px', 
-                fill: '#888' 
-            }).setOrigin(1, 0);
-            cy += 28;
+
+        let cRowY = panelY + 52;
+        controlGroups.forEach((group, gi) => {
+            if (gi > 0) {
+                const sepY = cRowY - 2;
+                this.add.graphics()
+                    .lineStyle(1, 0xffffff, 0.05)
+                    .lineBetween(rightPanelX + panelPad, sepY, rightPanelX + panelW - panelPad, sepY);
+            }
+            group.forEach(([key, action], i) => {
+                const rowY = cRowY + (i * rowH2);
+
+                const rowGfx = this.add.graphics();
+                rowGfx.fillStyle(0xffffff, 0.02);
+                rowGfx.fillRoundedRect(rightPanelX + 4, rowY, panelW - 8, rowH2 - 4, 6);
+
+                this.add.text(rightPanelX + panelPad, rowY + 5, key, {
+                    fontFamily: 'Orbitron, sans-serif', fontSize: '14px', fill: '#00f2ff', fontStyle: 'bold'
+                });
+                this.add.text(rightPanelX + panelW - panelPad, rowY + 5, action, {
+                    fontFamily: 'Inter, sans-serif', fontSize: '13px', fill: '#aaa'
+                }).setOrigin(1, 0);
+            });
+            cRowY += group.length * rowH2 + 10;
         });
 
         this.add.text(this.scale.width / 2, this.scale.height * 0.94, "NÉMESIS SAGRADA // CONECTADO AL NÚCLEO", { 
@@ -259,24 +314,21 @@ export default class MenuScene extends Phaser.Scene {
         }).setOrigin(0.5);
 
         // Botón de Silenciar (esquina inferior derecha)
-        const muteBtn = this.add.text(
-            this.scale.width - 20, 
-            this.scale.height - 20, 
+        const muteContainer = this.add.container(this.scale.width - 20, this.scale.height - 20).setDepth(200);
+        const muteBtnBg = this.add.rectangle(0, 0, 100, 36, 0x000000, 0.4)
+            .setInteractive({ useHandCursor: true }).setStrokeStyle(1, 0x555555);
+        const muteBtn = this.add.text(0, 0,
             window.isMuted ? '🔇 MUTE' : '🔊 SONIDO',
-            {
-                fontFamily: 'Orbitron, sans-serif',
-                fontSize: '14px',
-                fill: '#555',
-                backgroundColor: 'rgba(0,0,0,0.4)',
-                padding: { x: 8, y: 5 }
-            }
-        ).setOrigin(1, 1).setInteractive({ useHandCursor: true }).setDepth(200);
+            { fontFamily: 'Orbitron, sans-serif', fontSize: '14px', fill: '#555' }
+        ).setOrigin(0.5);
+        muteContainer.add([muteBtnBg, muteBtn]);
 
-        muteBtn.on('pointerover', () => muteBtn.setFill('#00f2ff'));
-        muteBtn.on('pointerout', () => muteBtn.setFill('#555'));
-        muteBtn.on('pointerdown', () => {
+        muteBtnBg.on('pointerover', () => { muteBtn.setFill('#00f2ff'); muteBtnBg.setStrokeStyle(1, 0x00f2ff); });
+        muteBtnBg.on('pointerout', () => { muteBtn.setFill('#555'); muteBtnBg.setStrokeStyle(1, 0x555555); });
+        muteBtnBg.on('pointerdown', () => {
             const muted = window.toggleMute ? window.toggleMute() : false;
             muteBtn.setText(muted ? '🔇 MUTE' : '🔊 SONIDO');
+            if (this.sound) this.sound.setMute(muted);
         });
 
         // Botón DEV (solo admin)

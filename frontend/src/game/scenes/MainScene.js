@@ -595,6 +595,12 @@ export default class MainScene extends Phaser.Scene {
 
         this.bossAIManager.update(time);
 
+        // Polling de música cada 5s (fallback para móvil donde once('complete') falla)
+        if (!this._lastMusicPoll || time - this._lastMusicPoll > 5000) {
+            this._lastMusicPoll = time;
+            this.audioManager.handleSceneMusic();
+        }
+
         this.enemies.forEach(enemy => {
             if (enemy.hp > 0 && enemy.sprite && enemy.sprite.active) {
                 enemy.update(this.player.sprite, time);
@@ -664,7 +670,7 @@ export default class MainScene extends Phaser.Scene {
             fontSize: '42px', fill: '#ff0000', fontStyle: 'bold'
         }).setOrigin(0.5);
 
-        const crystalsEarned = Math.floor(this.currentLevel / 3);
+        const crystalsEarned = Math.floor(Math.max(0, this.currentLevel - 8) / 12);
         const stats = `SECTOR ALCANZADO: ${this.currentLevel}\nRECURSOS RECUPERADOS: ${crystalsEarned} 💎\nSCORE TOTAL: ${this.score}`;
         
         const statsText = this.add.text(0, 0, stats, {
@@ -679,8 +685,12 @@ export default class MainScene extends Phaser.Scene {
 
         goContainer.add([box, title, statsText, hint]);
 
-        // Guardar resultado (El servidor calculará los cristales ganados de forma segura)
-        saveRunResult(this.score, this.currentLevel).catch(err => console.error(err));
+        // Guardar resultado y cristales vía backend (Supabase)
+        saveRunResult(this.score, this.currentLevel, crystalsEarned).catch(err => console.error(err));
+        // Persistencia local como fallback
+        let meta = JSON.parse(localStorage.getItem('metaStats')) || { crystals: 0, hpLevel: 0, dmgLevel: 0, speedLevel: 0 };
+        meta.crystals = (meta.crystals || 0) + crystalsEarned;
+        localStorage.setItem('metaStats', JSON.stringify(meta));
 
         // Detener música in-game y de menú
         this.sound.stopAll();

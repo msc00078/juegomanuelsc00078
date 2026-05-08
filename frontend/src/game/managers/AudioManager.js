@@ -6,6 +6,8 @@ export class AudioManager {
     async handleSceneMusic() {
         const { scene } = this;
 
+        if (!scene.cache || !scene.cache.audio) return;
+
         if (scene.sound.context.state === 'suspended') {
             await scene.sound.context.resume();
         }
@@ -70,6 +72,11 @@ export class AudioManager {
         music.play();
 
         music.once('complete', () => {
+            if (scene.registry.get('currentMusicKey') === targetTrack) {
+                this.handleSceneMusic();
+            }
+        });
+        music.on('stop', () => {
             if (scene.registry.get('currentMusicKey') === targetTrack) {
                 this.handleSceneMusic();
             }

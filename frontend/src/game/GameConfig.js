@@ -1,7 +1,6 @@
 import * as Phaser from 'phaser';
 import PreloadScene from './scenes/PreloadScene';
 import MenuScene from './scenes/MenuScene';
-import MapScene from './scenes/MapScene';
 import MainScene from './scenes/MainScene';
 import ShopScene from './scenes/ShopScene';
 import RelicScene from './scenes/RelicScene';
@@ -32,5 +31,5 @@ export const config = {
             gravity: { y: 0 }
         }
     },
-    scene: [PreloadScene, MenuScene, MapScene, MainScene, ShopScene, RelicScene, EventScene, UpgradeScene, InventoryScene, PauseScene, LevelUpScene, AdminScene]
+    scene: [PreloadScene, MenuScene, MainScene, ShopScene, RelicScene, EventScene, UpgradeScene, InventoryScene, PauseScene, LevelUpScene, AdminScene]
 };

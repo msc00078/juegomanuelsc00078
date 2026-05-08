@@ -63,6 +63,9 @@ const EVENTS = [
         npc: "Pix",
         options: [
             { text: "¿QUÉ ES EL NÚCLEO?", action: (scene) => {
+                let meta = JSON.parse(localStorage.getItem('metaStats')) || { crystals: 0 };
+                meta.crystals += 30;
+                localStorage.setItem('metaStats', JSON.stringify(meta));
                 return "'Un algoritmo que aprendió a ser Dios. Nos hackeó el alma.' (Pix te regala 30 Cristales Meta)";
             }},
             { text: "ACERCARTE A ELLA (30 CRISTALES)", action: (scene) => {

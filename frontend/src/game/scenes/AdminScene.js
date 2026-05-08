@@ -54,7 +54,6 @@ export default class AdminScene extends Phaser.Scene {
             ['Reliquias', 'RelicScene'],
             ['Mejoras', 'UpgradeScene'],
             ['Evento', 'EventScene'],
-            ['Mapa', 'MapScene'],
         ];
         escenas.forEach(([label, scene], i) => {
             row = i;

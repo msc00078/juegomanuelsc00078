@@ -11,6 +11,16 @@ Todas las novedades y mejoras implementadas en el proyecto.
   - Atajo de teclado `` ` `` (backtick) en partida para abrir AdminScene in-game.
   - El objeto `user` de Supabase se expone en `window.__phaserUser` para Phaser.
 - **Dev Mode bypass**: Si haces clic en `[DEV MODE]` en la pantalla de login, entras como admin sin necesidad de credenciales Supabase reales. También se activa automáticamente si existe `localStorage` flag.
+- **Sistema de cristales vía Supabase**:
+  - `saveRunResult(score, sector, crystalsEarned)` — envía cristales al backend, que los acumula en `profiles.total_crystals`.
+  - `getCrystals()` / `spendCrystals(amount)` — funciones frontend para sincronizar con Supabase.
+  - Cristales endurecidos: `Math.floor(currentLevel / 8)` en vez de `/ 3`.
+  - UpgradeScene sincroniza con Supabase al cargar y al gastar.
+- **UI del menú principal mejorada**:
+  - Leaderboard estilo Auth.jsx: 4 columnas (rank, username, score, S.X), filas individuales, gold para #1, loading/empty states, 10 jugadores.
+  - Panel de comandos en 2 columnas (tecla+icono / acción), agrupado con separadores.
+- **Mute para móvil arreglado**: target táctil grande (100×36), `toggleMute()` ahora mutea Phaser globalmente.
+- **Robustez de audio**: polling de música cada 5s en MainScene.update() + fallback `on('stop')` en AudioManager.
 ### Corregido
 - **Bug "no deja volver a jugar"**: `_startingGame` ahora se resetea a `false` en cada `create()` de MenuScene.
 - **Bug "400 Datos incompletos"**: backend rechazaba score=0 porque `!0 === true`. Cambiado a `score == null`.
@@ -21,6 +31,8 @@ Todas las novedades y mejoras implementadas en el proyecto.
 - **Bug "Oro 99999 se pierde al recoger"**: Ahora también setea `mainScene.gold`.
 - **Bug "reliquias hermes/titan no aplican en admin"**: AdminScene ahora recalcula velocidad del player.
 - **Bug "música de menú no vuelve"**: `playMenuMusic()` ya no depende de `paused`. Añadido `shutdown()` en MainScene que limpia audio. Añadido `window.stopMenuMusic()` en PauseScene.goToMenu().
+- **Bug "Pix promete 30 cristales pero nunca los da"**: EventScene.js — opción "¿QUÉ ES EL NÚCLEO?" ahora realmente otorga los 30 cristales.
+- **Código muerto eliminado**: `MapScene.js` eliminado (nunca se usaba).
 
 ## [3.1.0] - 2026-05-08
 ### Añadido

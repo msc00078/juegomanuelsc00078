@@ -39,7 +39,7 @@ function App() {
       }
     };
 
-    // Silenciar / Activar toda la música
+    // Silenciar / Activar toda la música y Phaser
     window.toggleMute = () => {
       window.isMuted = !window.isMuted;
       if (audioRef.current) {
@@ -49,6 +49,9 @@ function App() {
           audioRef.current.volume = 0.5;
           audioRef.current.play().catch(e => console.log(e));
         }
+      }
+      if (window.__phaserGame?.sound) {
+        window.__phaserGame.sound.setMute(window.isMuted);
       }
       return window.isMuted;
     };
@@ -73,6 +76,7 @@ function App() {
     const timeout = setTimeout(() => {
       const game = new Phaser.Game(config);
       gameRef.current = game;
+      window.__phaserGame = game;
     }, 100);
 
     return () => {
