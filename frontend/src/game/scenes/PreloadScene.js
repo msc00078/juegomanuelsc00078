@@ -40,8 +40,8 @@ export default class PreloadScene extends Phaser.Scene {
         });
 
         // CARGA DE ASSETS
-        this.load.image('heroe1', 'src/assets/heroe1.png');
-        this.load.image('heroe2', 'src/assets/heroe2.png');
+        this.load.image('heroe1', 'assets/heroe1.png');
+        this.load.image('heroe2', 'assets/heroe2.png');
         
         // Audio In-Game
         this.load.audio('game_track1', 'assets/audio/game_track1.mp3'); // Data Run
