@@ -24,9 +24,8 @@ function App() {
     window.isMuted = false;
 
     window.playMenuMusic = () => {
-      if (audioRef.current && !window.isMuted) {
+      if (audioRef.current && audioRef.current.paused && !window.isMuted) {
         audioRef.current.volume = 0.5;
-        audioRef.current.currentTime = 0;
         audioRef.current.play().catch(e => console.log(e));
       }
     };

@@ -18,6 +18,7 @@ const allowedOrigins = [
     'http://localhost:5173',
     'http://localhost:4173',
     'https://juegomanuelsc00078.onrender.com',
+    'https://juegomanuelsc00078.vercel.app',
 ];
 app.use(corsMiddleware({
     origin: (origin, callback) => {

@@ -7,6 +7,10 @@ export const supabase = (supabaseUrl && supabaseKey && supabaseKey !== 'TU_ANON_
     ? createClient(supabaseUrl, supabaseKey)
     : null;
 
+const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://localhost:3001'
+    : 'https://juegomanuelsc00078.onrender.com';
+
 export const signUp = async (email, password, username) => {
     if (!supabase) throw new Error("Supabase no está inicializado. Verifica las llaves en el .env.");
     const { data, error } = await supabase.auth.signUp({ email, password });
@@ -31,7 +35,7 @@ export const saveRunResult = async (score, sector, crystalsEarned = 0) => {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) return;
 
-        const response = await fetch('http://localhost:3001/api/save-score', {
+        const response = await fetch(`${API_BASE}/api/save-score`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

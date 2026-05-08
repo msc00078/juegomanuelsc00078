@@ -595,12 +595,6 @@ export default class MainScene extends Phaser.Scene {
 
         this.bossAIManager.update(time);
 
-        // Polling de música cada 5s (fallback para móvil donde once('complete') falla)
-        if (!this._lastMusicPoll || time - this._lastMusicPoll > 5000) {
-            this._lastMusicPoll = time;
-            this.audioManager.handleSceneMusic();
-        }
-
         this.enemies.forEach(enemy => {
             if (enemy.hp > 0 && enemy.sprite && enemy.sprite.active) {
                 enemy.update(this.player.sprite, time);

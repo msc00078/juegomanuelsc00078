@@ -76,11 +76,6 @@ export class AudioManager {
                 this.handleSceneMusic();
             }
         });
-        music.on('stop', () => {
-            if (scene.registry.get('currentMusicKey') === targetTrack) {
-                this.handleSceneMusic();
-            }
-        });
 
         scene.tweens.add({
             targets: music,
