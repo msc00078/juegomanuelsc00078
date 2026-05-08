@@ -205,7 +205,7 @@ export default class MainScene extends Phaser.Scene {
 
         this.physics.add.overlap(this.player.sprite, this.golds, (playerSprite, goldObj) => {
             goldObj.destroy();
-            this.gold += Phaser.Math.Between(5, 15);
+            this.gold += Phaser.Math.Between(2, 8);
             this.registry.set('gold', this.gold);
             this.updateUI();
         });

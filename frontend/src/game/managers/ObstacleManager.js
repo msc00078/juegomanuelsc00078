@@ -56,7 +56,7 @@ export class ObstacleManager {
         crate.destroy();
         scene.createParticles(x, y, 0x5d4037);
 
-        if (Math.random() < 0.4) {
+        if (Math.random() < 0.25) {
             if (Math.random() < 0.2) scene.spawnHealth(x, y);
             else scene.spawnGold(x, y);
         }

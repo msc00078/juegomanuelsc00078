@@ -28,9 +28,12 @@ router.post('/save-score', async (req, res) => {
     }
 
     try {
+        const p_crystals_val = Math.max(0, Math.floor(crystalsEarned || 0));
+        const rpcPayload = { p_score: score, p_sector: sector };
+        if (p_crystals_val > 0) rpcPayload.p_crystals = p_crystals_val;
         const response = await axios.post(
             `${SUPABASE_URL}/rest/v1/rpc/registrar_fin_partida`,
-            { p_score: score, p_sector: sector, p_crystals: Math.max(0, Math.floor(crystalsEarned || 0)) },
+            rpcPayload,
             {
                 headers: {
                     'apikey': SUPABASE_KEY,
