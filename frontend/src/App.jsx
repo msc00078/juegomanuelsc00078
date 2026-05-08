@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import * as Phaser from 'phaser';
 import { config } from './game/GameConfig';
 import Auth from './components/Auth';
+import { isAdmin } from './game/admin';
 import './App.css';
 
 function App() {
@@ -23,25 +24,18 @@ function App() {
     window.isMuted = false;
 
     window.playMenuMusic = () => {
-      if (audioRef.current && audioRef.current.paused && !window.isMuted) {
+      if (audioRef.current && !window.isMuted) {
         audioRef.current.volume = 0.5;
+        audioRef.current.currentTime = 0;
         audioRef.current.play().catch(e => console.log(e));
       }
     };
 
     window.stopMenuMusic = () => {
       if (audioRef.current) {
-        const fadeOut = setInterval(() => {
-          if (audioRef.current && audioRef.current.volume > 0.05) {
-            audioRef.current.volume -= 0.05;
-          } else {
-            if (audioRef.current) {
-              audioRef.current.pause();
-              audioRef.current.volume = 0.5;
-            }
-            clearInterval(fadeOut);
-          }
-        }, 50);
+        audioRef.current.volume = 0;
+        audioRef.current.pause();
+        audioRef.current.volume = 0.5;
       }
     };
 
@@ -73,6 +67,8 @@ function App() {
   // Arrancar Phaser SOLO cuando gameStarted y user sean true
   useEffect(() => {
     if (!gameStarted || !user) return;
+
+    window.__phaserUser = user;
 
     const timeout = setTimeout(() => {
       const game = new Phaser.Game(config);

@@ -51,6 +51,6 @@ export default class PreloadScene extends Phaser.Scene {
         this.load.audio('sonido_espada', 'assets/audio/sonido_espada.wav');
         this.load.audio('sonido_arco', 'assets/audio/sonido_arco.mp3');
         this.load.audio('sonido_bomba', 'assets/audio/sonido_bomba.wav');
-        this.load.audio('sonido_gameover', 'assets/audio/sonido_gameover.mp3');
+        this.load.audio('sonido_gameover', 'assets/audio/sonido_gameover.wav');
     }
 }

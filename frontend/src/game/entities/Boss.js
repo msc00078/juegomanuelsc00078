@@ -5,8 +5,8 @@ export class Boss {
         this.scene    = scene;
         this.level    = level;
         
-        // Escalado de vida por nivel: 450 base + 180 por cada 5 niveles (más progresivo)
-        const hpMultiplier = 1 + (Math.floor(level / 5) * 0.20);
+        // Escalado de vida por nivel: más agresivo para que bosses altos sean amenazantes
+        const hpMultiplier = 1 + (level / 5) * 0.7;
         this.hp       = Math.round(450 * hpMultiplier);
         this.maxHp    = this.hp;
         
@@ -14,8 +14,8 @@ export class Boss {
         this.phase    = 1;
         this.isDead   = false;
 
-        // Daño de contacto y ataques escala con nivel (más suave al inicio)
-        const damageMult = 0.8 + (level / 40);
+        // Daño de contacto y ataques — escala más rápido
+        const damageMult = 0.8 + (level / 20);
         this.contactDamage = Math.round(12 * damageMult); 
         this.attackDamage  = Math.round(16 * damageMult);
 
@@ -123,8 +123,8 @@ export class Boss {
             const minInterval = Math.max(600, 1000 - (this.level * 10));
             if (this.scene.apiCallInterval > minInterval) this.scene.apiCallInterval = minInterval; 
             // Invocar 2 kamikazes inmediatamente al entrar en fase 3
-            this.scene.spawnKamikazeFromBoss?.();
-            this.scene.spawnKamikazeFromBoss?.();
+            this.scene.spawnManager?.spawnKamikazeFromBoss();
+            this.scene.spawnManager?.spawnKamikazeFromBoss();
         }
     }
 
@@ -152,7 +152,7 @@ export class Boss {
 
         // Fase 3: invocar kamikaze con probabilidad
         if (this.phase === 3 && Math.random() < 0.25) {
-            this.scene.spawnKamikazeFromBoss?.();
+            this.scene.spawnManager?.spawnKamikazeFromBoss();
         }
     }
 

@@ -48,16 +48,15 @@ const makeScene = () => ({
     tweens: { add: vi.fn() },
     bossText: { setText: vi.fn() },
     apiCallInterval: 3000,
-    spawnKamikazeFromBoss: vi.fn()
+    spawnManager: { spawnKamikazeFromBoss: vi.fn() }
 });
-
 
 describe('Boss Logic Tests', () => {
     it('debería inicializarse con HP correcto y fase 1', () => {
         const scene = makeScene();
         const boss = new Boss(scene, 300, 300, 'logico');
-        expect(boss.hp).toBe(600);
-        expect(boss.maxHp).toBe(600);
+        expect(boss.hp).toBe(513);
+        expect(boss.maxHp).toBe(513);
         expect(boss.phase).toBe(1);
         expect(boss.isDead).toBe(false);
         expect(boss.bossType).toBe('logico');
@@ -67,30 +66,30 @@ describe('Boss Logic Tests', () => {
         const scene = makeScene();
         const boss = new Boss(scene, 300, 300, 'logico');
         boss.takeDamage(100);
-        expect(boss.hp).toBe(500);
+        expect(boss.hp).toBe(413);
         expect(scene.showDamageNumber).toHaveBeenCalledWith(300, 300, 100);
     });
 
-    it('debería entrar en fase 2 cuando la vida cae por debajo del 60%', () => {
+    it('debería entrar en fase 2 cuando la vida cae por debajo del 50%', () => {
         const scene = makeScene();
         const boss = new Boss(scene, 300, 300, 'logico');
-        boss.takeDamage(241); // 600 - 241 = 359 = 59.8%
+        boss.takeDamage(258);
         expect(boss.phase).toBe(2);
     });
 
-    it('debería entrar en fase 3 cuando la vida cae por debajo del 30%', () => {
+    it('debería entrar en fase 3 cuando la vida cae por debajo del 20%', () => {
         const scene = makeScene();
         const boss = new Boss(scene, 300, 300, 'logico');
-        boss.phase = 2; // Simular que ya está en fase 2
-        boss.hp = 200;
-        boss.takeDamage(21); // 200 - 21 = 179 = 29.8%
+        boss.phase = 2;
+        boss.hp = 100;
+        boss.takeDamage(5);
         expect(boss.phase).toBe(3);
     });
 
     it('debería morir si la vida llega a 0', () => {
         const scene = makeScene();
         const boss = new Boss(scene, 300, 300, 'logico');
-        boss.takeDamage(600);
+        boss.takeDamage(513);
         expect(boss.hp).toBe(0);
         expect(boss.isDead).toBe(true);
     });
@@ -100,14 +99,39 @@ describe('Boss Logic Tests', () => {
         const boss = new Boss(scene, 300, 300, 'logico');
         boss.isDead = true;
         boss.takeDamage(100);
-        expect(boss.hp).toBe(600); // Sin cambio
+        expect(boss.hp).toBe(513);
+    });
+
+    it('debería entrar en fase 3 cuando la vida cae por debajo del 20%', () => {
+        const scene = makeScene();
+        const boss = new Boss(scene, 300, 300, 'logico');
+        boss.phase = 2;
+        boss.hp = 100;
+        boss.takeDamage(15);
+        expect(boss.phase).toBe(3);
+    });
+
+    it('debería morir si la vida llega a 0', () => {
+        const scene = makeScene();
+        const boss = new Boss(scene, 300, 300, 'logico');
+        boss.takeDamage(513);
+        expect(boss.hp).toBe(0);
+        expect(boss.isDead).toBe(true);
+    });
+
+    it('no debería recibir daño si ya está muerto', () => {
+        const scene = makeScene();
+        const boss = new Boss(scene, 300, 300, 'logico');
+        boss.isDead = true;
+        boss.takeDamage(100);
+        expect(boss.hp).toBe(513);
     });
 
     it('no debería morir dos veces (die() idempotente)', () => {
         const scene = makeScene();
         const boss = new Boss(scene, 300, 300, 'logico');
         boss.die();
-        boss.die(); // Segunda llamada no debe lanzar error
+        boss.die();
         expect(boss.isDead).toBe(true);
     });
 

@@ -23,7 +23,6 @@ const makeScene = (registryOverrides = {}) => {
         setDepth: vi.fn().mockReturnThis(),
         setPosition: vi.fn().mockReturnThis(),
         setSize: vi.fn().mockReturnThis(),
-        setFillStyle: vi.fn().mockReturnThis(),
         body: {
             setCollideWorldBounds: vi.fn(),
             setBounce: vi.fn(),
@@ -61,7 +60,7 @@ const makeScene = (registryOverrides = {}) => {
             get: vi.fn((key) => registry[key] ?? null),
             set: vi.fn((key, val) => { registry[key] = val; })
         },
-        updateHealthUI: vi.fn(),
+        updateUI: vi.fn(),
         endGame: vi.fn()
     };
 };
@@ -77,25 +76,25 @@ describe('Player Logic Tests', () => {
     it('debería calcular la velocidad base correctamente', () => {
         const scene = makeScene();
         const player = new Player(scene, 100, 100);
-        expect(player.speed).toBe(200); // 200 * (1 + 0)
+        expect(player.speed).toBe(200);
     });
 
     it('debería aumentar la velocidad con bonusSpeed', () => {
         const scene = makeScene({ bonusSpeed: 0.5 });
         const player = new Player(scene, 100, 100);
-        expect(player.speed).toBe(300); // 200 * 1.5
+        expect(player.speed).toBe(300);
     });
 
     it('debería aplicar bonus de velocidad de la reliquia hermes', () => {
         const scene = makeScene({ relics: ['hermes'] });
         const player = new Player(scene, 100, 100);
-        expect(player.speed).toBeCloseTo(240); // 200 * 1.2
+        expect(player.speed).toBeCloseTo(240);
     });
 
     it('debería aplicar reducción de velocidad de la reliquia titan', () => {
         const scene = makeScene({ relics: ['titan'] });
         const player = new Player(scene, 100, 100);
-        expect(player.speed).toBe(180); // 200 * 0.9
+        expect(player.speed).toBe(180);
     });
 
     it('debería perder vida al recibir daño', () => {
@@ -119,11 +118,11 @@ describe('Player Logic Tests', () => {
         expect(scene.registry.set).toHaveBeenCalledWith('hp', 60);
     });
 
-    it('debería llamar a updateHealthUI al recibir daño', () => {
+    it('debería llamar a updateUI al recibir daño', () => {
         const scene = makeScene();
         const player = new Player(scene, 100, 100);
         player.takeDamage(40);
-        expect(scene.updateHealthUI).toHaveBeenCalled();
+        expect(scene.updateUI).toHaveBeenCalled();
     });
 
     it('debería ignorar daño si ya es invulnerable', () => {
@@ -161,14 +160,14 @@ describe('Player Logic Tests', () => {
     it('debería reducir el daño con la reliquia hierro', () => {
         const scene = makeScene({ relics: ['hierro'] });
         const player = new Player(scene, 100, 100);
-        player.takeDamage(5); // 5 - 2 = 3
+        player.takeDamage(5);
         expect(player.hp).toBe(97);
     });
 
     it('la reliquia hierro nunca debería reducir el daño a menos de 1', () => {
         const scene = makeScene({ relics: ['hierro'] });
         const player = new Player(scene, 100, 100);
-        player.takeDamage(1); // Math.max(1, 1 - 2) = 1
+        player.takeDamage(1);
         expect(player.hp).toBe(99);
     });
 });

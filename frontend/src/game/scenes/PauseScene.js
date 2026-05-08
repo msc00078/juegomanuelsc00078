@@ -50,6 +50,16 @@ export default class PauseScene extends Phaser.Scene {
             const mainScene = this.scene.get('MainScene');
             if (mainScene && mainScene.sound) {
                 mainScene.sound.setMute(muted);
+                // Al desmutear, restaurar el volumen de la pista actual
+                if (!muted) {
+                    const currentKey = mainScene.registry?.get('currentMusicKey');
+                    if (currentKey) {
+                        const current = mainScene.sound.get(currentKey);
+                        if (current) {
+                            mainScene.tweens?.add({ targets: current, volume: 0.5, duration: 500 });
+                        }
+                    }
+                }
             }
         });
 
@@ -108,6 +118,7 @@ export default class PauseScene extends Phaser.Scene {
     }
 
     goToMenu() {
+        if (window.stopMenuMusic) window.stopMenuMusic();
         this.scene.stop('MainScene');
         this.scene.stop();
         this.scene.start('MenuScene');

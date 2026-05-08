@@ -16,7 +16,7 @@ router.post('/save-score', async (req, res) => {
     // --- LOGICA DE VALIDACION (ANTI-HACK) ---
     
     // 1. Verificación de cordura básica
-    if (!score || !sector || !userId) {
+    if (score == null || sector == null || !userId) {
         return res.status(400).json({ error: 'Datos incompletos' });
     }
 

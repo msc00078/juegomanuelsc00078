@@ -54,11 +54,34 @@ export class LaserEliteEnemy extends EnemyBase {
         1200, 15, 0xff00ff, 1
       ).setRotation(lockedAngle).setDepth(51);
 
-      this.scene.physics.add.existing(laser, true);
-      
-      this.scene.physics.add.overlap(this.scene.player.sprite, laser, () => {
-        this.scene.player.takeDamage(25);
-      });
+      // Verificación manual distancia punto-línea (Arcade Physics no soporta AABB rotado)
+      const startX = this.sprite.x;
+      const startY = this.sprite.y;
+      const endX = this.sprite.x + Math.cos(lockedAngle) * 1200;
+      const endY = this.sprite.y + Math.sin(lockedAngle) * 1200;
+
+      const checkLaserDamage = () => {
+        if (!laser.active || this.isDead) return;
+        const px = this.scene.player.sprite.x;
+        const py = this.scene.player.sprite.y;
+        const dist = Phaser.Math.Distance.Between(px, py, startX, startY);
+        if (dist > 600) return;
+
+        const dx = endX - startX;
+        const dy = endY - startY;
+        const len = Math.sqrt(dx * dx + dy * dy);
+        if (len === 0) return;
+        const proj = ((px - startX) * dx + (py - startY) * dy) / (len * len);
+        if (proj < 0 || proj > 1) return;
+        const closestX = startX + proj * dx;
+        const closestY = startY + proj * dy;
+        const lineDist = Phaser.Math.Distance.Between(px, py, closestX, closestY);
+        if (lineDist < 30 && !this.scene.player.isInvulnerable) {
+          this.scene.player.takeDamage(25);
+        }
+      };
+
+      checkLaserDamage();
 
       this.scene.tweens.add({
         targets: laser,

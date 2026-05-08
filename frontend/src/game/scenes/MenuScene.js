@@ -1,5 +1,6 @@
 import * as Phaser from 'phaser';
 import { getLeaderboard } from '../supabase';
+import { isAdmin } from '../admin';
 
 export default class MenuScene extends Phaser.Scene {
     constructor() {
@@ -7,6 +8,8 @@ export default class MenuScene extends Phaser.Scene {
     }
 
     create() {
+        this._startingGame = false;
+
         // Iniciar/Asegurar música de menú global
         if (window.playMenuMusic) window.playMenuMusic();
 
@@ -142,6 +145,8 @@ export default class MenuScene extends Phaser.Scene {
         personalityText.on('pointerout', () => personalityText.setFill('#ffcc00'));
 
         playBg.on('pointerdown', () => {
+            if (this._startingGame) return;
+            this._startingGame = true;
             let savedMeta = JSON.parse(localStorage.getItem('metaStats')) || {};
             let meta = {
                 hpLevel: savedMeta.hpLevel || 0,
@@ -273,5 +278,23 @@ export default class MenuScene extends Phaser.Scene {
             const muted = window.toggleMute ? window.toggleMute() : false;
             muteBtn.setText(muted ? '🔇 MUTE' : '🔊 SONIDO');
         });
+
+        // Botón DEV (solo admin)
+        const user = window.__phaserUser;
+        if (isAdmin(user)) {
+            const devBtn = this.add.text(20, this.scale.height - 20, '[DEV]', {
+                fontFamily: 'Orbitron, sans-serif',
+                fontSize: '14px',
+                fill: '#333',
+                padding: { x: 8, y: 5 }
+            }).setOrigin(0, 1).setInteractive({ useHandCursor: true }).setDepth(200);
+
+            devBtn.on('pointerover', () => devBtn.setFill('#00f2ff'));
+            devBtn.on('pointerout', () => devBtn.setFill('#333'));
+            devBtn.on('pointerdown', () => {
+                this.registry.set('user', user);
+                this.scene.start('AdminScene');
+            });
+        }
     }
 }

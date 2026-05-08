@@ -67,7 +67,7 @@ describe('Auth Component Tests', () => {
 
     it('debería cambiar al modo de registro al hacer clic en el toggle', async () => {
         await act(async () => { renderAuth(); });
-        const toggleText = screen.getByText('¿Eres nuevo? Crea un perfil aquí');
+        const toggleText = screen.getByText('¿Nuevo sujeto? Regístrate aquí');
         await act(async () => { fireEvent.click(toggleText); });
         expect(screen.getByPlaceholderText('USERNAME')).toBeTruthy();
         expect(screen.getByText('CREAR PERFIL')).toBeTruthy();
@@ -77,8 +77,7 @@ describe('Auth Component Tests', () => {
         const handleLogin = vi.fn();
         await act(async () => { renderAuth(handleLogin); });
 
-        // Cambiar a modo registro
-        const toggleText = screen.getByText('¿Eres nuevo? Crea un perfil aquí');
+        const toggleText = screen.getByText('¿Nuevo sujeto? Regístrate aquí');
         await act(async () => { fireEvent.click(toggleText); });
 
         await act(async () => {
@@ -96,10 +95,10 @@ describe('Auth Component Tests', () => {
 
     it('debería volver a modo login al hacer clic en toggle de registro', async () => {
         await act(async () => { renderAuth(); });
-        const toggleA = screen.getByText('¿Eres nuevo? Crea un perfil aquí');
-        await act(async () => { fireEvent.click(toggleA); }); // → modo registro
-        const toggleB = screen.getByText('¿Ya tienes una cuenta? Inicia sesión');
-        await act(async () => { fireEvent.click(toggleB); }); // → vuelta a login
+        const toggleA = screen.getByText('¿Nuevo sujeto? Regístrate aquí');
+        await act(async () => { fireEvent.click(toggleA); });
+        const toggleB = screen.getByText('¿Ya tienes acceso? Entra aquí');
+        await act(async () => { fireEvent.click(toggleB); });
         expect(screen.getByText('INICIAR SESIÓN')).toBeTruthy();
     });
 });

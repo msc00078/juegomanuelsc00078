@@ -1,7 +1,71 @@
 # Changelog - AI Boss Arena (Roguelike Edition)
 
 Todas las novedades y mejoras implementadas en el proyecto.
-\n## [3.0.0] - 2026-05-07
+
+## [3.2.0] - 2026-05-08
+### Añadido
+- **Sistema Admin completo**:
+  - `frontend/src/game/admin.js` — utilidad `isAdmin()` con whitelist de emails + fallback localStorage.
+  - `AdminScene.js` — panel con 30+ botones para: saltar a cualquier nivel, forzar salas (boss, élite, tesoro), ir directamente a cualquier escena (tienda, reliquias, mejoras, evento, mapa), activar God Mode, oro/daño infinitos, insta-kill, cristales meta.
+  - Botón `[DEV]` en MenuScene, visible solo para admin (esquina inferior izquierda).
+  - Atajo de teclado `` ` `` (backtick) en partida para abrir AdminScene in-game.
+  - El objeto `user` de Supabase se expone en `window.__phaserUser` para Phaser.
+- **Dev Mode bypass**: Si haces clic en `[DEV MODE]` en la pantalla de login, entras como admin sin necesidad de credenciales Supabase reales. También se activa automáticamente si existe `localStorage` flag.
+### Corregido
+- **Bug "no deja volver a jugar"**: `_startingGame` ahora se resetea a `false` en cada `create()` de MenuScene.
+- **Bug "400 Datos incompletos"**: backend rechazaba score=0 porque `!0 === true`. Cambiado a `score == null`.
+- **Bug "láser élite no daña"**: El láser rotado usaba AABB de Arcade Physics que no rota con el sprite. Reemplazado por detección manual distancia punto-a-línea.
+- **Bug "crates de daño no dañan"**: Dos `physics.add.collider` entre player y crates se cancelaban; eliminado el collider duplicado sin callback (línea 226).
+- **Bug "boss escala muy poco"**: `hpMultiplier` de `1 + floor(level/5)*0.20` a `1 + (level/5)*0.7` (2.6x → 6.6x en nivel 40). `damageMult` de `0.8 + level/40` a `0.8 + level/20`.
+- **Bug "God Mode se pierde al reanudar"**: Ahora también escribe en registry.
+- **Bug "Oro 99999 se pierde al recoger"**: Ahora también setea `mainScene.gold`.
+- **Bug "reliquias hermes/titan no aplican en admin"**: AdminScene ahora recalcula velocidad del player.
+- **Bug "música de menú no vuelve"**: `playMenuMusic()` ya no depende de `paused`. Añadido `shutdown()` en MainScene que limpia audio. Añadido `window.stopMenuMusic()` en PauseScene.goToMenu().
+
+## [3.1.0] - 2026-05-08
+### Añadido
+- **Seguridad backend (crítico)**:
+  - CORS restringido a orígenes conocidos (localhost, dominio producción).
+  - Rate limiting en `/api/boss-decision`, `/api/boss-warmup` (30 req/min) y `/api/save-score` (10 req/min).
+  - Límite de tamaño de body a 10KB en Express (`express.json({ limit: '10kb' })`).
+  - Validación y sanitización de todos los campos en `/api/boss-decision` (`boss_hp`, `player_hp`, `distance`, `boss_phase`, `boss_type`).
+  - Middleware `helmet` para cabeceras de seguridad (CSP, X-Frame-Options, HSTS, etc.).
+  - `app.disable('x-powered-by')` para ocultar tecnología del servidor.
+- **Modularización del frontend**: MainScene.js reducido de 1271 → 611 líneas (-52%).
+  - `AudioManager.js` (81 líneas): gestión de música y SFX.
+  - `VFXManager.js` (60 líneas): partículas, daño flotante, crítico, pushBack.
+  - `BossAIManager.js` (68 líneas): peticiones a la API del jefe y fallback local.
+  - `CombatManager.js` (128 líneas): flechas, bombas, proyectiles, ciclo de armas.
+  - `LootManager.js` (63 líneas): oro, salud, XP, magnetismo.
+  - `ProgressionManager.js` (67 líneas): checkLevelClear, nextLevel, árbol de probabilidades.
+  - `ObstacleManager.js` (55 líneas): generación y destrucción de obstáculos.
+  - `EliteManager.js` (78 líneas): prompt y spawn de élites.
+  - `EnemyManager.js` (32 líneas): muerte de enemigos y barras de vida.
+  - Total: 12 managers en `frontend/src/game/managers/`.
+### Corregido
+- **Tests**: 5 tests desactualizados actualizados (Enemy, Auth, Boss, Player, supabase). Todos en verde (58/58 frontend, 4/4 backend).
+- **Bug de daño triple en trampas**: Eliminados overlap redundante y detección manual en `update()`. Ahora solo collider.
+- **Bug de método duplicado**: `spawnKamikazeFromBoss()` eliminado de MainScene.js (ya existía en SpawnManager.js). Boss.js redirigido a `spawnManager.spawnKamikazeFromBoss()`.
+- **Bug de teclas duplicadas**: Unificados los dos bloques de registro de atajos de teclado (P/ESC/I/TAB).
+- **Bug de puerto incorrecto**: Cambiado `localhost:5000` → `localhost:3001` en la llamada a la API del boss.
+- **Import muerto**: Eliminado `import cors from 'express'` (línea 2) en `backend/index.js`.
+
+## [3.0.2] - 2026-05-08
+### Añadido
+- **AGENTS.md**: Nueva sección "Flujo Git" con convención para commit/push.
+### Corregido
+- **Superposición de música en móvil**: 
+  - Reemplazado `setInterval` en `stopMenuMusic()` por `pause()` directo para evitar throttle del navegador móvil.
+  - `AudioContext.resume()` ahora es `await` en `handleMusic()` de `MainScene.js`.
+  - Añadido `stopMenuMusic()` en `endGame()` para silenciar menú al volver de partida.
+  - Añadido guarda anti-doble-click en botón "INICIAR PURGA" en `MenuScene.js`.
+  - Al desmutear desde pausa, se restaura el volumen de la pista Phaser actual.
+
+## [3.0.1] - 2026-05-08
+### Modificado
+- **AGENTS.md**: Renombrado de `agents.md` a `AGENTS.md`. Ampliado con estructura del proyecto, comandos de desarrollo, dependencia backend-frontend, variables de entorno, testing y convenciones generales.
+
+## [3.0.0] - 2026-05-07
 ### Añadido
 - **Sistema de Audio Inmersivo**:
   - Implementación de SFX para Espada, Arco y Bombas.

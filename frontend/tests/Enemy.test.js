@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
-import { Enemy, StandardEnemy, TankEnemy, KamikazeEnemy, RangedEnemy, SummonerEnemy } from '../src/game/entities/Enemy.js';
+import EnemyBase from '../src/game/entities/base/EnemyBase.js';
+import { StandardEnemy, TankEnemy, KamikazeEnemy, RangedEnemy, SummonerEnemy } from '../src/game/entities';
 
 const makeScene = () => {
     const rectMock = () => ({
@@ -51,14 +52,13 @@ const makeScene = () => {
         spawnGold: vi.fn(),
         spawnXp: vi.fn(),
         setupEnemyCollisions: vi.fn(),
-        physics: { add: { existing: vi.fn() }, moveToObject: vi.fn() }
     };
 };
 
 describe('Enemy Logic Tests', () => {
     it('debería inicializarse con la vida correcta', () => {
         const scene = makeScene();
-        const enemy = new Enemy(scene, 100, 100, 100, 50, 0xff0000, 25);
+        const enemy = new EnemyBase(scene, 100, 100, 100, 50, 0xff0000, 25);
         expect(enemy.hp).toBe(100);
         expect(enemy.maxHp).toBe(100);
         expect(enemy.isDead).toBe(false);
@@ -66,21 +66,21 @@ describe('Enemy Logic Tests', () => {
 
     it('debería perder vida al recibir daño', () => {
         const scene = makeScene();
-        const enemy = new Enemy(scene, 100, 100, 100, 50, 0xff0000, 25);
+        const enemy = new EnemyBase(scene, 100, 100, 100, 50, 0xff0000, 25);
         enemy.takeDamage(30);
         expect(enemy.hp).toBe(70);
     });
 
     it('debería llamar a showDamageNumber al recibir daño', () => {
         const scene = makeScene();
-        const enemy = new Enemy(scene, 100, 100, 100, 50, 0xff0000, 25);
+        const enemy = new EnemyBase(scene, 100, 100, 100, 50, 0xff0000, 25);
         enemy.takeDamage(30);
         expect(scene.showDamageNumber).toHaveBeenCalledWith(100, 100, 30);
     });
 
     it('debería morir si la vida llega a 0', () => {
         const scene = makeScene();
-        const enemy = new Enemy(scene, 100, 100, 100, 50, 0xff0000, 25);
+        const enemy = new EnemyBase(scene, 100, 100, 100, 50, 0xff0000, 25);
         scene.enemies.push(enemy);
         enemy.takeDamage(100);
         expect(enemy.hp).toBe(0);
@@ -90,7 +90,7 @@ describe('Enemy Logic Tests', () => {
 
     it('debería ignorar daño si ya está muerto', () => {
         const scene = makeScene();
-        const enemy = new Enemy(scene, 100, 100, 100, 50, 0xff0000, 25);
+        const enemy = new EnemyBase(scene, 100, 100, 100, 50, 0xff0000, 25);
         enemy.isDead = true;
         enemy.takeDamage(50);
         expect(enemy.hp).toBe(100);
@@ -98,22 +98,22 @@ describe('Enemy Logic Tests', () => {
 
     it('debería omitir update si está muerto', () => {
         const scene = makeScene();
-        const enemy = new Enemy(scene, 100, 100, 100, 50, 0xff0000, 25);
+        const enemy = new EnemyBase(scene, 100, 100, 100, 50, 0xff0000, 25);
         enemy.isDead = true;
-        enemy.update({ active: true }); // No debe lanzar error
+        enemy.update({ active: true });
         expect(scene.physics.moveToObject).not.toHaveBeenCalled();
     });
 
     it('debería detener velocidad si playerSprite no está activo en update', () => {
         const scene = makeScene();
-        const enemy = new Enemy(scene, 100, 100, 100, 50, 0xff0000, 25);
+        const enemy = new EnemyBase(scene, 100, 100, 100, 50, 0xff0000, 25);
         enemy.update({ active: false });
         expect(enemy.sprite.body.setVelocity).toHaveBeenCalledWith(0, 0);
     });
 
     it('debería activar startBleed y marcar isBleeding', () => {
         const scene = makeScene();
-        const enemy = new Enemy(scene, 100, 100, 100, 50, 0xff0000, 25);
+        const enemy = new EnemyBase(scene, 100, 100, 100, 50, 0xff0000, 25);
         enemy.startBleed();
         expect(enemy.isBleeding).toBe(true);
         expect(scene.time.delayedCall).toHaveBeenCalled();
@@ -121,10 +121,10 @@ describe('Enemy Logic Tests', () => {
 
     it('startBleed no debería activarse dos veces', () => {
         const scene = makeScene();
-        const enemy = new Enemy(scene, 100, 100, 100, 50, 0xff0000, 25);
+        const enemy = new EnemyBase(scene, 100, 100, 100, 50, 0xff0000, 25);
         enemy.startBleed();
         const prevCallCount = scene.time.delayedCall.mock.calls.length;
-        enemy.startBleed(); // Segunda llamada ignorada
+        enemy.startBleed();
         expect(scene.time.delayedCall.mock.calls.length).toBe(prevCallCount);
     });
 });
@@ -137,10 +137,10 @@ describe('Enemy Subclasses Tests', () => {
         expect(enemy.name).toBe('Ente Glitch');
     });
 
-    it('TankEnemy debería tener 100 HP y nombre correcto', () => {
+    it('TankEnemy debería tener 250 HP y nombre correcto', () => {
         const scene = makeScene();
         const enemy = new TankEnemy(scene, 100, 100);
-        expect(enemy.hp).toBe(100);
+        expect(enemy.hp).toBe(250);
         expect(enemy.name).toBe('Protector Aumentado');
     });
 

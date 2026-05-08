@@ -7,6 +7,7 @@ import ShopScene from './scenes/ShopScene';
 import RelicScene from './scenes/RelicScene';
 import EventScene from './scenes/EventScene';
 import UpgradeScene from './scenes/UpgradeScene';
+import AdminScene from './scenes/AdminScene';
 
 import InventoryScene from './scenes/InventoryScene';
 import PauseScene from './scenes/PauseScene';
@@ -31,5 +32,5 @@ export const config = {
             gravity: { y: 0 }
         }
     },
-    scene: [PreloadScene, MenuScene, MapScene, MainScene, ShopScene, RelicScene, EventScene, UpgradeScene, InventoryScene, PauseScene, LevelUpScene]
+    scene: [PreloadScene, MenuScene, MapScene, MainScene, ShopScene, RelicScene, EventScene, UpgradeScene, InventoryScene, PauseScene, LevelUpScene, AdminScene]
 };

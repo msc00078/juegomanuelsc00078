@@ -4,7 +4,7 @@ import { signUp, signIn, saveRunResult, getLeaderboard } from '../src/game/supab
 const mockCreate = {
     signUp: vi.fn(),
     signInWithPassword: vi.fn(),
-    getUser: vi.fn()
+    getSession: vi.fn()
 };
 const mockFrom = vi.fn();
 
@@ -13,7 +13,7 @@ vi.mock('@supabase/supabase-js', () => ({
         auth: {
             signUp: (...args) => mockCreate.signUp(...args),
             signInWithPassword: (...args) => mockCreate.signInWithPassword(...args),
-            getUser: (...args) => mockCreate.getUser(...args)
+            getSession: (...args) => mockCreate.getSession(...args)
         },
         from: (...args) => mockFrom(...args)
     }))
@@ -63,21 +63,25 @@ describe('Supabase Service Tests', () => {
     });
 
     it('saveRunResult no debería lanzar error con datos válidos', async () => {
-        mockCreate.getUser.mockResolvedValueOnce({
-            data: { user: { id: 'abc', email: 'test@test.com' } }
+        mockCreate.getSession.mockResolvedValueOnce({
+            data: { session: { access_token: 'mock-token', user: { id: 'abc' } } }
         });
-        mockFrom.mockReturnValue(makeChain({ total_crystals: 10, high_score: 500, max_sector: 3 }));
+        const originalFetch = globalThis.fetch;
+        globalThis.fetch = vi.fn().mockResolvedValue({
+            ok: true,
+            json: () => Promise.resolve({ message: 'Puntuación validada y guardada.' })
+        });
         const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-        await saveRunResult(600, 4, 20);
+        await saveRunResult(600, 4);
         expect(errorSpy).not.toHaveBeenCalled();
         errorSpy.mockRestore();
+        if (originalFetch) globalThis.fetch = originalFetch;
     });
 
     it('saveRunResult no debería crashear si el usuario no está logueado', async () => {
-        mockCreate.getUser.mockResolvedValueOnce({ data: { user: null } });
+        mockCreate.getSession.mockResolvedValueOnce({ data: { session: null } });
         const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-        await saveRunResult(100, 1, 5);
-        // No debe lanzar error, simplemente hace return
+        await saveRunResult(100, 1);
         errorSpy.mockRestore();
     });
 });
