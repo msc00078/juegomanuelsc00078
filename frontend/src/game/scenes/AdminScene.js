@@ -219,8 +219,8 @@ export default class AdminScene extends Phaser.Scene {
     }
 
     _addCrystals(amount) {
-        let meta = JSON.parse(localStorage.getItem('metaStats')) || { crystals: 0, hpLevel: 0, dmgLevel: 0, speedLevel: 0 };
+        let meta = JSON.parse(localStorage.getItem('metaStats:v1') || localStorage.getItem('metaStats')) || { crystals: 0, hpLevel: 0, dmgLevel: 0, speedLevel: 0 };
         meta.crystals = (meta.crystals || 0) + amount;
-        localStorage.setItem('metaStats', JSON.stringify(meta));
+        localStorage.setItem('metaStats:v1', JSON.stringify(meta));
     }
 }

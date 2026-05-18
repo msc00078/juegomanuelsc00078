@@ -16,12 +16,14 @@ const ALL_NPCS = [
   tejedorData, sombra9Data, huerfanoData
 ];
 
-const SEEN_KEY = 'loreSeen';
-const PROGRESS_KEY = 'loreNpcProgress';
+const SEEN_KEY = 'loreSeen:v1';
+const SEEN_KEY_OLD = 'loreSeen';
+const PROGRESS_KEY = 'loreNpcProgress:v1';
+const PROGRESS_KEY_OLD = 'loreNpcProgress';
 
 function getSeenSet() {
   try {
-    const raw = localStorage.getItem(SEEN_KEY);
+    const raw = localStorage.getItem(SEEN_KEY) || localStorage.getItem(SEEN_KEY_OLD);
     return new Set(raw ? JSON.parse(raw) : []);
   } catch { return new Set(); }
 }
@@ -32,7 +34,7 @@ function saveSeenSet(seenSet) {
 
 function getProgressMap() {
   try {
-    const raw = localStorage.getItem(PROGRESS_KEY);
+    const raw = localStorage.getItem(PROGRESS_KEY) || localStorage.getItem(PROGRESS_KEY_OLD);
     return new Map(raw ? JSON.parse(raw) : []);
   } catch { return new Map(); }
 }
@@ -114,6 +116,8 @@ export class LoreManager {
 
   resetProgress() {
     localStorage.removeItem(SEEN_KEY);
+    localStorage.removeItem(SEEN_KEY_OLD);
     localStorage.removeItem(PROGRESS_KEY);
+    localStorage.removeItem(PROGRESS_KEY_OLD);
   }
 }

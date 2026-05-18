@@ -2,6 +2,27 @@
 
 Todas las novedades y mejoras implementadas en el proyecto.
 
+## [3.2.1] - 2026-05-18
+### Modificado
+- **Puntuación de React Doctor Perfecta (100/100)**:
+  - **Versionado de LocalStorage**: Cambiadas todas las claves de persistencia local (`metaStats`, `loreSeen`, `loreNpcProgress`) a sus contrapartes seguras y versionadas (`metaStats:v1`, `loreSeen:v1`, `loreNpcProgress:v1`) en `MainScene.js`, `UpgradeScene.js`, `MenuScene.js`, `AdminScene.js`, `EventScene.js`, y `LoreManager.js`. Se implementó un robusto sistema de migración automática retrocompatible para asegurar que los jugadores conserven intacta toda su meta-progresión de cristales y diálogos.
+  - **Refactorización de Auth.jsx**: Sustitución de los 8 hooks `useState` independientes por un único hook `useReducer` centralizado y predecible. Cambiado el sistema de renderizado de elementos del ranking para usar claves de identificación estables y únicas (`key={player.id || player.username}`) en lugar del índice del array (`key={index}`).
+  - **Optimización de Rerenders en App.jsx**: Reemplazado el estado `gameStarted` por una referencia mutable `gameStartedRef` mediante `useRef`, eliminando re-renderizados duplicados al montar el juego o cambiar entre avisos.
+  - **Accesibilidad Total (A11y)**: Añadidos atributos de rol interactivo (`role="button"`), soporte de foco por teclado (`tabIndex={0}`) y eventos de tecla (`onKeyDown`) a todos los elementos estáticos del DOM que disponen de listeners click (el selector de registro en `Auth.jsx`, la advertencia en `App.jsx`, y el activador de reproducción de audio).
+  - **Estilos de Enfoque Teclado**: Eliminadas las declaraciones `outline: none` en línea y sustituidas por un estilo global en CSS (`*:focus-visible`) que dibuja un elegante anillo de foco cian retro-cyberpunk solo para usuarios de teclado.
+  - **Optimización de Ciclos**: Refactorizado el bucle de búsqueda de enemigos objetivo para bombas pegajosas en `CombatManager.js` reduciendo una costosa iteración encadenada `.filter().map()` a una única y directa llamada `.reduce()`.
+  - **Corrección de Advertencias Tipográficas**: Reemplazados todos los caracteres de tres puntos suspensivos ("...") en el JSX por la entidad elipsis tipográfica correcta `…`.
+- **Code-Splitting en Compilación (Rendimiento)**: Configurada la fragmentación en manual chunks en `vite.config.js` para extraer las librerías `phaser` y `@supabase` del bundle principal. El chunk de carga inicial `index.js` ha disminuido drásticamente de **1.76 MB** a tan solo **179 kB** (una optimización de ~90%), acelerando la carga inicial del juego y habilitando la caché prolongada en el cliente.
+- **Resolución de Vulnerabilidades (Seguridad)**: Ejecutada una auditoría de dependencias y subsanada la vulnerabilidad de severidad de grado moderado en `brace-expansion` mediante `npm audit fix`, logrando un reporte de 0 vulnerabilidades.
+- **Saneamiento de Linter y Código Muerto (Estructura y Patrones)**: Corregidos el 100% de los errores y advertencias de ESLint preexistentes en todo el proyecto:
+  - Resuelto el bug `Phaser is not defined` en [TankEnemy.js](file:///c:/Users/marta/OneDrive/Escritorio/manuel/juegomanuelsc00078/frontend/src/game/entities/TankEnemy.js) importando `Phaser` en ES modules.
+  - Limpiados parámetros de firma y llamadas sin uso (`playerSprite`) en [Boss.js](file:///c:/Users/marta/OneDrive/Escritorio/manuel/juegomanuelsc00078/frontend/src/game/entities/Boss.js).
+  - Eliminados imports muertos de enemigos, funciones de escalado y librerías Phaser en [MainScene.js](file:///c:/Users/marta/OneDrive/Escritorio/manuel/juegomanuelsc00078/frontend/src/game/scenes/MainScene.js) y [HUDManager.js](file:///c:/Users/marta/OneDrive/Escritorio/manuel/juegomanuelsc00078/frontend/src/game/managers/HUDManager.js).
+  - Limpiadas variables locales declaradas pero nunca leídas en [MenuScene.js](file:///c:/Users/marta/OneDrive/Escritorio/manuel/juegomanuelsc00078/frontend/src/game/scenes/MenuScene.js), [PreloadScene.js](file:///c:/Users/marta/OneDrive/Escritorio/manuel/juegomanuelsc00078/frontend/src/game/scenes/PreloadScene.js), [UpgradeScene.js](file:///c:/Users/marta/OneDrive/Escritorio/manuel/juegomanuelsc00078/frontend/src/game/scenes/UpgradeScene.js) y [MobileControls.js](file:///c:/Users/marta/OneDrive/Escritorio/manuel/juegomanuelsc00078/frontend/src/game/ui/MobileControls.js).
+  - Limpiados imports y parámetros en ficheros de testing ([Auth.test.jsx](file:///c:/Users/marta/OneDrive/Escritorio/manuel/juegomanuelsc00078/frontend/tests/Auth.test.jsx) and [setup.js](file:///c:/Users/marta/OneDrive/Escritorio/manuel/juegomanuelsc00078/frontend/tests/setup.js)).
+  - Ajustada la firma del método `update` en [GuardianEnemy.js](file:///c:/Users/marta/OneDrive/Escritorio/manuel/juegomanuelsc00078/frontend/src/game/entities/GuardianEnemy.js) para eliminar el argumento de tiempo no utilizado.
+- **Depuración e Higiene de Dependencias**: Utilizadas las herramientas `depcheck` y `knip` para detectar código muerto. Se desinstaló la librería `react-responsive` al estar 100% en desuso, liberando el bundle del juego de dependencias huérfanas adicionales y reduciendo el tamaño compilado del motor Phaser de **1.35 MB** a solo **1.19 MB**.
+
 ## [3.2.0] - 2026-05-08
 ### Añadido
 - **Sistema Admin completo**:

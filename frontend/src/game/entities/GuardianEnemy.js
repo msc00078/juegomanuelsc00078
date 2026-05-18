@@ -13,7 +13,7 @@ export class GuardianEnemy extends EnemyBase {
     ).setDepth(10);
   }
 
-  update(playerSprite, time) {
+  update(playerSprite) {
     if (this.isDead) return;
     if (!this.sprite?.active || !playerSprite?.active) return;
 

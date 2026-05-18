@@ -27,7 +27,7 @@ export default class UpgradeScene extends Phaser.Scene {
             fontSize: '14px', fill: '#ff00e1', fontStyle: 'italic'
         }).setOrigin(0.5);
 
-        let stats = JSON.parse(localStorage.getItem('metaStats')) || {
+        let stats = JSON.parse(localStorage.getItem('metaStats:v1') || localStorage.getItem('metaStats')) || {
             crystals: 0, hpLevel: 0, dmgLevel: 0, speedLevel: 0
         };
 
@@ -47,9 +47,9 @@ export default class UpgradeScene extends Phaser.Scene {
         // Guardar referencias para actualización sin restart
         this._rowRefs = [];
 
-        this._rowRefs.push(this.createUpgradeRow(stats, H * 0.44, "INTEGRIDAD BASE", "+10 HP", 'hpLevel', 25, cx, W));
-        this._rowRefs.push(this.createUpgradeRow(stats, H * 0.59, "PROTOCOLOS DE ATAQUE", "+2 DAÑO", 'dmgLevel', 35, cx, W));
-        this._rowRefs.push(this.createUpgradeRow(stats, H * 0.74, "OVERCLOCK MOTOR", "+5% VELOCIDAD", 'speedLevel', 50, cx, W));
+        this._rowRefs.push(this.createUpgradeRow(stats, H * 0.44, "INTEGRIDAD BASE", "+10 HP", 'hpLevel', 25, cx));
+        this._rowRefs.push(this.createUpgradeRow(stats, H * 0.59, "PROTOCOLOS DE ATAQUE", "+2 DAÑO", 'dmgLevel', 35, cx));
+        this._rowRefs.push(this.createUpgradeRow(stats, H * 0.74, "OVERCLOCK MOTOR", "+5% VELOCIDAD", 'speedLevel', 50, cx));
 
         const backBtnContainer = this.add.container(cx, H * 0.90);
         const backBg = this.add.rectangle(0, 0, 280, 50, 0x00f2ff, 0.1).setInteractive();
@@ -74,7 +74,7 @@ export default class UpgradeScene extends Phaser.Scene {
         getCrystals().then(supabaseCrystals => {
             if (supabaseCrystals !== null && supabaseCrystals > stats.crystals) {
                 stats.crystals = supabaseCrystals;
-                localStorage.setItem('metaStats', JSON.stringify(stats));
+                localStorage.setItem('metaStats:v1', JSON.stringify(stats));
                 this._refreshDisplay();
             }
         });
@@ -90,7 +90,7 @@ export default class UpgradeScene extends Phaser.Scene {
         });
     }
 
-    createUpgradeRow(stats, y, label, effect, key, costPerLevel, cx, W) {
+    createUpgradeRow(stats, y, label, effect, key, costPerLevel, cx) {
         let level = stats[key] || 0;
         let cost  = (level + 1) * costPerLevel;
 
@@ -130,7 +130,7 @@ export default class UpgradeScene extends Phaser.Scene {
             if (stats.crystals >= currentCost) {
                 stats.crystals -= currentCost;
                 stats[key]++;
-                localStorage.setItem('metaStats', JSON.stringify(stats));
+                localStorage.setItem('metaStats:v1', JSON.stringify(stats));
                 spendCrystals(currentCost).catch(() => {});
                 this._refreshDisplay();
             } else {

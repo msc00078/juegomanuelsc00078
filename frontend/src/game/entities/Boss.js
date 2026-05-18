@@ -143,11 +143,11 @@ export class Boss {
         if (action === 'dash') {
             this._doDash(aimX, aimY, speedMult, phaseMod);
         } else if (action === 'projectile') {
-            this._doProjectile(aimX, aimY, speedMult, playerSprite);
+            this._doProjectile(aimX, aimY, speedMult);
         } else if (action === 'area') {
             this._doArea(speedMult, phaseMod);
         } else if (action === 'bomb') {
-            this._doBombAttack(playerSprite);
+            this._doBombAttack();
         }
 
         // Fase 3: invocar kamikaze con probabilidad
@@ -193,7 +193,7 @@ export class Boss {
         });
     }
 
-    _doProjectile(aimX, aimY, speedMult, playerSprite) {
+    _doProjectile(aimX, aimY, speedMult) {
         if (!this.sprite?.active) return;
         this.sprite.body.setVelocity(0);
 
@@ -256,7 +256,7 @@ export class Boss {
         }
     }
 
-    _doBombAttack(playerSprite) {
+    _doBombAttack() {
         if (!this.sprite?.active) return;
         // El boss suelta 3 bombas alrededor suyo o hacia el jugador
         for (let i = 0; i < 3; i++) {

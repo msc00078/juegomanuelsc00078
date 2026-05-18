@@ -15,7 +15,7 @@ export default class PreloadScene extends Phaser.Scene {
         this.add.rectangle(cx, cy, W, H, 0x050505);
 
         // Texto de carga
-        const loadingText = this.add.text(cx, cy - 50, "INICIALIZANDO NÚCLEO...", {
+        this.add.text(cx, cy - 50, "INICIALIZANDO NÚCLEO…", {
             fontFamily: 'Orbitron, sans-serif',
             fontSize: '24px', fill: '#00f2ff', fontStyle: 'bold'
         }).setOrigin(0.5);

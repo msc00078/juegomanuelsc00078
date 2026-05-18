@@ -1,8 +1,5 @@
 import * as Phaser from 'phaser';
-import { Player, Boss, 
-         StandardEnemy, TankEnemy, RangedEnemy, KamikazeEnemy, SummonerEnemy,
-         TeleporterEnemy, HealerEnemy, GuardianEnemy, TrapperEnemy, LaserEliteEnemy,
-         applyEnemyScaling } from '../entities';
+import { Player, Boss } from '../entities';
 import { InputManager } from '../managers/InputManager';
 import { HUDManager } from '../managers/HUDManager';
 import { SpawnManager } from '../managers/SpawnManager';
@@ -645,13 +642,13 @@ export default class MainScene extends Phaser.Scene {
         return this.bossAIManager.requestBossAction(targetBoss);
     }
 
-    endGame(message) {
+    endGame() {
         this.gameOver = true;
         this.physics.pause(); 
         this.playSFX('sonido_gameover', 0.8);
 
         // Oscurecer fondo
-        const overlay = this.add.rectangle(this.scale.width / 2, this.scale.height / 2, this.scale.width, this.scale.height, 0x000000, 0.8).setDepth(1000);
+        this.add.rectangle(this.scale.width / 2, this.scale.height / 2, this.scale.width, this.scale.height, 0x000000, 0.8).setDepth(1000);
         
         // Contenedor Game Over
         const goContainer = this.add.container(this.scale.width / 2, this.scale.height / 2).setDepth(1001);
@@ -682,9 +679,9 @@ export default class MainScene extends Phaser.Scene {
         // Guardar resultado y cristales vía backend (Supabase)
         saveRunResult(this.score, this.currentLevel, crystalsEarned).catch(err => console.error(err));
         // Persistencia local como fallback
-        let meta = JSON.parse(localStorage.getItem('metaStats')) || { crystals: 0, hpLevel: 0, dmgLevel: 0, speedLevel: 0 };
+        let meta = JSON.parse(localStorage.getItem('metaStats:v1') || localStorage.getItem('metaStats')) || { crystals: 0, hpLevel: 0, dmgLevel: 0, speedLevel: 0 };
         meta.crystals = (meta.crystals || 0) + crystalsEarned;
-        localStorage.setItem('metaStats', JSON.stringify(meta));
+        localStorage.setItem('metaStats:v1', JSON.stringify(meta));
 
         // Detener música in-game y de menú
         this.sound.stopAll();

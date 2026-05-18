@@ -24,7 +24,7 @@ export class MobileControls {
     
     const atkY = this.scene.scale.height - 200;
     const attackBtn = this.scene.add.circle(this.scene.scale.width - 120, atkY, 75, 0xff0000, 0.5).setDepth(1000).setScrollFactor(0).setInteractive();
-    const attackTxt = this.scene.add.text(this.scene.scale.width - 120, atkY, "ATK", { fontSize: '28px', fill: '#fff', fontStyle: 'bold' }).setOrigin(0.5).setDepth(1001).setScrollFactor(0);
+    this.scene.add.text(this.scene.scale.width - 120, atkY, "ATK", { fontSize: '28px', fill: '#fff', fontStyle: 'bold' }).setOrigin(0.5).setDepth(1001).setScrollFactor(0);
     
     attackBtn.on('pointerdown', () => { 
         attackBtn.setAlpha(0.8);
@@ -35,7 +35,7 @@ export class MobileControls {
     
     const dashY = this.scene.scale.height - 90;
     const dashBtn = this.scene.add.circle(this.scene.scale.width - 250, dashY, 55, 0x00ff00, 0.5).setDepth(1000).setScrollFactor(0).setInteractive();
-    const dashTxt = this.scene.add.text(this.scene.scale.width - 250, dashY, "DASH", { fontSize: '22px', fill: '#fff', fontStyle: 'bold' }).setOrigin(0.5).setDepth(1001).setScrollFactor(0);
+    this.scene.add.text(this.scene.scale.width - 250, dashY, "DASH", { fontSize: '22px', fill: '#fff', fontStyle: 'bold' }).setOrigin(0.5).setDepth(1001).setScrollFactor(0);
     
     dashBtn.on('pointerdown', () => { 
         dashBtn.setAlpha(0.8);

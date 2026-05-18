@@ -1,5 +1,3 @@
-import * as Phaser from 'phaser';
-
 /**
  * Gestor del HUD y la interfaz de usuario durante el juego.
  */

@@ -96,7 +96,7 @@ export const spendCrystals = async (amount) => {
 export const getLeaderboard = async () => {
     const { data, error } = await supabase
         .from('profiles')
-        .select('username, high_score, max_sector')
+        .select('id, username, high_score, max_sector')
         .order('high_score', { ascending: false })
         .limit(10);
 

@@ -2,14 +2,18 @@ import { useEffect, useRef, useState } from 'react';
 import * as Phaser from 'phaser';
 import { config } from './game/GameConfig';
 import Auth from './components/Auth';
-import { isAdmin } from './game/admin';
 import './App.css';
+
+const isMobileDevice = () => {
+  if (typeof window === 'undefined') return false;
+  return /Mobi|Android/i.test(navigator.userAgent) || navigator.maxTouchPoints > 0;
+};
 
 function App() {
   const gameRef = useRef(null);
   const audioRef = useRef(null);
-  const [showMobileWarning, setShowMobileWarning] = useState(false);
-  const [gameStarted, setGameStarted] = useState(false);
+  const [showMobileWarning, setShowMobileWarning] = useState(isMobileDevice);
+  const gameStartedRef = useRef(false);
   const [user, setUser] = useState(null);
 
   // Función para iniciar la música (el navegador exige interacción previa)
@@ -58,17 +62,14 @@ function App() {
 
   // Detectar móvil al montar
   useEffect(() => {
-    const isMobile = /Mobi|Android/i.test(navigator.userAgent) || navigator.maxTouchPoints > 0;
-    if (isMobile) {
-      setShowMobileWarning(true);
-    } else {
-      setGameStarted(true);
+    if (!isMobileDevice()) {
+      gameStartedRef.current = true;
     }
   }, []);
 
   // Arrancar Phaser SOLO cuando gameStarted y user sean true
   useEffect(() => {
-    if (!gameStarted || !user) return;
+    if (!gameStartedRef.current || !user) return;
 
     window.__phaserUser = user;
 
@@ -85,7 +86,7 @@ function App() {
         gameRef.current = null;
       }
     };
-  }, [gameStarted, user]);
+  }, [user]);
 
   const handleStartMobile = async () => {
     playMusic(); // Iniciar música al tocar el aviso móvil
@@ -111,7 +112,7 @@ function App() {
     }
 
     setShowMobileWarning(false);
-    setGameStarted(true);
+    gameStartedRef.current = true;
   };
 
   return (
@@ -122,7 +123,17 @@ function App() {
 
       {/* ---- Pantalla de aviso móvil ---- */}
       {showMobileWarning && (
-        <div className="mobile-warning" onClick={handleStartMobile}>
+        <div 
+          className="mobile-warning" 
+          onClick={handleStartMobile}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              handleStartMobile();
+            }
+          }}
+          role="button"
+          tabIndex={0}
+        >
           <div className="rotate-icon">📱</div>
           <h2>GIRA TU MÓVIL</h2>
           <p>Para la mejor experiencia, pon el móvil en <strong>horizontal</strong> y toca la pantalla.</p>
@@ -132,7 +143,16 @@ function App() {
       
       {/* ---- Pantalla de Login (Supabase) ---- */}
       {!user && !showMobileWarning && (
-        <div onClick={playMusic}>
+        <div 
+          onClick={playMusic}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              playMusic();
+            }
+          }}
+          role="button"
+          tabIndex={0}
+        >
           <Auth onLogin={(user) => setUser(user)} />
         </div>
       )}

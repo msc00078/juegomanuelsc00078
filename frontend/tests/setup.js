@@ -19,7 +19,7 @@ vi.mock('phaser', () => {
       }
     },
     Math: {
-      Between: vi.fn((min, max) => min),
+      Between: vi.fn((min) => min),
       Distance: { Between: vi.fn(() => 100) },
       Angle: { Between: vi.fn(() => 0) }
     }

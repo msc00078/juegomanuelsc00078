@@ -1,27 +1,62 @@
-import { useState, useEffect } from 'react';
+import { useReducer, useEffect } from 'react';
 import { signUp, signIn, getLeaderboard } from '../game/supabase';
-import { useMediaQuery } from 'react-responsive';
+
+const initialState = {
+  email: '',
+  password: '',
+  username: '',
+  isSignUp: false,
+  loading: false,
+  leaderboard: [],
+  leaderboardLoading: true,
+  showLeaderboardMobile: false,
+};
+
+function authReducer(state, action) {
+  switch (action.type) {
+    case 'SET_FIELD':
+      return { ...state, [action.field]: action.value };
+    case 'TOGGLE_SIGN_UP':
+      return { ...state, isSignUp: !state.isSignUp };
+    case 'SET_LOADING':
+      return { ...state, loading: action.value };
+    case 'SET_LEADERBOARD_SUCCESS':
+      return { ...state, leaderboard: action.payload, leaderboardLoading: false };
+    case 'SET_LEADERBOARD_LOADING':
+      return { ...state, leaderboardLoading: action.value };
+    case 'SET_SHOW_LEADERBOARD_MOBILE':
+      return { ...state, showLeaderboardMobile: action.value };
+    case 'RESET_FORM':
+      return { ...state, email: '', password: '', username: '' };
+    default:
+      return state;
+  }
+}
 
 export default function Auth({ onLogin }) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [username, setUsername] = useState('');
-  const [isSignUp, setIsSignUp] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [leaderboard, setLeaderboard] = useState([]);
-  const [leaderboardLoading, setLeaderboardLoading] = useState(true);
-  const [showLeaderboardMobile, setShowLeaderboardMobile] = useState(false);
-  const isMobile = useMediaQuery({ query: '(max-width: 600px)' });
+  const [state, dispatch] = useReducer(authReducer, initialState);
+  const {
+    email,
+    password,
+    username,
+    isSignUp,
+    loading,
+    leaderboard,
+    leaderboardLoading,
+  } = state;
 
   useEffect(() => {
     const fetchLeaderboard = async () => {
       try {
         const { data, error } = await getLeaderboard();
-        if (!error && data) setLeaderboard(data);
+        if (!error && data) {
+          dispatch({ type: 'SET_LEADERBOARD_SUCCESS', payload: data });
+        } else {
+          dispatch({ type: 'SET_LEADERBOARD_LOADING', value: false });
+        }
       } catch (err) {
         console.error('No se pudo cargar el ranking', err);
-      } finally {
-        setLeaderboardLoading(false);
+        dispatch({ type: 'SET_LEADERBOARD_LOADING', value: false });
       }
     };
     fetchLeaderboard();
@@ -29,7 +64,7 @@ export default function Auth({ onLogin }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    dispatch({ type: 'SET_LOADING', value: true });
     try {
       if (isSignUp) {
         const { data, error } = await signUp(email, password, username);
@@ -44,7 +79,7 @@ export default function Auth({ onLogin }) {
       console.error(err);
       alert('Error crítico de conexión: ' + (err.message || err) + '\n\n1. ¿Reiniciaste el servidor (npm run dev)?\n2. ¿Pusiste bien tu ANON_KEY en el archivo .env?');
     } finally {
-      setLoading(false);
+      dispatch({ type: 'SET_LOADING', value: false });
     }
   };
 
@@ -63,7 +98,7 @@ export default function Auth({ onLogin }) {
                   type="text" 
                   placeholder="USERNAME" 
                   value={username} 
-                  onChange={e => setUsername(e.target.value)} 
+                  onChange={e => dispatch({ type: 'SET_FIELD', field: 'username', value: e.target.value })} 
                   required 
                 />
               </div>
@@ -73,7 +108,7 @@ export default function Auth({ onLogin }) {
                 type="email" 
                 placeholder="EMAIL" 
                 value={email} 
-                onChange={e => setEmail(e.target.value)} 
+                onChange={e => dispatch({ type: 'SET_FIELD', field: 'email', value: e.target.value })} 
                 required 
               />
             </div>
@@ -82,17 +117,26 @@ export default function Auth({ onLogin }) {
                 type="password" 
                 placeholder="PASSWORD" 
                 value={password} 
-                onChange={e => setPassword(e.target.value)} 
+                onChange={e => dispatch({ type: 'SET_FIELD', field: 'password', value: e.target.value })} 
                 required 
               />
             </div>
             <button type="submit" className="auth-submit-btn" disabled={loading}>
-              {loading ? 'SINCRONIZANDO...' : isSignUp ? 'CREAR PERFIL' : 'INICIAR SESIÓN'}
+              {loading ? 'SINCRONIZANDO…' : isSignUp ? 'CREAR PERFIL' : 'INICIAR SESIÓN'}
             </button>
           </form>
 
           <div className="auth-toggle">
-            <p onClick={() => setIsSignUp(!isSignUp)}>
+            <p 
+              onClick={() => dispatch({ type: 'TOGGLE_SIGN_UP' })}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  dispatch({ type: 'TOGGLE_SIGN_UP' });
+                }
+              }}
+              role="button"
+              tabIndex={0}
+            >
               {isSignUp ? '¿Ya tienes acceso? Entra aquí' : '¿Nuevo sujeto? Regístrate aquí'}
             </p>
           </div>
@@ -107,12 +151,12 @@ export default function Auth({ onLogin }) {
 
           <div className="leaderboard-list">
             {leaderboardLoading ? (
-              <div className="status-msg">Cargando datos del Núcleo...</div>
+              <div className="status-msg">Cargando datos del Núcleo…</div>
             ) : leaderboard.length === 0 ? (
               <div className="status-msg">Aún no hay registros en la simulación.</div>
             ) : (
               leaderboard.map((player, index) => (
-                <div key={index} className={`leaderboard-item ${index === 0 ? 'top-1' : ''}`}>
+                <div key={player.id || player.username || index} className={`leaderboard-item ${index === 0 ? 'top-1' : ''}`}>
                   <span className="rank">{index === 0 ? '👑' : `#${index + 1}`}</span>
                   <span className="name">{player.username || 'Sujeto Anónimo'}</span>
                   <span className="score">{player.high_score.toLocaleString()} PTS</span>

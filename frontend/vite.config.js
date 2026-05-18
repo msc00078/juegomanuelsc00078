@@ -4,6 +4,23 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('phaser')) {
+              return 'phaser';
+            }
+            if (id.includes('@supabase') || id.includes('supabase')) {
+              return 'supabase';
+            }
+            return 'vendor';
+          }
+        }
+      }
+    }
+  },
   test: {
     environment: 'jsdom',
     globals: true,

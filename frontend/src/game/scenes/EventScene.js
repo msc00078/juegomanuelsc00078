@@ -278,9 +278,9 @@ export default class EventScene extends Phaser.Scene {
     this.totalRewards = this.totalRewards || {};
 
     if (rewards.crystals) {
-      const meta = JSON.parse(localStorage.getItem('metaStats')) || { crystals: 0, hpLevel: 0, dmgLevel: 0, speedLevel: 0 };
+      const meta = JSON.parse(localStorage.getItem('metaStats:v1') || localStorage.getItem('metaStats')) || { crystals: 0, hpLevel: 0, dmgLevel: 0, speedLevel: 0 };
       meta.crystals = (meta.crystals || 0) + rewards.crystals;
-      localStorage.setItem('metaStats', JSON.stringify(meta));
+      localStorage.setItem('metaStats:v1', JSON.stringify(meta));
       this.totalRewards.crystals = (this.totalRewards.crystals || 0) + rewards.crystals;
     }
 

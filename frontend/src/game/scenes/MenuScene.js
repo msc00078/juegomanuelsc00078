@@ -38,7 +38,7 @@ export default class MenuScene extends Phaser.Scene {
         });
 
         // TÍTULO CON GLITCH
-        const title = this.add.text(this.scale.width / 2, this.scale.height * 0.22, "NEÓN SAGRADO", { 
+        this.add.text(this.scale.width / 2, this.scale.height * 0.22, "NEÓN SAGRADO", { 
             fontFamily: 'Orbitron, sans-serif',
             fontSize: '84px', 
             fill: '#fff', 
@@ -147,7 +147,7 @@ export default class MenuScene extends Phaser.Scene {
         playBg.on('pointerdown', () => {
             if (this._startingGame) return;
             this._startingGame = true;
-            let savedMeta = JSON.parse(localStorage.getItem('metaStats')) || {};
+            let savedMeta = JSON.parse(localStorage.getItem('metaStats:v1') || localStorage.getItem('metaStats')) || {};
             let meta = {
                 hpLevel: savedMeta.hpLevel || 0,
                 dmgLevel: savedMeta.dmgLevel || 0,
@@ -220,7 +220,6 @@ export default class MenuScene extends Phaser.Scene {
                 const isFirst = index === 0;
 
                 const rowGfx = this.add.graphics();
-                const rowColor = isFirst ? 0xffd700 : 0xffffff;
                 rowGfx.fillStyle(0xffffff, isFirst ? 0.05 : 0.02);
                 rowGfx.fillRoundedRect(panelX + 4, rowY, panelW - 8, rowH2 - 4, 6);
                 if (isFirst) {
@@ -233,7 +232,7 @@ export default class MenuScene extends Phaser.Scene {
                 const scoreX = panelX + panelW - panelPad - 80;
                 const sectorX = panelX + panelW - panelPad - 5;
 
-                const rankTxt = this.add.text(rankX, rowY + 5, isFirst ? '👑' : `#${index + 1}`, {
+                this.add.text(rankX, rowY + 5, isFirst ? '👑' : `#${index + 1}`, {
                     fontFamily: 'Orbitron, sans-serif', fontSize: isFirst ? '18px' : '14px', fill: isFirst ? '#ffcc00' : '#555', fontStyle: 'bold'
                 });
 

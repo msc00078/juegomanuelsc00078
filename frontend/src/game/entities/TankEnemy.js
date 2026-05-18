@@ -1,3 +1,4 @@
+import * as Phaser from 'phaser';
 import EnemyBase from './base/EnemyBase';
 
 export class TankEnemy extends EnemyBase {

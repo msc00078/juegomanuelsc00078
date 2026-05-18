@@ -61,7 +61,10 @@ export class CombatManager {
         this.scene.tweens.add({ targets: bomb, scale: 1.2, duration: 200, yoyo: true, repeat: 9 });
 
         if (isSticky) {
-            let targets = this.scene.enemies.filter(e => e.hp > 0).map(e => e.sprite);
+            let targets = this.scene.enemies.reduce((acc, e) => {
+                if (e.hp > 0 && e.sprite) acc.push(e.sprite);
+                return acc;
+            }, []);
             if (this.scene.bosses) {
                 this.scene.bosses.forEach(b => {
                     if (b.hp > 0) targets.push(b.sprite);
